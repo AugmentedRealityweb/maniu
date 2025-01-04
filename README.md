@@ -53,64 +53,59 @@
                     <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Brunch">
                     <div class="card-body text-center">
                         <h5 class="card-title fw-bold">Brunch</h5>
-                        <ul class="list-unstyled">
-                            <li><strong>Avocado Toast:</strong> Toast, avocado, cherry tomatoes, olive oil.</li>
-                            <li><strong>Pancakes:</strong> Fluffy pancakes, maple syrup, fresh fruits.</li>
-                            <li><strong>Egg Benedict:</strong> Poached eggs, hollandaise sauce, ham.</li>
-                            <li><strong>Bagel & Cream Cheese:</strong> Fresh bagel, cream cheese, smoked salmon.</li>
-                            <li><strong>Breakfast Bowl:</strong> Yogurt, granola, berries, honey.</li>
-                        </ul>
+                        <button class="btn btn-danger mt-3" data-bs-toggle="collapse" data-bs-target="#brunchMenu">View</button>
                     </div>
                 </div>
             </div>
-            <!-- Gustari si Salate -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card menu-card">
-                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Gustari si Salate">
-                    <div class="card-body text-center">
-                        <h5 class="card-title fw-bold">Gustari Si Salate</h5>
-                        <ul class="list-unstyled">
-                            <li><strong>Caesar Salad:</strong> Romaine lettuce, croutons, parmesan, caesar dressing.</li>
-                            <li><strong>Greek Salad:</strong> Tomatoes, cucumbers, olives, feta cheese.</li>
-                            <li><strong>Bruschetta:</strong> Grilled bread, tomatoes, garlic, basil.</li>
-                            <li><strong>Caprese Salad:</strong> Mozzarella, tomatoes, basil, balsamic glaze.</li>
-                            <li><strong>Stuffed Mushrooms:</strong> Mushrooms, cheese, breadcrumbs, herbs.</li>
-                        </ul>
+            <!-- Brunch Items -->
+            <div class="collapse mt-4" id="brunchMenu">
+                <div class="list-group">
+                    <a href="#brunchItem1" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#brunchModal1">Avocado Toast</a>
+                    <a href="#brunchItem2" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#brunchModal2">Pancakes</a>
+                    <a href="#brunchItem3" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#brunchModal3">Egg Benedict</a>
+                    <a href="#brunchItem4" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#brunchModal4">Bagel & Cream Cheese</a>
+                    <a href="#brunchItem5" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#brunchModal5">Breakfast Bowl</a>
+                </div>
+            </div>
+
+            <!-- Brunch Modals -->
+            <div class="modal fade" id="brunchModal1" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Avocado Toast</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="https://via.placeholder.com/300x200" class="img-fluid mb-3" alt="Avocado Toast">
+                            <p>Toast, avocado, cherry tomatoes, olive oil.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- Supe si Ciorbe -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card menu-card">
-                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Supe si Ciorbe">
-                    <div class="card-body text-center">
-                        <h5 class="card-title fw-bold">Supe Si Ciorbe</h5>
-                        <ul class="list-unstyled">
-                            <li><strong>Chicken Soup:</strong> Chicken, vegetables, noodles.</li>
-                            <li><strong>Minestrone:</strong> Mixed vegetables, pasta, tomato broth.</li>
-                            <li><strong>Tomato Soup:</strong> Fresh tomatoes, cream, basil.</li>
-                            <li><strong>Beef Broth:</strong> Beef, carrots, celery, parsley.</li>
-                            <li><strong>Vegetable Cream Soup:</strong> Assorted vegetables, cream, croutons.</li>
-                        </ul>
+
+            <div class="modal fade" id="brunchModal2" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Pancakes</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="https://via.placeholder.com/300x200" class="img-fluid mb-3" alt="Pancakes">
+                            <p>Fluffy pancakes, maple syrup, fresh fruits.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- Paste -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card menu-card">
-                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Paste">
-                    <div class="card-body text-center">
-                        <h5 class="card-title fw-bold">Paste</h5>
-                        <ul class="list-unstyled">
-                            <li><strong>Spaghetti Carbonara:</strong> Pasta, eggs, pancetta, parmesan.</li>
-                            <li><strong>Fettuccine Alfredo:</strong> Pasta, cream, butter, parmesan.</li>
-                            <li><strong>Lasagna:</strong> Layers of pasta, meat, ricotta, marinara sauce.</li>
-                            <li><strong>Penne Arrabiata:</strong> Pasta, spicy tomato sauce, garlic.</li>
-                            <li><strong>Pesto Pasta:</strong> Pasta, basil pesto, parmesan.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+
+            <!-- Repeat similar structure for other Brunch items and categories -->
         </div>
     </section>
 
