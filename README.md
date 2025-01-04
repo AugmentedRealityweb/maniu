@@ -4,92 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Menu</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         body {
             scroll-behavior: smooth;
+            background-color: #f8f9fa;
         }
-        .menu-item {
-            border: 1px solid #e63946;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .menu-header {
+            background: linear-gradient(90deg, rgba(255,94,87,1) 0%, rgba(255,195,113,1) 100%);
+            color: white;
         }
-        .menu-item h4 {
-            color: #e63946;
+        .menu-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .menu-card:hover {
+            transform: scale(1.05);
+        }
+        .menu-footer {
+            background: #343a40;
+            color: white;
         }
     </style>
 </head>
-<body class="bg-gray-50 font-sans">
-    <!-- Header with Language Switch -->
-    <header class="bg-gradient-to-r from-red-400 to-yellow-500 text-white py-4 shadow-md">
-        <div class="container mx-auto px-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Smart Menu</h1>
-            <div class="flex space-x-4">
-                <button class="bg-white text-red-500 font-bold py-1 px-3 rounded">RO</button>
-                <button class="bg-white text-red-500 font-bold py-1 px-3 rounded">EN</button>
+<body>
+    <!-- Header -->
+    <header class="menu-header py-4">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1 class="fw-bold">Smart Menu</h1>
+            <div>
+                <button class="btn btn-light fw-bold me-2">RO</button>
+                <button class="btn btn-light fw-bold">EN</button>
             </div>
         </div>
     </header>
 
-    <!-- Main Menu Section -->
-    <section class="container mx-auto px-4 py-8">
-        <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Our Menu</h2>
-        <div class="grid md:grid-cols-2 gap-6">
+    <!-- Menu Section -->
+    <section class="container my-5">
+        <h2 class="text-center fw-bold mb-4">Our Menu</h2>
+        <div class="row g-4">
             <!-- Brunch -->
-            <div class="menu-item">
-                <h4 class="font-bold text-lg">Brunch</h4>
-                <button class="bg-red-500 text-white py-1 px-3 rounded">View</button>
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title fw-bold">Brunch</h5>
+                        <button class="btn btn-danger mt-3">View</button>
+                    </div>
+                </div>
             </div>
             <!-- Gustari si Salate -->
-            <div class="menu-item">
-                <h4 class="font-bold text-lg">Gustari Si Salate</h4>
-                <button class="bg-red-500 text-white py-1 px-3 rounded">View</button>
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title fw-bold">Gustari Si Salate</h5>
+                        <button class="btn btn-danger mt-3">View</button>
+                    </div>
+                </div>
             </div>
             <!-- Supe si Ciorbe -->
-            <div class="menu-item">
-                <h4 class="font-bold text-lg">Supe Si Ciorbe</h4>
-                <button class="bg-red-500 text-white py-1 px-3 rounded">View</button>
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title fw-bold">Supe Si Ciorbe</h5>
+                        <button class="btn btn-danger mt-3">View</button>
+                    </div>
+                </div>
             </div>
             <!-- Paste -->
-            <div class="menu-item">
-                <h4 class="font-bold text-lg">Paste</h4>
-                <button class="bg-red-500 text-white py-1 px-3 rounded">View</button>
+            <div class="col-md-6 col-lg-4">
+                <div class="card menu-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title fw-bold">Paste</h5>
+                        <button class="btn btn-danger mt-3">View</button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Food Detail Section -->
-    <section class="container mx-auto px-4 py-8 bg-white shadow-lg rounded-lg">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Burger de vita</h2>
-        <div class="flex space-x-4">
-            <img src="https://via.placeholder.com/150" alt="Burger de vita" class="rounded-lg">
-            <div>
-                <p class="text-gray-700">1 pastila carne vita (170 g), 1 chifla cu susan (86 g), 30 g ketchup, 50 g rosii...</p>
-                <p class="text-lg font-bold text-red-500 mt-2">37,00 Lei</p>
+    <section class="container my-5">
+        <div class="card menu-card">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="https://via.placeholder.com/300" class="img-fluid rounded-start" alt="Burger de vita">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">Burger de vita</h5>
+                        <p class="card-text">1 pastila carne vita (170 g), 1 chifla cu susan (86 g), 30 g ketchup...</p>
+                        <p class="card-text text-danger fw-bold">37,00 Lei</p>
+                        <h6 class="fw-bold">Informatii nutritionale:</h6>
+                        <ul>
+                            <li>Valoare energetica: 1234 kcal</li>
+                            <li>Grasimi: 58 g</li>
+                            <li>Proteine: 58 g</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="mt-6">
-            <h3 class="font-bold text-lg">Informatii nutritionale</h3>
-            <ul class="list-disc list-inside text-gray-600">
-                <li>Valoare energetica: 1234 kcal</li>
-                <li>Grasimi: 58 g</li>
-                <li>Proteine: 58 g</li>
-            </ul>
         </div>
     </section>
 
-    <!-- Footer with Actions -->
-    <footer class="bg-gradient-to-r from-gray-800 via-gray-900 to-black text-white py-6">
-        <div class="container mx-auto text-center">
-            <div class="flex justify-center space-x-6 mb-4">
-                <button class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Cere nota</button>
-                <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded">Cheama ospatarul</button>
+    <!-- Footer -->
+    <footer class="menu-footer py-4">
+        <div class="container text-center">
+            <div class="mb-3">
+                <button class="btn btn-danger me-2">Cere nota</button>
+                <button class="btn btn-warning">Cheama ospatarul</button>
             </div>
-            <p>&copy; 2025 Smart Menu. All rights reserved.</p>
+            <p class="mb-0">&copy; 2025 Smart Menu. All rights reserved.</p>
         </div>
     </footer>
 </body>
