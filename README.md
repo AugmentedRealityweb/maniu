@@ -9,77 +9,87 @@
         body {
             scroll-behavior: smooth;
         }
-        .menu-section {
-            border: 2px solid #e63946;
-            border-radius: 12px;
+        .menu-item {
+            border: 1px solid #e63946;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        .menu-section h3 {
+        .menu-item h4 {
             color: #e63946;
-            font-weight: bold;
         }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
-    <!-- Navigation Bar -->
-    <header class="bg-gradient-to-r from-red-400 to-yellow-500 shadow-md">
-        <nav class="container mx-auto px-4 py-4 flex justify-between items-center text-white">
-            <a href="#" class="text-2xl font-extrabold tracking-wider">Restaurant</a>
-            <div class="hidden md:flex space-x-6">
-                <a href="#menu" class="hover:underline">Menu</a>
-                <a href="#about" class="hover:underline">About</a>
-                <a href="#contact" class="hover:underline">Contact</a>
+    <!-- Header with Language Switch -->
+    <header class="bg-gradient-to-r from-red-400 to-yellow-500 text-white py-4 shadow-md">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Smart Menu</h1>
+            <div class="flex space-x-4">
+                <button class="bg-white text-red-500 font-bold py-1 px-3 rounded">RO</button>
+                <button class="bg-white text-red-500 font-bold py-1 px-3 rounded">EN</button>
             </div>
-        </nav>
+        </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="bg-cover bg-center h-80 flex items-center justify-center text-white" style="background-image: url('https://tse4.mm.bing.net/th?id=OIP.qTEHRnCMgOKY87hkM95NygHaE6&pid=Api');">
-        <div class="bg-black bg-opacity-60 p-6 rounded-lg text-center">
-            <h1 class="text-4xl md:text-5xl font-extrabold">Discover Our Menu</h1>
-            <p class="mt-2 text-lg md:text-xl">Explore a world of flavors and delicious experiences</p>
-        </div>
-    </section>
-
-    <!-- Menu Section -->
-    <section id="menu" class="container mx-auto px-4 py-10">
-        <h2 class="text-3xl font-extrabold text-center text-gray-800 mb-8">Our Menu</h2>
-        <div class="space-y-10">
-            <!-- Main Course -->
-            <div class="menu-section bg-white shadow-md p-4">
-                <h3 class="text-xl mb-2">Fel Principal</h3>
-                <div class="flex space-x-4">
-                    <img src="https://tse4.mm.bing.net/th?id=OIP.mV26GuNqF_Rte3ynISEjsAHaE2&pid=Api" alt="Main Course" class="w-32 h-32 rounded-lg object-cover">
-                    <div>
-                        <h4 class="font-bold text-lg">Somon mediteranean cu orez</h4>
-                        <p class="text-sm text-gray-600">Somon, capere, roșii cherry, lămâie, ulei de măsline...</p>
-                        <p class="text-lg font-semibold text-red-500">75,00 Lei</p>
-                    </div>
-                </div>
+    <!-- Main Menu Section -->
+    <section class="container mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Our Menu</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Brunch -->
+            <div class="menu-item">
+                <h4 class="font-bold text-lg">Brunch</h4>
+                <button class="bg-red-500 text-white py-1 px-3 rounded">View</button>
             </div>
-
-            <!-- Burgers -->
-            <div class="menu-section bg-white shadow-md p-4">
-                <h3 class="text-xl mb-2">Burgers</h3>
-                <div class="flex space-x-4">
-                    <img src="https://tse4.mm.bing.net/th?id=OIP.o77Uq83-UtGePE2GltXipwHaE7&pid=Api" alt="House Burger" class="w-32 h-32 rounded-lg object-cover">
-                    <div>
-                        <h4 class="font-bold text-lg">House Burger</h4>
-                        <p class="text-sm text-gray-600">Chiflă de casă, carne de vită, ceapă la grătar...</p>
-                        <p class="text-lg font-semibold text-red-500">59,00 Lei</p>
-                    </div>
-                </div>
+            <!-- Gustari si Salate -->
+            <div class="menu-item">
+                <h4 class="font-bold text-lg">Gustari Si Salate</h4>
+                <button class="bg-red-500 text-white py-1 px-3 rounded">View</button>
+            </div>
+            <!-- Supe si Ciorbe -->
+            <div class="menu-item">
+                <h4 class="font-bold text-lg">Supe Si Ciorbe</h4>
+                <button class="bg-red-500 text-white py-1 px-3 rounded">View</button>
+            </div>
+            <!-- Paste -->
+            <div class="menu-item">
+                <h4 class="font-bold text-lg">Paste</h4>
+                <button class="bg-red-500 text-white py-1 px-3 rounded">View</button>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gradient-to-r from-gray-800 via-gray-900 to-black text-white py-8">
-        <div class="container mx-auto px-4 text-center">
-            <p class="text-lg">&copy; 2025 Restaurant. All rights reserved.</p>
-            <div class="mt-4 flex justify-center space-x-4">
+    <!-- Food Detail Section -->
+    <section class="container mx-auto px-4 py-8 bg-white shadow-lg rounded-lg">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Burger de vita</h2>
+        <div class="flex space-x-4">
+            <img src="https://via.placeholder.com/150" alt="Burger de vita" class="rounded-lg">
+            <div>
+                <p class="text-gray-700">1 pastila carne vita (170 g), 1 chifla cu susan (86 g), 30 g ketchup, 50 g rosii...</p>
+                <p class="text-lg font-bold text-red-500 mt-2">37,00 Lei</p>
+            </div>
+        </div>
+        <div class="mt-6">
+            <h3 class="font-bold text-lg">Informatii nutritionale</h3>
+            <ul class="list-disc list-inside text-gray-600">
+                <li>Valoare energetica: 1234 kcal</li>
+                <li>Grasimi: 58 g</li>
+                <li>Proteine: 58 g</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Footer with Actions -->
+    <footer class="bg-gradient-to-r from-gray-800 via-gray-900 to-black text-white py-6">
+        <div class="container mx-auto text-center">
+            <div class="flex justify-center space-x-6 mb-4">
                 <button class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Cere nota</button>
-                <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded">Cheamă ospătarul</button>
+                <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded">Cheama ospatarul</button>
             </div>
+            <p>&copy; 2025 Smart Menu. All rights reserved.</p>
         </div>
     </footer>
 </body>
