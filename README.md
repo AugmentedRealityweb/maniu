@@ -50,59 +50,63 @@
             <!-- Brunch -->
             <div class="col-md-6 col-lg-4">
                 <div class="card menu-card">
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Brunch">
                     <div class="card-body text-center">
                         <h5 class="card-title fw-bold">Brunch</h5>
-                        <button class="btn btn-danger mt-3">View</button>
+                        <ul class="list-unstyled">
+                            <li><strong>Avocado Toast:</strong> Toast, avocado, cherry tomatoes, olive oil.</li>
+                            <li><strong>Pancakes:</strong> Fluffy pancakes, maple syrup, fresh fruits.</li>
+                            <li><strong>Egg Benedict:</strong> Poached eggs, hollandaise sauce, ham.</li>
+                            <li><strong>Bagel & Cream Cheese:</strong> Fresh bagel, cream cheese, smoked salmon.</li>
+                            <li><strong>Breakfast Bowl:</strong> Yogurt, granola, berries, honey.</li>
+                        </ul>
                     </div>
                 </div>
             </div>
             <!-- Gustari si Salate -->
             <div class="col-md-6 col-lg-4">
                 <div class="card menu-card">
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Gustari si Salate">
                     <div class="card-body text-center">
                         <h5 class="card-title fw-bold">Gustari Si Salate</h5>
-                        <button class="btn btn-danger mt-3">View</button>
+                        <ul class="list-unstyled">
+                            <li><strong>Caesar Salad:</strong> Romaine lettuce, croutons, parmesan, caesar dressing.</li>
+                            <li><strong>Greek Salad:</strong> Tomatoes, cucumbers, olives, feta cheese.</li>
+                            <li><strong>Bruschetta:</strong> Grilled bread, tomatoes, garlic, basil.</li>
+                            <li><strong>Caprese Salad:</strong> Mozzarella, tomatoes, basil, balsamic glaze.</li>
+                            <li><strong>Stuffed Mushrooms:</strong> Mushrooms, cheese, breadcrumbs, herbs.</li>
+                        </ul>
                     </div>
                 </div>
             </div>
             <!-- Supe si Ciorbe -->
             <div class="col-md-6 col-lg-4">
                 <div class="card menu-card">
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Supe si Ciorbe">
                     <div class="card-body text-center">
                         <h5 class="card-title fw-bold">Supe Si Ciorbe</h5>
-                        <button class="btn btn-danger mt-3">View</button>
+                        <ul class="list-unstyled">
+                            <li><strong>Chicken Soup:</strong> Chicken, vegetables, noodles.</li>
+                            <li><strong>Minestrone:</strong> Mixed vegetables, pasta, tomato broth.</li>
+                            <li><strong>Tomato Soup:</strong> Fresh tomatoes, cream, basil.</li>
+                            <li><strong>Beef Broth:</strong> Beef, carrots, celery, parsley.</li>
+                            <li><strong>Vegetable Cream Soup:</strong> Assorted vegetables, cream, croutons.</li>
+                        </ul>
                     </div>
                 </div>
             </div>
             <!-- Paste -->
             <div class="col-md-6 col-lg-4">
                 <div class="card menu-card">
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Paste">
                     <div class="card-body text-center">
                         <h5 class="card-title fw-bold">Paste</h5>
-                        <button class="btn btn-danger mt-3">View</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Food Detail Section -->
-    <section class="container my-5">
-        <div class="card menu-card">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="https://via.placeholder.com/300" class="img-fluid rounded-start" alt="Burger de vita">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold">Burger de vita</h5>
-                        <p class="card-text">1 pastila carne vita (170 g), 1 chifla cu susan (86 g), 30 g ketchup...</p>
-                        <p class="card-text text-danger fw-bold">37,00 Lei</p>
-                        <h6 class="fw-bold">Informatii nutritionale:</h6>
-                        <ul>
-                            <li>Valoare energetica: 1234 kcal</li>
-                            <li>Grasimi: 58 g</li>
-                            <li>Proteine: 58 g</li>
+                        <ul class="list-unstyled">
+                            <li><strong>Spaghetti Carbonara:</strong> Pasta, eggs, pancetta, parmesan.</li>
+                            <li><strong>Fettuccine Alfredo:</strong> Pasta, cream, butter, parmesan.</li>
+                            <li><strong>Lasagna:</strong> Layers of pasta, meat, ricotta, marinara sauce.</li>
+                            <li><strong>Penne Arrabiata:</strong> Pasta, spicy tomato sauce, garlic.</li>
+                            <li><strong>Pesto Pasta:</strong> Pasta, basil pesto, parmesan.</li>
                         </ul>
                     </div>
                 </div>
