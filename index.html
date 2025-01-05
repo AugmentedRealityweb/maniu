@@ -398,6 +398,7 @@
     </div>
   </div>
 
+  <!-- Script-ul cu aplicația Vue -->
   <script>
     // Eliminăm diacriticele pentru căutare
     function removeDiacritics(str) {
@@ -750,56 +751,55 @@
 
     app.mount('#app');
   </script>
+
+  <!-- Script-ul unificat pentru Firebase (inițializare + Firestore) -->
   <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    // 1. Importăm funcțiile necesare
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-    authDomain: "restaurantapp-d0256.firebaseapp.com",
-    projectId: "restaurantapp-d0256",
-    storageBucket: "restaurantapp-d0256.firebasestorage.app",
-    messagingSenderId: "275208346650",
-    appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-    measurementId: "G-F44TB27G17"
-  };
+    // 2. Configurația proiectului Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBahkhy2GgUW2...",
+      authDomain: "restaurantapp-d0256.firebaseapp.com",
+      projectId: "restaurantapp-d0256",
+      storageBucket: "restaurantapp-d0256.firebasestorage.app",
+      messagingSenderId: "275208346650",
+      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+      measurementId: "G-F44TB27G17"
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-  <script type="module">
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    // 3. Inițializăm Firebase
+    const firebaseApp = initializeApp(firebaseConfig);
 
-  const db = getFirestore(app);
+    // 4. (Opțional) Inițializăm Analytics
+    const analytics = getAnalytics(firebaseApp);
 
-  // Funcție pentru a adăuga o comandă
-  async function addOrder(order) {
-    try {
-      const docRef = await addDoc(collection(db, "orders"), order);
-      console.log("Comanda a fost adăugată cu ID:", docRef.id);
-    } catch (e) {
-      console.error("Eroare la adăugarea comenzii:", e);
+    // 5. Inițializăm Firestore
+    const db = getFirestore(firebaseApp);
+
+    // Funcție exemplu pentru a adăuga o comandă
+    async function addOrder(order) {
+      try {
+        const docRef = await addDoc(collection(db, "orders"), order);
+        console.log("Comanda a fost adăugată cu ID:", docRef.id);
+      } catch (e) {
+        console.error("Eroare la adăugarea comenzii:", e);
+      }
     }
-  }
 
-  // Exemplu de comandă
-  const testOrder = {
-    orderId: "CMD001",
-    items: [
-      { name: "Pizza", price: 30, quantity: 1 },
-      { name: "Tiramisu", price: 20, quantity: 2 }
-    ],
-    total: 70,
-  };
+    // EXEMPLU: adăugăm o comandă la refresh (comentat dacă nu dorim permanent)
+    const testOrder = {
+      orderId: "CMD001",
+      items: [
+        { name: "Pizza", price: 30, quantity: 1 },
+        { name: "Tiramisu", price: 20, quantity: 2 }
+      ],
+      total: 70,
+    };
 
-  // Testăm adăugarea comenzii
-  addOrder(testOrder);
-</script>
+    // addOrder(testOrder);
+  </script>
 </body>
 </html>
