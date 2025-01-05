@@ -36,21 +36,20 @@
       background-color: #1F2937;
     }
 
-    /* Efect de highlight (luminos) pentru butoanele portocalii */
+    /* Butoane portocalii */
     .btn-orange {
       @apply bg-orange-500 text-white py-2 px-4 rounded-lg transition-all 
-        transform shadow hover:shadow-xl hover:scale-105 
-        focus:outline-none focus:ring-2 focus:ring-orange-500;
+             transform shadow hover:shadow-xl hover:scale-105 
+             focus:outline-none focus:ring-2 focus:ring-orange-500;
     }
 
-    /* Mică animație la deschiderea/închiderea sidebarului pe mobil */
-    .slide-fade-enter-active,
-    .slide-fade-leave-active {
-      transition: all .3s ease;
+    /* Efect slide jos/sus pentru bara de comenzi */
+    .slide-down-enter-active, .slide-down-leave-active {
+      transition: max-height 0.4s ease, opacity 0.4s ease;
+      overflow: hidden;
     }
-    .slide-fade-enter,
-    .slide-fade-leave-to {
-      transform: translateX(-50px);
+    .slide-down-enter, .slide-down-leave-to {
+      max-height: 0;
       opacity: 0;
     }
   </style>
@@ -263,7 +262,7 @@
               </p>
             </div>
             <p class="text-gray-300">
-              Puncte acumulate: 
+              Puncte acumulate:
               <span class="font-bold text-orange-500">{{ clientPoints.toFixed(2) }}</span>
             </p>
           </div>
@@ -271,49 +270,61 @@
       </main>
 
       <!-- ORDERS: apare DOAR dacă avem comenzi în coș -->
-      <aside
-        v-if="orders.length > 0"
-        class="md:w-80 bg-gray-800 md:border-l border-gray-700 p-4 overflow-y-auto scrollbar 
-               md:max-h-[50vh]"
-      >
-        <h3 class="text-xl font-bold mb-4">Comanda Ta</h3>
-        <!-- Lista de produse din coș -->
-        <div
-          v-for="(order, index) in orders"
-          :key="index"
-          class="flex justify-between items-center bg-gray-700 p-4 rounded-lg mb-2"
-        >
-          <div>
-            <h4 class="font-bold">{{ order.name }}</h4>
-            <small class="text-gray-400">x{{ order.quantity }}</small>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="text-orange-500 font-bold">
-              {{ order.price }} Lei
-            </span>
-            <button
-              class="text-red-500 hover:text-red-300"
-              @click="removeFromOrder(index)"
-            >
-              Remove
-            </button>
-          </div>
-        </div>
-
-        <!-- Total și butonul de Payment -->
-        <div class="mt-4 flex justify-between items-center">
-          <span class="text-lg font-semibold">Total:</span>
-          <span class="text-orange-500 text-xl font-bold">
-            {{ total }}
-          </span>
-        </div>
+      <div v-if="orders.length > 0" class="md:w-80 relative md:border-l border-gray-700 bg-gray-800">
+        <!-- Buton toggler pentru bara de comenzi -->
         <button
-          class="btn-orange w-full mt-4"
-          @click="checkout"
+          class="btn-orange w-full"
+          @click="isOrderBarOpen = !isOrderBarOpen"
         >
-          Finalizează Comanda
+          Comanda Ta (Open/Close)
         </button>
-      </aside>
+
+        <!-- Bara de comenzi cu slide down/up -->
+        <transition name="slide-down">
+          <aside
+            v-show="isOrderBarOpen"
+            class="p-4 overflow-y-auto scrollbar md:max-h-[50vh]"
+          >
+            <h3 class="text-xl font-bold mb-4">Comanda Ta</h3>
+            <!-- Lista de produse din coș -->
+            <div
+              v-for="(order, index) in orders"
+              :key="index"
+              class="flex justify-between items-center bg-gray-700 p-4 rounded-lg mb-2"
+            >
+              <div>
+                <h4 class="font-bold">{{ order.name }}</h4>
+                <small class="text-gray-400">x{{ order.quantity }}</small>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-orange-500 font-bold">
+                  {{ order.price }} Lei
+                </span>
+                <button
+                  class="btn-orange"
+                  @click="removeFromOrder(index)"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+
+            <!-- Total și butonul de Payment -->
+            <div class="mt-4 flex justify-between items-center">
+              <span class="text-lg font-semibold">Total:</span>
+              <span class="text-orange-500 text-xl font-bold">
+                {{ total }}
+              </span>
+            </div>
+            <button
+              class="btn-orange w-full mt-4"
+              @click="checkout"
+            >
+              Finalizează Comanda
+            </button>
+          </aside>
+        </transition>
+      </div>
     </div>
   </div>
 
@@ -323,6 +334,7 @@
         return {
           // Control sidebar mobil
           isSidebarVisible: false,
+
           // Tab principal: 'meniu' / 'puncte'
           activeTab: 'meniu',
 
@@ -337,6 +349,9 @@
           clientPoints: 0,       // puncte acumulate
           isFirstOrder: true,    // true dacă userul încă nu a finalizat nicio comandă
 
+          // Toggle pentru bara de comenzi
+          isOrderBarOpen: true,
+
           // Categorii
           categories: [
             {
@@ -345,8 +360,7 @@
             },
             {
               name: 'soups',
-              image:
-                'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg',
+              image: 'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg',
             },
             {
               name: 'pasta',
@@ -392,24 +406,21 @@
                 title: 'Ciorbă de burtă',
                 description: 'Tradițională, smântână, ardei iute.',
                 price: 18,
-                image:
-                  'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg',
+                image: 'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg',
                 ingredients: ['Burtă', 'Smântână', 'Ardei iute'],
               },
               {
                 title: 'Supă cremă de roșii',
                 description: 'Roșii proaspete, crutoane, busuioc.',
                 price: 15,
-                image:
-                  'https://www.lalena.ro/images/uploaded/600x_Supa-crema-de-rosii-108.jpg',
+                image: 'https://www.lalena.ro/images/uploaded/600x_Supa-crema-de-rosii-108.jpg',
                 ingredients: ['Roșii', 'Crutoane', 'Busuioc'],
               },
               {
                 title: 'Ciorbă de legume',
                 description: 'Legume proaspete, zeamă de lămâie.',
                 price: 12,
-                image:
-                  'https://www.prestij.ro/uploads/produse/1440/94--ciorba-taraneasca-de-legume.jpg',
+                image: 'https://www.prestij.ro/uploads/produse/1440/94--ciorba-taraneasca-de-legume.jpg',
                 ingredients: ['Morcovi', 'Cartofi', 'Ceapă', 'Apio'],
               },
             ],
@@ -562,13 +573,61 @@
           }
           this.clientPoints += pointsToAdd;
 
+          // Generăm un ID de comandă simplu (timestamp)
+          const orderId = new Date().getTime();
+          // Link către această pagină, cu parametrul orderId
+          const currentUrl = window.location.href.split('?')[0]; 
+          const orderUrl = `${currentUrl}?orderId=${orderId}`;
+          
+          // Generăm cod QR folosind Google Chart
+          const qrApiUrl = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(orderUrl)}`;
+
+          // Deschidem un tab nou cu rezumatul comenzii și codul QR
+          const newWindow = window.open("", "_blank");
+          newWindow.document.write(`
+            <html>
+              <head>
+                <title>Comanda Ta</title>
+                <style>
+                  body { background-color: #2d2d2d; color: #fff; font-family: sans-serif; padding: 20px; }
+                  .qr { margin-top: 20px; }
+                  .order-item { margin-bottom: 8px; }
+                  .highlight { color: #f97316; font-weight: bold; }
+                </style>
+              </head>
+              <body>
+                <h1>Comanda Ta</h1>
+                <p>Număr client: <span class="highlight">#${this.clientNumber}</span></p>
+                <div>
+                  ${this.orders.map((o) => {
+                    const linePrice = (o.price * o.quantity).toFixed(2);
+                    return `<div class="order-item">
+                              <span class="highlight">${o.quantity}x</span> ${o.name}
+                              — <span class="highlight">${linePrice} Lei</span>
+                            </div>`;
+                  }).join('')}
+                </div>
+                <p>Total: <span class="highlight">${this.total} Lei</span></p>
+                
+                <div class="qr">
+                  <p>Scanează codul QR pentru a deschide exact această comandă:</p>
+                  <img src="${qrApiUrl}" alt="QR Code">
+                </div>
+                <p style="margin-top: 20px; color: #ccc; font-size: 0.9rem;">
+                  *Pentru a sincroniza adăugiri între client și ospătar, e necesară conexiune real-time la un server.
+                </p>
+              </body>
+            </html>
+          `);
+          newWindow.document.close();
+
           alert(
             `Comanda a fost finalizată!\n` +
             `Număr client: #${this.clientNumber}\n` +
             `Ai câștigat ${pointsToAdd.toFixed(2)} puncte.`
           );
 
-          // Golește coșul
+          // Golește coșul local
           this.orders = [];
         },
       },
