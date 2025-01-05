@@ -52,7 +52,7 @@
     <main class="flex-1 p-6 overflow-y-auto scrollbar">
       <!-- Header -->
       <header class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">Dashboard</h1>
+        <h1 class="text-3xl font-bold">Menu</h1>
         <input
           type="text"
           placeholder="Search for food, coffee, etc..."
@@ -91,7 +91,7 @@
             v-for="product in currentProducts"
             :key="product.title"
             class="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer"
-            @click="showProductDetails(product)"
+            @click="addToOrder(product)"
             data-aos="fade-up"
             data-aos-duration="600"
           >
@@ -104,26 +104,41 @@
         </div>
       </section>
 
-      <!-- Product Details -->
-      <section v-else-if="view === 'details'" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-gray-800 rounded-lg shadow-lg w-11/12 sm:w-3/4 lg:w-1/2">
-          <div class="relative">
-            <button
-              class="absolute top-4 right-4 text-gray-500 text-2xl"
-              @click="view = 'products'"
+      <!-- Orders Section -->
+      <section class="mt-8">
+        <h2 class="text-xl font-semibold mb-4">Your Order</h2>
+        <div class="bg-gray-800 rounded-lg p-4 shadow-lg">
+          <ul class="space-y-4">
+            <li
+              v-for="(order, index) in orders"
+              :key="index"
+              class="flex justify-between items-center bg-gray-700 p-4 rounded-lg"
             >
-              &times;
-            </button>
-            <img :src="currentProduct.image" :alt="currentProduct.title" class="w-full h-64 object-cover">
+              <div>
+                <h3 class="font-bold">{{ order.name }}</h3>
+                <p class="text-gray-400">x{{ order.quantity }}</p>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="font-bold text-orange-500">{{ order.price }}</span>
+                <button
+                  @click="removeFromOrder(index)"
+                  class="text-red-500 hover:text-red-400"
+                >
+                  Remove
+                </button>
+              </div>
+            </li>
+          </ul>
+          <div class="flex justify-between items-center mt-6">
+            <h3 class="font-bold text-lg">Total:</h3>
+            <span class="font-bold text-xl text-orange-500">{{ total }}</span>
           </div>
-          <div class="p-6">
-            <h2 class="text-xl font-bold mb-2">{{ currentProduct.title }}</h2>
-            <p class="text-orange-500 text-lg font-bold mb-2">{{ currentProduct.price }}</p>
-            <p class="text-gray-400 text-sm mb-4">{{ currentProduct.description }}</p>
-            <button class="bg-orange-500 text-white py-2 px-4 rounded-lg" @click="view = 'products'">
-              Close
-            </button>
-          </div>
+          <button
+            @click="checkout"
+            class="bg-orange-500 hover:bg-orange-400 text-white w-full py-3 rounded-lg mt-4"
+          >
+            Proceed to Payment
+          </button>
         </div>
       </section>
     </main>
@@ -174,19 +189,35 @@
           },
           currentProducts: [],
           currentProduct: null,
+          orders: [],
         };
+      },
+      computed: {
+        total() {
+          return this.orders.reduce((sum, order) => sum + parseFloat(order.price.split(' ')[0]) * order.quantity, 0).toFixed(2);
+        },
       },
       methods: {
         loadProducts(category) {
           this.currentProducts = this.products[category];
           this.view = 'products';
         },
-        showProductDetails(product) {
-          this.currentProduct = product;
-          this.view = 'details';
+        addToOrder(product) {
+          const existingOrder = this.orders.find((order) => order.name === product.title);
+          if (existingOrder) {
+            existingOrder.quantity++;
+          } else {
+            this.orders.push({ name: product.title, quantity: 1, price: product.price });
+          }
+        },
+        removeFromOrder(index) {
+          this.orders.splice(index, 1);
         },
         backToCategories() {
           this.view = 'categories';
+        },
+        checkout() {
+          alert('Proceeding to Payment');
         },
       },
     });
