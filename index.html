@@ -25,7 +25,22 @@
       font-family: 'Inter', sans-serif;
       background-color: #111827; /* Echivalent bg-gray-900 */
       color: #fff;
+      /* Eliminăm margin/padding default dacă vrei full screen strict */
+      margin: 0;
+      padding: 0;
     }
+
+    /* NOTĂ: Înlocuim h-screen + overflow-hidden cu min-h-screen + overflow-auto */
+    /* Astfel, modalul nu mai e tăiat */
+
+    /* Container principal */
+    #app {
+      @apply min-h-screen overflow-auto flex; 
+      /* min-h-screen => să ocupe cel puțin înălțimea ecranului
+         overflow-auto => dacă ceva depășește, apare scrollbar */
+    }
+
+    /* Scrollbar personalizat */
     .scrollbar {
       scrollbar-width: thin;
       scrollbar-color: #4B5563 #1F2937;
@@ -52,7 +67,7 @@
         focus:outline-none focus:ring-0;
     }
 
-    /* Butoane mici +/- pentru cantitate, fără outline/dungă colorată */
+    /* Butoane +/- pentru cantitate, fără outline/dungă colorată */
     .btn-incdec {
       background-color: #f49032;
       color: #fff;
@@ -60,10 +75,10 @@
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
-      appearance: none;
+      appearance: none; /* Eliminăm stiluri implicite */
 
       @apply w-8 h-8 rounded-full flex items-center justify-center 
-             focus:outline-none focus:ring-0 active:ring-0 hover:ring-0;
+             focus:outline-none focus:ring-0 hover:ring-0 active:ring-0;
     }
     .btn-incdec::-moz-focus-inner {
       border: 0;
@@ -75,7 +90,7 @@
       border: none !important;
     }
 
-    /* Animație shake pentru coș */
+    /* Animație shake pt coș */
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       20%, 60% { transform: translateX(-5px); }
@@ -107,7 +122,7 @@
   </style>
 </head>
 <body>
-  <div id="app" class="h-screen flex overflow-hidden">
+  <div id="app" class="scrollbar">
     <!-- SIDEBAR -->
     <aside class="hidden md:flex md:flex-col md:w-64 bg-gray-800 p-4 space-y-4">
       <div class="text-2xl font-bold text-center mb-6">
@@ -370,7 +385,7 @@
         </button>
       </div>
 
-      <!-- Bara COMANDA TA -->
+      <!-- Bara COMANDA TA (Slide-cart) -->
       <transition name="slide-cart">
         <aside
           v-show="isOrderOpen && orders.length > 0"
@@ -400,7 +415,7 @@
               </div>
             </div>
 
-            <!-- Total + buton Finalizează Comanda dedesubt -->
+            <!-- Total + buton Finalizează Comanda -->
             <div class="mt-4">
               <div class="flex justify-between items-center">
                 <span class="text-lg font-semibold">Total:</span>
@@ -416,7 +431,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Afișare cod QR când e generat -->
+  <!-- MODAL: Afișare cod QR (pus în afara #app) -->
   <div
     v-if="qrOrderId"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -441,19 +456,17 @@
     </div>
   </div>
 
-  <!-- Script-ul Vue (logică de meniu, fidelizare, QR etc.) -->
+  <!-- Script Vue (logică meniu, fidelizare, QR etc.) -->
   <script>
-    // Eliminăm diacriticele pentru căutare
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
-    let db = null; // Vom inițializa mai jos, după import Firestore
+    let db = null;
 
     const app = Vue.createApp({
       data() {
         return {
-          // Sidebar mobil
           isSidebarVisible: false,
 
           // Coș
@@ -462,7 +475,7 @@
 
           // Tablouri
           activeTab: 'meniu',
-          view: 'categorii', // 'categorii' / 'produse'
+          view: 'categorii',
 
           // Produse curente
           currentProducts: [],
@@ -485,7 +498,6 @@
             { name: 'desserts', image: 'https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp' },
             { name: 'drinks', image: 'https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp' },
           ],
-
           // Produse
           products: {
             brunch: [
@@ -603,7 +615,7 @@
                 ingredients: ['Brânză', 'Biscuiți', 'Căpșuni'],
               },
             ],
-            drinks: [
+            drinks: [ /* Noua categorie */
               {
                 title: 'Cocktail',
                 description: 'Băutură răcoritoare cu fructe proaspete și alcool fin.',
@@ -630,7 +642,7 @@
 
           // Coș
           orders: [],
-          // Istoric comenzi
+          // Istoric
           myOrders: [],
 
           // QR
@@ -638,7 +650,6 @@
         };
       },
       computed: {
-        // Produsele filtrate după search
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
@@ -656,7 +667,6 @@
           }
           return results;
         },
-        // Total coș
         total() {
           return this.orders
             .reduce((sum, o) => sum + o.price * o.quantity, 0)
@@ -664,7 +674,6 @@
         },
       },
       methods: {
-        // Afișare categorii cu denumiri în RO
         renameCategory(cat) {
           const dict = {
             brunch: 'Mic Dejun',
@@ -707,7 +716,7 @@
             });
           }
           this.currentProduct = null;
-          // Animație shake pentru coș
+          // Animație shake
           this.isShaking = true;
           setTimeout(() => {
             this.isShaking = false;
@@ -727,17 +736,11 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
-
-        // Construiește link-ul către comanda stocată (pentru scanare/aflare date)
         buildOrderLink(orderId) {
-          // Exemplu simplu: actualDomain + "/confirm.html?orderId=" + orderId
-          // Deocamdată punem doar un placeholder cu ?orderId=...
           return window.location.origin + "/confirm.html?orderId=" + orderId;
         },
-
-        // Generează codul QR pentru un orderId
         async generateQr(orderId) {
-          this.qrOrderId = orderId;  // Afișează overlay
+          this.qrOrderId = orderId;
           this.$nextTick(() => {
             const canvas = this.$refs.qrCanvas;
             if (!canvas) return;
@@ -747,8 +750,6 @@
             });
           });
         },
-
-        // Finalizarea comenzii -> salvăm in Firestore, local, generăm cod QR
         async checkout() {
           if (this.isFirstOrder) {
             this.clientNumber++;
@@ -768,18 +769,15 @@
             createdAt: new Date().toISOString(),
           };
 
-          // Salvăm în Firestore
           if (db) {
             try {
               const { collection, addDoc } = window.fireStoreExports;
-              const docRef = await addDoc(collection(db, "orders"), orderData);
-              console.log("Comanda salvată cu ID:", docRef.id);
+              await addDoc(collection(db, "orders"), orderData);
             } catch (err) {
-              console.error("Eroare la salvarea comenzii în Firestore:", err);
+              console.error("Eroare la salvarea comenzii:", err);
             }
           }
-
-          // Salvăm local (istoric)
+          // Salvăm local
           this.myOrders.push({ orderId, items: orderData.items });
           localStorage.setItem('myOrders', JSON.stringify(this.myOrders));
           localStorage.setItem(orderId, JSON.stringify(this.orders));
@@ -788,12 +786,11 @@
           this.orders = [];
           this.isOrderOpen = false;
 
-          // Generează cod QR
+          // Generăm QR
           this.generateQr(orderId);
         },
       },
       mounted() {
-        // Citim datele existente din localStorage
         const storedPoints = localStorage.getItem('clientPoints');
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
@@ -832,7 +829,6 @@
       addDoc
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    // Înlocuiește valorile cu cele reale din consola proiectului tău Firebase
     const firebaseConfig = {
   apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
   authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -842,11 +838,9 @@
   appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
   measurementId: "G-F44TB27G17"
 };
-
     const firebaseApp = initializeApp(firebaseConfig);
     const _db = getFirestore(firebaseApp);
 
-    // Expunem global obiectele necesare
     window.db = _db;
     window.fireStoreExports = { collection, addDoc };
   </script>
