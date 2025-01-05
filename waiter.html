@@ -1,0 +1,110 @@
+<!-- waiter.html -->
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ospătar - Scanare Comandă</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #111827;
+      color: #fff;
+    }
+    #reader {
+      width: 300px;
+      margin: 0 auto;
+    }
+    #orderDetails {
+      margin-top: 20px;
+      text-align: left;
+      display: none;
+    }
+    .order-item {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Scanare Cod QR Comandă</h1>
+  <div id="reader"></div>
+  <div id="orderDetails">
+    <h2>Detalii Comandă</h2>
+    <p><strong>ID Comandă:</strong> <span id="orderId"></span></p>
+    <h3>Produse:</h3>
+    <ul id="itemsList"></ul>
+    <p><strong>Total:</strong> <span id="totalPrice"></span> Lei</p>
+  </div>
+
+  <!-- html5-qrcode -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+      authDomain: "restaurantapp-d0256.firebaseapp.com",
+      projectId: "restaurantapp-d0256",
+      storageBucket: "restaurantapp-d0256.appspot.com",
+      messagingSenderId: "275208346650",
+      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+      measurementId: "G-F44TB27G17"
+    };
+
+    // Inițializează Firebase
+    const firebaseApp = initializeApp(firebaseConfig);
+    const db = getFirestore(firebaseApp);
+
+    // Funcția pentru a obține detalii comandă
+    async function getOrderDetails(orderId) {
+      try {
+        const q = query(collection(db, "orders"), where("orderId", "==", orderId));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const order = querySnapshot.docs[0].data();
+          document.getElementById('orderId').textContent = order.orderId;
+          const itemsList = document.getElementById('itemsList');
+          itemsList.innerHTML = '';
+          order.items.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.name} x ${item.quantity} – ${ (item.price * item.quantity).toFixed(2) } Lei`;
+            li.classList.add('order-item');
+            itemsList.appendChild(li);
+          });
+          document.getElementById('totalPrice').textContent = order.total.toFixed(2);
+          document.getElementById('orderDetails').style.display = 'block';
+        } else {
+          alert("Comandă nu a fost găsită!");
+        }
+      } catch (e) {
+        console.error("Eroare la preluarea comenzii: ", e);
+      }
+    }
+
+    // Inițializează scanner-ul QR
+    function onScanSuccess(decodedText, decodedResult) {
+      // Oprește scanner-ul după scanare
+      html5QrcodeScanner.clear().then(_ => {
+        // Procesare text decodat
+        getOrderDetails(decodedText);
+      }).catch(error => {
+        console.error("Eroare la oprirea scanner-ului: ", error);
+      });
+    }
+
+    function onScanFailure(error) {
+      // Poți afișa erori sau ignora
+      console.warn(`Scanarea a eșuat. Motiv: ${error}`);
+    }
+
+    // Configurare scanner
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+      "reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+  </script>
+</body>
+</html>
