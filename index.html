@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Meniu Restaurant - Pagina Principală</title>
 
-  <!-- Vue 3 -->
+  <!-- Vue 3 (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
 
-  <!-- TailwindCSS -->
+  <!-- TailwindCSS (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Google Material Icons -->
@@ -16,6 +16,9 @@
     href="https://fonts.googleapis.com/icon?family=Material+Icons"
     rel="stylesheet"
   />
+
+  <!-- Bibliotecă pentru generare coduri QR în browser -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 
   <style>
     body {
@@ -40,8 +43,8 @@
 
     /* Butoane moderne, rotunjite, cu highlight #d35400 */
     .btn-orange {
-      background-color: #f49032; /* Fundal */
-      color: #fff;              /* Text alb */
+      background-color: #f49032;
+      color: #fff;
       font-weight: bold;
       border: 1px solid #f49032;
       @apply py-2 px-6 rounded-full transition-all transform shadow 
@@ -57,7 +60,7 @@
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
-      appearance: none; /* Dezactivează stilurile implicite */
+      appearance: none;
 
       @apply w-8 h-8 rounded-full flex items-center justify-center 
              focus:outline-none focus:ring-0 active:ring-0 hover:ring-0;
@@ -413,14 +416,39 @@
     </div>
   </div>
 
-  <!-- Script Vue -->
+  <!-- MODAL: Afișare cod QR când e generat -->
+  <div
+    v-if="qrOrderId"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <div class="bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 md:w-1/2 relative">
+      <button
+        class="absolute top-4 right-4 text-gray-500 text-2xl"
+        @click="qrOrderId = ''"
+      >
+        &times;
+      </button>
+      <h2 class="text-xl font-bold mb-4">
+        Scanează acest cod QR pentru a vedea comanda:
+      </h2>
+      <div class="flex justify-center">
+        <canvas ref="qrCanvas"></canvas>
+      </div>
+      <p class="text-sm text-gray-400 mt-4">
+        Link Comandă: 
+        <span class="underline">{{ buildOrderLink(qrOrderId) }}</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Script-ul Vue (logică de meniu, fidelizare, QR etc.) -->
   <script>
-    // Funcție ajutătoare pentru căutare (elimină diacriticele)
+    // Eliminăm diacriticele pentru căutare
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
-    let db = null; // Inițializat mai jos, după import Firestore
+    let db = null; // Vom inițializa mai jos, după import Firestore
 
     const app = Vue.createApp({
       data() {
@@ -458,7 +486,7 @@
             { name: 'drinks', image: 'https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp' },
           ],
 
-          // Produse (pe categorii)
+          // Produse
           products: {
             brunch: [
               {
@@ -604,10 +632,13 @@
           orders: [],
           // Istoric comenzi
           myOrders: [],
+
+          // QR
+          qrOrderId: '',
         };
       },
       computed: {
-        // Produsele filtrate
+        // Produsele filtrate după search
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
@@ -633,6 +664,7 @@
         },
       },
       methods: {
+        // Afișare categorii cu denumiri în RO
         renameCategory(cat) {
           const dict = {
             brunch: 'Mic Dejun',
@@ -675,7 +707,6 @@
             });
           }
           this.currentProduct = null;
-
           // Animație shake pentru coș
           this.isShaking = true;
           setTimeout(() => {
@@ -696,6 +727,28 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
+
+        // Construiește link-ul către comanda stocată (pentru scanare/aflare date)
+        buildOrderLink(orderId) {
+          // Exemplu simplu: actualDomain + "/scan.html?orderId=" + orderId
+          // Deocamdată punem doar un placeholder cu ?orderId=...
+          return window.location.origin + "/scan.html?orderId=" + orderId;
+        },
+
+        // Generează codul QR pentru un orderId
+        async generateQr(orderId) {
+          this.qrOrderId = orderId;  // Afișează overlay
+          this.$nextTick(() => {
+            const canvas = this.$refs.qrCanvas;
+            if (!canvas) return;
+            const qrUrl = this.buildOrderLink(orderId);
+            QRCode.toCanvas(canvas, qrUrl, { width: 250 }, (err) => {
+              if (err) console.error(err);
+            });
+          });
+        },
+
+        // Finalizarea comenzii -> salvăm in Firestore, local, generăm cod QR
         async checkout() {
           if (this.isFirstOrder) {
             this.clientNumber++;
@@ -715,6 +768,7 @@
             createdAt: new Date().toISOString(),
           };
 
+          // Salvăm în Firestore
           if (db) {
             try {
               const { collection, addDoc } = window.fireStoreExports;
@@ -723,21 +777,23 @@
             } catch (err) {
               console.error("Eroare la salvarea comenzii în Firestore:", err);
             }
-          } else {
-            console.warn("FireStore 'db' nu este inițializat!");
           }
 
+          // Salvăm local (istoric)
           this.myOrders.push({ orderId, items: orderData.items });
           localStorage.setItem('myOrders', JSON.stringify(this.myOrders));
           localStorage.setItem(orderId, JSON.stringify(this.orders));
 
+          // Golește coșul
           this.orders = [];
           this.isOrderOpen = false;
 
-          window.location.href = 'confirm.html?orderId=' + orderId;
+          // Generează cod QR
+          this.generateQr(orderId);
         },
       },
       mounted() {
+        // Citim datele existente din localStorage
         const storedPoints = localStorage.getItem('clientPoints');
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
@@ -776,15 +832,16 @@
       addDoc
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
+    // Înlocuiește valorile cu cele reale din consola proiectului tău Firebase
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2G...",
-      authDomain: "restaurantapp-d0256.firebaseapp.com",
-      projectId: "restaurantapp-d0256",
-      storageBucket: "restaurantapp-d0256.firebasestorage.app",
-      messagingSenderId: "275208346650",
-      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-      measurementId: "G-F44TB27G17"
-    };
+  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+  authDomain: "restaurantapp-d0256.firebaseapp.com",
+  projectId: "restaurantapp-d0256",
+  storageBucket: "restaurantapp-d0256.firebasestorage.app",
+  messagingSenderId: "275208346650",
+  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+  measurementId: "G-F44TB27G17"
+};
 
     const firebaseApp = initializeApp(firebaseConfig);
     const _db = getFirestore(firebaseApp);
