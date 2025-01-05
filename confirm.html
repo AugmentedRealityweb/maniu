@@ -56,7 +56,7 @@
 
       <!-- QR Code -->
       <div class="mt-6 flex flex-col items-center">
-        <p class="mb-2">Arată Aces cod QR Ospatarului:</p>
+        <p class="mb-2">Scanează pentru a vedea această comandă:</p>
         <!-- *** Observă link-ul generat pentru quickchart.io -->
         <img
           :src="qrUrl"
@@ -96,7 +96,7 @@
         // QR code folosește quickchart.io
         // Ca text, punem link-ul complet (cu domain-ul tău). De ex:
         qrUrl() {
-          const currentLink = encodeURIComponent(window.location.origin + '/confirmare.html?orderId=' + this.orderId);
+          const currentLink = encodeURIComponent(window.location.href);
           return (
             'https://quickchart.io/qr?size=200&text=' + currentLink
           );
