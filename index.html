@@ -633,7 +633,6 @@
         },
       },
       methods: {
-        // Afișare categorii cu denumiri în RO
         renameCategory(cat) {
           const dict = {
             brunch: 'Mic Dejun',
@@ -649,8 +648,6 @@
           this.currentProducts = this.products[categoryName] || [];
           this.view = 'produse';
           this.searchQuery = '';
-
-          // Scroll la top
           this.$nextTick(() => {
             window.scrollTo(0, 0);
           });
@@ -659,8 +656,6 @@
           this.view = 'categorii';
           this.currentProduct = null;
           this.searchQuery = '';
-
-          // Scroll la top
           this.$nextTick(() => {
             window.scrollTo(0, 0);
           });
@@ -681,13 +676,12 @@
           }
           this.currentProduct = null;
 
-          // Animație shake coș
+          // Animație shake pentru coș
           this.isShaking = true;
           setTimeout(() => {
             this.isShaking = false;
           }, 500);
         },
-        // Butoane +/- în coș
         incrementQuantity(index) {
           this.orders[index].quantity++;
         },
@@ -702,26 +696,18 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
-
-        // Aici facem "Finalizează Comanda" => salvăm datele și în Firestore
         async checkout() {
-          // Dacă e prima comandă, alocăm un nr. client
           if (this.isFirstOrder) {
             this.clientNumber++;
             this.isFirstOrder = false;
           }
-
-          // Calculăm punctele
           let pointsToAdd = 0;
           for (const item of this.orders) {
             pointsToAdd += item.price * item.quantity * 0.05;
           }
           this.clientPoints += pointsToAdd;
 
-          // Creăm ID
           const orderId = 'CMD' + Date.now();
-
-          // Structură de date pentru Firestore
           const orderData = {
             orderId,
             items: JSON.parse(JSON.stringify(this.orders)),
@@ -729,7 +715,6 @@
             createdAt: new Date().toISOString(),
           };
 
-          // Scriem comanda în Firestore (dacă `db` e inițializat corect)
           if (db) {
             try {
               const { collection, addDoc } = window.fireStoreExports;
@@ -742,21 +727,17 @@
             console.warn("FireStore 'db' nu este inițializat!");
           }
 
-          // Salvăm comanda și local (istoric personal)
           this.myOrders.push({ orderId, items: orderData.items });
           localStorage.setItem('myOrders', JSON.stringify(this.myOrders));
           localStorage.setItem(orderId, JSON.stringify(this.orders));
 
-          // Golește coșul
           this.orders = [];
           this.isOrderOpen = false;
 
-          // Redirecționare către confirm.html (sau altceva)
           window.location.href = 'confirm.html?orderId=' + orderId;
         },
       },
       mounted() {
-        // Citim datele existente din localStorage
         const storedPoints = localStorage.getItem('clientPoints');
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
@@ -788,7 +769,6 @@
 
   <!-- Script pentru Firebase (fără Analytics) -->
   <script type="module">
-    // 1. Importăm din Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import {
       getFirestore,
@@ -796,9 +776,8 @@
       addDoc
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    // 2. Configurarea proiectului tău Firebase
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+      apiKey: "AIzaSyBahkhy2G...",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
       projectId: "restaurantapp-d0256",
       storageBucket: "restaurantapp-d0256.firebasestorage.app",
@@ -807,20 +786,12 @@
       measurementId: "G-F44TB27G17"
     };
 
-    // 3. Inițializăm Firebase
     const firebaseApp = initializeApp(firebaseConfig);
-
-    // 4. Inițializăm Firestore
     const _db = getFirestore(firebaseApp);
 
-    // 5. Expunem în window ca să avem acces și în script-ul Vue (checkout())
+    // Expunem global obiectele necesare
     window.db = _db;
-    // De asemenea, expunem obiectele necesare (collection, addDoc) sub un "fireStoreExports"
-    // pentru a le putea folosi direct in `this.checkout()`
     window.fireStoreExports = { collection, addDoc };
-
-    // (Optional) Test de adăugare (comentează dacă nu vrei să ruleze la fiecare refresh)
-    // addDoc(collection(_db, "orders"), { test: "hello from minimal example" });
   </script>
 </body>
 </html>
