@@ -420,7 +420,7 @@
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
-    let db = null; // Vom inițializa mai jos, după ce importăm Firestore.
+    let db = null; // Inițializat mai jos, după import Firestore
 
     const app = Vue.createApp({
       data() {
@@ -798,14 +798,14 @@
 
     // 2. Configurarea proiectului tău Firebase
     const firebaseConfig = {
-  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-  authDomain: "restaurantapp-d0256.firebaseapp.com",
-  projectId: "restaurantapp-d0256",
-  storageBucket: "restaurantapp-d0256.firebasestorage.app",
-  messagingSenderId: "275208346650",
-  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-  measurementId: "G-F44TB27G17"
-};
+      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+      authDomain: "restaurantapp-d0256.firebaseapp.com",
+      projectId: "restaurantapp-d0256",
+      storageBucket: "restaurantapp-d0256.firebasestorage.app",
+      messagingSenderId: "275208346650",
+      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+      measurementId: "G-F44TB27G17"
+    };
 
     // 3. Inițializăm Firebase
     const firebaseApp = initializeApp(firebaseConfig);
@@ -816,11 +816,11 @@
     // 5. Expunem în window ca să avem acces și în script-ul Vue (checkout())
     window.db = _db;
     // De asemenea, expunem obiectele necesare (collection, addDoc) sub un "fireStoreExports"
-    // pentru a le putea folosi direct in `this.checkout()` (sau ne putem folosi direct de `_db`)
+    // pentru a le putea folosi direct in `this.checkout()`
     window.fireStoreExports = { collection, addDoc };
 
     // (Optional) Test de adăugare (comentează dacă nu vrei să ruleze la fiecare refresh)
-    // addDoc(collection(_db, "orders"), { test: "hello" });
+    // addDoc(collection(_db, "orders"), { test: "hello from minimal example" });
   </script>
 </body>
 </html>
