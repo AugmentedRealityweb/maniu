@@ -38,20 +38,31 @@
 
     /* Efect de highlight (luminos) pentru butoanele portocalii */
     .btn-orange {
-      @apply bg-orange-500 text-white py-2 px-4 rounded-lg transition-all 
-        transform shadow hover:shadow-xl hover:scale-105 
-        focus:outline-none focus:ring-2 focus:ring-orange-500;
+      background-color: #f97316; /* Culoare portocalie */
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      transition: all 0.2s ease;
+      transform: translateY(0);
+    }
+    .btn-orange:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-    /* Mică animație la deschiderea/închiderea sidebarului pe mobil */
-    .slide-fade-enter-active,
-    .slide-fade-leave-active {
-      transition: all .3s ease;
+    .btn-orange:focus {
+      outline: 2px solid #fb923c;
     }
-    .slide-fade-enter,
-    .slide-fade-leave-to {
-      transform: translateX(-50px);
-      opacity: 0;
+
+    .slide-down {
+      transition: max-height 0.3s ease-in-out;
+      overflow: hidden;
+    }
+    .slide-down.hidden {
+      max-height: 0;
+    }
+    .slide-down.visible {
+      max-height: 500px; /* sau în funcție de înălțimea dorită */
     }
   </style>
 </head>
@@ -133,32 +144,29 @@
 
         <!-- Afișăm tab-ul MENIU -->
         <section v-if="activeTab === 'meniu'">
-          <!-- view: categories / products -->
-          <div v-if="view === 'categories'">
-            <h2 class="text-xl font-semibold mb-4">Alege Categoria</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              <div
-                v-for="category in categories"
-                :key="category.name"
-                class="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-gray-700 transition"
-                @click="loadProducts(category.name)"
-              >
-                <img
-                  :src="category.image"
-                  :alt="category.name"
-                  class="w-full h-40 object-cover"
-                />
-                <div class="p-4">
-                  <h3 class="text-lg font-bold capitalize">
-                    {{ category.name }}
-                  </h3>
-                </div>
+          <h2 class="text-xl font-semibold mb-4">Alege Categoria</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div
+              v-for="category in categories"
+              :key="category.name"
+              class="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-gray-700 transition"
+              @click="loadProducts(category.name)"
+            >
+              <img
+                :src="category.image"
+                :alt="category.name"
+                class="w-full h-40 object-cover"
+              />
+              <div class="p-4">
+                <h3 class="text-lg font-bold capitalize">
+                  {{ category.name }}
+                </h3>
               </div>
             </div>
           </div>
 
-          <!-- view: products -->
-          <div v-else-if="view === 'products'">
+          <!-- Produse -->
+          <div v-if="view === 'products'">
             <button
               class="btn-orange mb-4"
               @click="backToCategories"
@@ -166,7 +174,6 @@
               Înapoi la Categorii
             </button>
 
-            <!-- Bară de căutare produse -->
             <div class="flex items-center gap-4 mb-4">
               <h2 class="text-xl font-semibold">Produse</h2>
               <input
@@ -177,7 +184,6 @@
               />
             </div>
 
-            <!-- Listă produse afișate (filtrate) -->
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               <div
                 v-for="product in displayedProducts"
@@ -251,7 +257,6 @@
         <section v-else-if="activeTab === 'puncte'">
           <h2 class="text-2xl font-bold mb-4">Punctele mele</h2>
           <div class="bg-gray-800 p-4 rounded shadow max-w-md">
-            <!-- Dacă clientul încă nu are număr (0), înseamnă că nu a făcut nicio comandă finalizată -->
             <div v-if="clientNumber === 0" class="mb-4">
               <p class="text-gray-300">
                 Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
@@ -273,11 +278,9 @@
       <!-- ORDERS: apare DOAR dacă avem comenzi în coș -->
       <aside
         v-if="orders.length > 0"
-        class="md:w-80 bg-gray-800 md:border-l border-gray-700 p-4 overflow-y-auto scrollbar 
-               md:max-h-[50vh]"
+        class="md:w-80 bg-gray-800 md:border-l border-gray-700 p-4 overflow-y-auto scrollbar"
       >
         <h3 class="text-xl font-bold mb-4">Comanda Ta</h3>
-        <!-- Lista de produse din coș -->
         <div
           v-for="(order, index) in orders"
           :key="index"
@@ -299,8 +302,6 @@
             </button>
           </div>
         </div>
-
-        <!-- Total și butonul de Payment -->
         <div class="mt-4 flex justify-between items-center">
           <span class="text-lg font-semibold">Total:</span>
           <span class="text-orange-500 text-xl font-bold">
@@ -321,188 +322,38 @@
     const app = Vue.createApp({
       data() {
         return {
-          // Control sidebar mobil
           isSidebarVisible: false,
-          // Tab principal: 'meniu' / 'puncte'
           activeTab: 'meniu',
-
-          // Sub-vizualizare meniu: 'categories' / 'products'
           view: 'categories',
-
-          // Pentru căutarea produselor
           searchQuery: '',
-
-          // Fidelizare
-          clientNumber: 0,       // 0 = încă niciun user nou
-          clientPoints: 0,       // puncte acumulate
-          isFirstOrder: true,    // true dacă userul încă nu a finalizat nicio comandă
-
-          // Categorii
+          clientNumber: 0,
+          clientPoints: 0,
+          isFirstOrder: true,
           categories: [
-            {
-              name: 'brunch',
-              image: 'https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp',
-            },
-            {
-              name: 'soups',
-              image:
-                'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg',
-            },
-            {
-              name: 'pasta',
-              image: 'https://i.giphy.com/dZRlFW1sbFEpG.webp',
-            },
-            {
-              name: 'main',
-              image: 'https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp',
-            },
-            {
-              name: 'desserts',
-              image: 'https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp',
-            },
+            { name: 'brunch', image: 'https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp' },
+            { name: 'soups', image: 'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg' },
+            { name: 'pasta', image: 'https://i.giphy.com/dZRlFW1sbFEpG.webp' },
+            { name: 'main', image: 'https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp' },
+            { name: 'desserts', image: 'https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp' },
           ],
-
-          // Produse
           products: {
             brunch: [
-              {
-                title: 'Toast cu avocado',
-                description: 'Avocado, toast, ouă poșate, roșii cherry.',
-                price: 25,
-                image: 'https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp',
-                ingredients: ['Avocado', 'Toast', 'Ouă', 'Roșii cherry'],
-              },
-              {
-                title: 'Ouă Benedict',
-                description: 'Ouă poșate, sos hollandaise, șuncă.',
-                price: 30,
-                image: 'https://i.giphy.com/X3E37CTy55jNK.webp',
-                ingredients: ['Ouă', 'Hollandaise', 'Șuncă'],
-              },
-              {
-                title: 'Clătite',
-                description: 'Clătite, sirop de arțar, fructe proaspete.',
-                price: 20,
-                image: 'https://i.giphy.com/5zu5JovduWFBS.webp',
-                ingredients: ['Făină', 'Ouă', 'Sirop de arțar', 'Fructe'],
-              },
-            ],
-            soups: [
-              {
-                title: 'Ciorbă de burtă',
-                description: 'Tradițională, smântână, ardei iute.',
-                price: 18,
-                image:
-                  'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg',
-                ingredients: ['Burtă', 'Smântână', 'Ardei iute'],
-              },
-              {
-                title: 'Supă cremă de roșii',
-                description: 'Roșii proaspete, crutoane, busuioc.',
-                price: 15,
-                image:
-                  'https://www.lalena.ro/images/uploaded/600x_Supa-crema-de-rosii-108.jpg',
-                ingredients: ['Roșii', 'Crutoane', 'Busuioc'],
-              },
-              {
-                title: 'Ciorbă de legume',
-                description: 'Legume proaspete, zeamă de lămâie.',
-                price: 12,
-                image:
-                  'https://www.prestij.ro/uploads/produse/1440/94--ciorba-taraneasca-de-legume.jpg',
-                ingredients: ['Morcovi', 'Cartofi', 'Ceapă', 'Apio'],
-              },
-            ],
-            pasta: [
-              {
-                title: 'Spaghete Carbonara',
-                description: 'Spaghetti, bacon, parmezan, ouă.',
-                price: 28,
-                image: 'https://i.giphy.com/dZRlFW1sbFEpG.webp',
-                ingredients: ['Spaghetti', 'Bacon', 'Parmezan', 'Ouă'],
-              },
-              {
-                title: 'Penne Arrabbiata',
-                description: 'Penne, sos de roșii picant, usturoi.',
-                price: 25,
-                image: 'https://i.giphy.com/f0N7csaAc6t60OmXkm.webp',
-                ingredients: ['Penne', 'Roșii', 'Usturoi', 'Ardei iute'],
-              },
-              {
-                title: 'Tagliatelle Alfredo',
-                description: 'Tagliatelle, sos Alfredo, pui.',
-                price: 30,
-                image: 'https://i.giphy.com/xOML6s8aBmAtlLwujM.webp',
-                ingredients: ['Tagliatelle', 'Pui', 'Parmezan', 'Smântână'],
-              },
-            ],
-            main: [
-              {
-                title: 'Muschiuleț de porc',
-                description: 'Muschiuleț, cartofi copți, mozzarella, bacon.',
-                price: 45,
-                image: 'https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp',
-                ingredients: ['Porc', 'Cartofi', 'Mozzarella', 'Bacon'],
-              },
-              {
-                title: 'Tomahawk porc',
-                description: 'Carne de porc, cartofi, sos brun.',
-                price: 41,
-                image: 'https://i.giphy.com/KDskfOILt91T2.webp',
-                ingredients: ['Tomahawk', 'Cartofi', 'Sos brun'],
-              },
-              {
-                title: 'Ceafă sfărâmată',
-                description: 'Ceafă, piure de cartofi, ardei copți.',
-                price: 36,
-                image: 'https://i.giphy.com/l378puWI9Fpi4OApO.webp',
-                ingredients: ['Ceafă porc', 'Piure', 'Ardei copți'],
-              },
-            ],
-            desserts: [
-              {
-                title: 'Tiramisu',
-                description: 'Prăjitură italiană cu cafea, mascarpone.',
-                price: 20,
-                image: 'https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp',
-                ingredients: ['Cafea', 'Mascarpone', 'Pișcoturi'],
-              },
-              {
-                title: 'Pavlova',
-                description: 'Bezea, frișcă, fructe de pădure.',
-                price: 18,
-                image: 'https://i.giphy.com/iiwu9bTOZ1HiM.webp',
-                ingredients: ['Bezea', 'Frișcă', 'Fructe de pădure'],
-              },
-              {
-                title: 'Cheesecake',
-                description: 'Cheesecake cu dulceață de căpșuni.',
-                price: 22,
-                image: 'https://i.giphy.com/Xi2UAW7kTQvHa.webp',
-                ingredients: ['Brânză', 'Biscuiți', 'Căpșuni'],
-              },
+              { title: 'Toast cu avocado', description: 'Avocado, toast, ouă poșate, roșii cherry.', price: 25, image: 'https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp', ingredients: ['Avocado', 'Toast', 'Ouă', 'Roșii cherry'] },
             ],
           },
-
-          // Stocare internă
           currentProducts: [],
           currentProduct: null,
           orders: [],
+          cartVisible: false,
         };
       },
       computed: {
-        // Produsele filtrate (dacă searchQuery nu e gol, căutăm în toate categoriile)
         displayedProducts() {
           if (this.searchQuery.trim()) {
             const q = this.searchQuery.toLowerCase();
             let results = [];
             for (const catKey in this.products) {
-              const found = this.products[catKey].filter((prod) => {
-                return (
-                  prod.title.toLowerCase().includes(q) ||
-                  prod.description.toLowerCase().includes(q)
-                );
-              });
+              const found = this.products[catKey].filter((prod) => prod.title.toLowerCase().includes(q) || prod.description.toLowerCase().includes(q));
               results = results.concat(found);
             }
             return results;
@@ -510,15 +361,14 @@
             return this.currentProducts;
           }
         },
-        // Totalul de plată
         total() {
-          const s = this.orders.reduce((sum, o) => {
-            return sum + o.price * o.quantity;
-          }, 0);
-          return s.toFixed(2);
+          return this.orders.reduce((sum, o) => sum + o.price * o.quantity, 0).toFixed(2);
         },
       },
       methods: {
+        toggleCart() {
+          this.cartVisible = !this.cartVisible;
+        },
         loadProducts(category) {
           this.currentProducts = this.products[category] || [];
           this.view = 'products';
@@ -537,38 +387,24 @@
           if (existing) {
             existing.quantity++;
           } else {
-            this.orders.push({
-              name: product.title,
-              price: product.price,
-              quantity: 1,
-            });
+            this.orders.push({ name: product.title, price: product.price, quantity: 1 });
           }
-          this.currentProduct = null; // închidem modalul
+          this.currentProduct = null;
         },
         removeFromOrder(index) {
           this.orders.splice(index, 1);
         },
         checkout() {
-          // Dacă e prima oară când userul comandă
           if (this.isFirstOrder) {
-            this.clientNumber++;     // alocăm un număr de client
+            this.clientNumber++;
             this.isFirstOrder = false;
           }
-
-          // Calculăm punctele pentru tot ce e în coș
           let pointsToAdd = 0;
           for (const item of this.orders) {
-            pointsToAdd += item.price * item.quantity * 0.05; // 5%
+            pointsToAdd += item.price * item.quantity * 0.05;
           }
           this.clientPoints += pointsToAdd;
-
-          alert(
-            `Comanda a fost finalizată!\n` +
-            `Număr client: #${this.clientNumber}\n` +
-            `Ai câștigat ${pointsToAdd.toFixed(2)} puncte.`
-          );
-
-          // Golește coșul
+          alert(`Comanda a fost finalizată!\nNumăr client: #${this.clientNumber}\nAi câștigat ${pointsToAdd.toFixed(2)} puncte.`);
           this.orders = [];
         },
       },
