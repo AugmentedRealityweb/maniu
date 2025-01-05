@@ -730,9 +730,9 @@
 
         // Construiește link-ul către comanda stocată (pentru scanare/aflare date)
         buildOrderLink(orderId) {
-          // Exemplu simplu: actualDomain + "/scan.html?orderId=" + orderId
+          // Exemplu simplu: actualDomain + "/confirm.html?orderId=" + orderId
           // Deocamdată punem doar un placeholder cu ?orderId=...
-          return window.location.origin + "/scan.html?orderId=" + orderId;
+          return window.location.origin + "/confirm.html?orderId=" + orderId;
         },
 
         // Generează codul QR pentru un orderId
