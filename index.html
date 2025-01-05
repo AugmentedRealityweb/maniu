@@ -36,7 +36,7 @@
       background-color: #1F2937;
     }
 
-    /* Efect de highlight (luminos) pentru butoanele portocalii */
+    /* Butoane portocalii (Adaugă în coș, Finalizează comanda) */
     .btn-orange {
       @apply bg-orange-500 text-white py-2 px-4 rounded-lg transition-all 
         transform shadow hover:shadow-xl hover:scale-105 
@@ -52,6 +52,15 @@
     .slide-fade-leave-to {
       transform: translateX(-50px);
       opacity: 0;
+    }
+
+    /* Animație slide pentru bara Comanda Ta */
+    .slide-cart-enter-active, .slide-cart-leave-active {
+      transition: max-height 0.3s ease;
+      overflow: hidden;
+    }
+    .slide-cart-enter-from, .slide-cart-leave-to {
+      max-height: 0;
     }
   </style>
 </head>
@@ -85,9 +94,9 @@
       </nav>
     </aside>
 
-    <!-- CONȚINUT PRINCIPAL (Meniu / Puncte) + ORDERS -->
+    <!-- CONȚINUT PRINCIPAL (Meniu / Puncte / Confirmare) -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
-      <!-- SECTIUNE MENIU / PUNCTE -->
+      <!-- SECTIUNE PRINCIPALĂ (MENIU / PUNCTE / CONFIRMARE) -->
       <main class="flex-1 p-4 overflow-y-auto scrollbar relative">
         <!-- Buton meniu pentru mobil (deschide mini-sidebar) -->
         <div class="flex items-center justify-between mb-4 md:hidden">
@@ -133,7 +142,7 @@
 
         <!-- Afișăm tab-ul MENIU -->
         <section v-if="activeTab === 'meniu'">
-          <!-- view: categories / products -->
+          <!-- Sub-vizualizare: categories / products -->
           <div v-if="view === 'categories'">
             <h2 class="text-xl font-semibold mb-4">Alege Categoria</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -157,7 +166,7 @@
             </div>
           </div>
 
-          <!-- view: products -->
+          <!-- Sub-vizualizare: products -->
           <div v-else-if="view === 'products'">
             <button
               class="btn-orange mb-4"
@@ -251,7 +260,7 @@
         <section v-else-if="activeTab === 'puncte'">
           <h2 class="text-2xl font-bold mb-4">Punctele mele</h2>
           <div class="bg-gray-800 p-4 rounded shadow max-w-md">
-            <!-- Dacă clientul încă nu are număr (0), înseamnă că nu a făcut nicio comandă finalizată -->
+            <!-- Dacă clientul încă nu are număr (0), înseamnă că n-a finalizat nicio comandă -->
             <div v-if="clientNumber === 0" class="mb-4">
               <p class="text-gray-300">
                 Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
@@ -263,57 +272,110 @@
               </p>
             </div>
             <p class="text-gray-300">
-              Puncte acumulate: 
+              Puncte acumulate:
               <span class="font-bold text-orange-500">{{ clientPoints.toFixed(2) }}</span>
             </p>
           </div>
         </section>
-      </main>
 
-      <!-- ORDERS: apare DOAR dacă avem comenzi în coș -->
-      <aside
-        v-if="orders.length > 0"
-        class="md:w-80 bg-gray-800 md:border-l border-gray-700 p-4 overflow-y-auto scrollbar 
-               md:max-h-[50vh]"
-      >
-        <h3 class="text-xl font-bold mb-4">Comanda Ta</h3>
-        <!-- Lista de produse din coș -->
-        <div
-          v-for="(order, index) in orders"
-          :key="index"
-          class="flex justify-between items-center bg-gray-700 p-4 rounded-lg mb-2"
-        >
-          <div>
-            <h4 class="font-bold">{{ order.name }}</h4>
-            <small class="text-gray-400">x{{ order.quantity }}</small>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="text-orange-500 font-bold">
-              {{ order.price }} Lei
-            </span>
+        <!-- Afișăm pagina de CONFIRMARE (după ce se finalizează comanda) -->
+        <section v-else-if="activeTab === 'confirmation'">
+          <h2 class="text-2xl font-bold mb-4">Comanda Ta - Confirmare</h2>
+
+          <!-- Dacă nu avem lastOrder, afișăm un fallback -->
+          <div v-if="!lastOrder">
+            <p class="text-gray-300">Momentan nu există o comandă de afișat.</p>
             <button
-              class="text-red-500 hover:text-red-300"
-              @click="removeFromOrder(index)"
+              class="btn-orange mt-4"
+              @click="activeTab = 'meniu'"
             >
-              Remove
+              Înapoi la Meniu
             </button>
           </div>
-        </div>
 
-        <!-- Total și butonul de Payment -->
-        <div class="mt-4 flex justify-between items-center">
-          <span class="text-lg font-semibold">Total:</span>
-          <span class="text-orange-500 text-xl font-bold">
-            {{ total }}
-          </span>
-        </div>
+          <!-- Afișare detalii COMANDĂ + QR code -->
+          <div v-else class="bg-gray-800 p-4 rounded shadow max-w-xl">
+            <h3 class="text-xl font-semibold mb-4">
+              Detalii Comandă #{{ lastOrderId }}
+            </h3>
+            <div v-for="(item, index) in lastOrder" :key="index" class="flex justify-between mb-2">
+              <span>{{ item.name }} x {{ item.quantity }}</span>
+              <span class="text-orange-500">{{ (item.price * item.quantity).toFixed(2) }} Lei</span>
+            </div>
+            <div class="border-t border-gray-700 my-4 pt-2 flex justify-between">
+              <span class="font-bold">Total:</span>
+              <span class="font-bold text-orange-500">{{ lastOrderTotal }} Lei</span>
+            </div>
+
+            <!-- QR CODE care duce la această pagină (cu ID-ul comenzii) -->
+            <div class="flex items-center flex-col mt-6">
+              <p class="mb-2">Scanează pentru a vedea această comandă:</p>
+              <img :src="qrUrl" alt="QR Code" class="rounded shadow"/>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Butonul de toggle al barei Comanda Ta (afișat DOAR dacă avem produse în coș) -->
+      <div
+        v-if="orders.length > 0 && activeTab !== 'confirmation'"
+        class="fixed bottom-6 right-6 z-50"
+      >
         <button
-          class="btn-orange w-full mt-4"
-          @click="checkout"
+          @click="isOrderOpen = !isOrderOpen"
+          class="btn-orange flex items-center"
         >
-          Finalizează Comanda
+          <span class="material-icons mr-2">shopping_cart</span>
+          Coș ({{ orders.length }})
         </button>
-      </aside>
+      </div>
+
+      <!-- Bara COMANDA TA, cu slide up/down -->
+      <transition name="slide-cart">
+        <aside
+          v-show="isOrderOpen && orders.length > 0 && activeTab !== 'confirmation'"
+          class="fixed bottom-0 left-0 w-full bg-gray-800 border-t border-gray-700 p-4 overflow-y-auto scrollbar"
+          style="max-height:50vh;"
+        >
+          <h3 class="text-xl font-bold mb-4">Comanda Ta</h3>
+          <!-- Lista de produse din coș -->
+          <div
+            v-for="(order, index) in orders"
+            :key="index"
+            class="flex justify-between items-center bg-gray-700 p-4 rounded-lg mb-2"
+          >
+            <div>
+              <h4 class="font-bold">{{ order.name }}</h4>
+              <small class="text-gray-400">x{{ order.quantity }}</small>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-orange-500 font-bold">
+                {{ (order.price * order.quantity).toFixed(2) }} Lei
+              </span>
+              <button
+                class="text-red-500 hover:text-red-300"
+                @click="removeFromOrder(index)"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+
+          <!-- Total și butonul de Payment -->
+          <div class="mt-4 flex justify-between items-center">
+            <span class="text-lg font-semibold">Total:</span>
+            <span class="text-orange-500 text-xl font-bold">
+              {{ total }}
+            </span>
+          </div>
+          <button
+            class="btn-orange w-full mt-4"
+            @click="checkout"
+          >
+            Finalizează Comanda
+          </button>
+        </aside>
+      </transition>
     </div>
   </div>
 
@@ -323,7 +385,10 @@
         return {
           // Control sidebar mobil
           isSidebarVisible: false,
-          // Tab principal: 'meniu' / 'puncte'
+          // Control arată/ascunde bara de comenzi
+          isOrderOpen: false,
+
+          // Tab principal: 'meniu' / 'puncte' / 'confirmation'
           activeTab: 'meniu',
 
           // Sub-vizualizare meniu: 'categories' / 'products'
@@ -488,6 +553,10 @@
           currentProducts: [],
           currentProduct: null,
           orders: [],
+
+          // După finalizare comandă
+          lastOrder: null,        // stocăm aici obiectele din coș
+          lastOrderId: null,      // un ID random
         };
       },
       computed: {
@@ -510,28 +579,49 @@
             return this.currentProducts;
           }
         },
-        // Totalul de plată
+        // Totalul de plată (coșul curent)
         total() {
           const s = this.orders.reduce((sum, o) => {
             return sum + o.price * o.quantity;
           }, 0);
           return s.toFixed(2);
         },
+        // Totalul ultimei comenzi
+        lastOrderTotal() {
+          if (!this.lastOrder) return 0;
+          return this.lastOrder
+            .reduce((acc, item) => acc + item.price * item.quantity, 0)
+            .toFixed(2);
+        },
+        // QR code URL (folosim Google Chart API)
+        qrUrl() {
+          // Link către actuala pagină + query param pentru ID-ul comenzii
+          const link = window.location.origin + window.location.pathname
+            + '?orderId=' + this.lastOrderId;
+          return (
+            'https://chart.googleapis.com/chart?chs=180x180&cht=qr&chl=' +
+            encodeURIComponent(link)
+          );
+        },
       },
       methods: {
+        // Încarcă produsele din categoria selectată
         loadProducts(category) {
           this.currentProducts = this.products[category] || [];
           this.view = 'products';
           this.searchQuery = '';
         },
+        // Înapoi la lista de categorii
         backToCategories() {
           this.view = 'categories';
           this.currentProduct = null;
           this.searchQuery = '';
         },
+        // Deschide modalul cu detalii de produs
         showProductDetails(product) {
           this.currentProduct = product;
         },
+        // Adaugă produsul în coș
         addToOrder(product) {
           const existing = this.orders.find((o) => o.name === product.title);
           if (existing) {
@@ -544,14 +634,17 @@
             });
           }
           this.currentProduct = null; // închidem modalul
+          // Arătăm bara de coș dacă e ascunsă
+          this.isOrderOpen = true;
         },
+        // Șterge un produs din coș
         removeFromOrder(index) {
           this.orders.splice(index, 1);
         },
+        // Finalizează comanda
         checkout() {
-          // Dacă e prima oară când userul comandă
           if (this.isFirstOrder) {
-            this.clientNumber++;     // alocăm un număr de client
+            this.clientNumber++;
             this.isFirstOrder = false;
           }
 
@@ -562,15 +655,30 @@
           }
           this.clientPoints += pointsToAdd;
 
-          alert(
-            `Comanda a fost finalizată!\n` +
-            `Număr client: #${this.clientNumber}\n` +
-            `Ai câștigat ${pointsToAdd.toFixed(2)} puncte.`
-          );
+          // Salvăm copia comenzii curente
+          this.lastOrder = JSON.parse(JSON.stringify(this.orders));
+          // Generăm un ID random (poate fi data + un nr random)
+          this.lastOrderId = 'CMD' + Date.now();
 
           // Golește coșul
           this.orders = [];
+          this.isOrderOpen = false;
+
+          // Comută pe pagina de confirmare
+          this.activeTab = 'confirmation';
         },
+      },
+      mounted() {
+        // Verificăm dacă exista un parametru ?orderId în URL (simulare reîncărcare pagină)
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+        if (orderId) {
+          // Într-un proiect real, aici am face un request la server cu orderId
+          // și am afișa comanda specifică. Aici doar simulăm că n-avem date
+          this.activeTab = 'confirmation';
+          // lastOrder rămâne null dacă nu avem stocare backend, e doar exemplu
+          this.lastOrderId = orderId;
+        }
       },
     });
 
