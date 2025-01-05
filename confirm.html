@@ -1,122 +1,51 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Jaegar Resto - Confirmare</title>
-
-  <!-- Vue 3 -->
-  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
-
-  <!-- TailwindCSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google Material Icons -->
-  <link
-    href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    rel="stylesheet"
-  />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confirmare Comandă</title>
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #1F2937;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      background-color: #111827;
       color: #fff;
     }
-    .btn-orange {
-      @apply bg-orange-500 text-white py-2 px-4 rounded-lg transition-all 
-        transform shadow hover:shadow-xl hover:scale-105 
-        focus:outline-none focus:ring-2 focus:ring-orange-500;
+    #qrcode {
+      margin-top: 20px;
+    }
+    a {
+      color: #f49032;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <div id="app" class="min-h-screen p-6 flex flex-col items-center">
-    <h1 class="text-3xl font-bold mb-4">Comanda Ta - Confirmare</h1>
+  <h1>Comanda a fost plasată cu succes!</h1>
+  <p>ID Comandă: <span id="orderId"></span></p>
+  <div id="qrcode"></div>
+  <p><a href="index.html">Înapoi la Meniu</a></p>
 
-    <!-- Aici afișăm detaliile comenzii -->
-    <div v-if="orderItems && orderItems.length > 0" class="bg-gray-800 p-6 rounded shadow max-w-lg w-full">
-      <h2 class="text-xl font-semibold mb-4">
-        Detalii Comandă #{{ orderId }}
-      </h2>
-
-      <div
-        v-for="(item, index) in orderItems"
-        :key="index"
-        class="flex justify-between mb-2"
-      >
-        <span>{{ item.name }} x {{ item.quantity }}</span>
-        <span class="text-orange-500">{{ (item.price * item.quantity).toFixed(2) }} Lei</span>
-      </div>
-
-      <div class="border-t border-gray-700 my-4 pt-2 flex justify-between">
-        <span class="font-bold">Total:</span>
-        <span class="font-bold text-orange-500">{{ total }} Lei</span>
-      </div>
-
-      <!-- QR Code -->
-      <div class="mt-6 flex flex-col items-center">
-        <p class="mb-2">Arată acest cod QR ospătarului:</p>
-        <!-- *** Observă link-ul generat pentru quickchart.io -->
-        <img
-          :src="qrUrl"
-          alt="QR Code"
-          class="rounded shadow"
-          width="180"
-          height="180"
-        />
-      </div>
-    </div>
-
-    <div v-else class="bg-gray-800 p-6 rounded shadow max-w-lg w-full">
-      <p>Nu am găsit nicio comandă. Poate a expirat sau a fost ștearsă.</p>
-    </div>
-
-    <!-- Buton "Înapoi la Meniu" -->
-    <div class="mt-6">
-      <a href="index.html" class="btn-orange">Înapoi la Meniu</a>
-    </div>
-  </div>
-
+  <!-- QRCode.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
-    const app = Vue.createApp({
-      data() {
-        return {
-          orderId: null,
-          orderItems: null,
-        };
-      },
-      computed: {
-        total() {
-          if (!this.orderItems) return 0;
-          return this.orderItems
-            .reduce((sum, x) => sum + x.price * x.quantity, 0)
-            .toFixed(2);
-        },
-        // QR code folosește quickchart.io
-        // Ca text, punem link-ul complet (cu domain-ul tău). De ex:
-        qrUrl() {
-          const currentLink = encodeURIComponent(window.location.href);
-          return (
-            'https://quickchart.io/qr?size=200&text=' + currentLink
-          );
-        },
-      },
-      mounted() {
-        // Luăm orderId din query string
-        const params = new URLSearchParams(window.location.search);
-        this.orderId = params.get('orderId');
+    // Obține ID-ul comenzii din URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('orderId');
+    document.getElementById('orderId').textContent = orderId;
 
-        if (this.orderId) {
-          // Citim din localStorage
-          const data = localStorage.getItem(this.orderId);
-          if (data) {
-            this.orderItems = JSON.parse(data);
-          }
-        }
-      },
-    });
-    app.mount('#app');
+    // Generează QR Code-ul
+    if(orderId){
+      const qrcode = new QRCode(document.getElementById("qrcode"), {
+        text: orderId,
+        width: 128,
+        height: 128,
+        colorDark : "#f49032",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+      });
+    }
   </script>
 </body>
 </html>
