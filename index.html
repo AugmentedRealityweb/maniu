@@ -167,7 +167,7 @@
 
         <!-- Tab-ul MENIU -->
         <section v-if="activeTab === 'meniu'">
-          <!-- Bară de căutare (acum e mereu afișată în tab-ul Meniu, inclusiv în 'categories') -->
+          <!-- Bară de căutare (caută în toate produsele, indiferent de tab-ul categories/products) -->
           <div class="flex items-center gap-4 mb-4">
             <input
               type="text"
@@ -177,42 +177,12 @@
             />
           </div>
 
-          <!-- Sub-vizualizare: lista de categorii -->
-          <div v-if="view === 'categories'">
-            <h2 class="text-xl font-semibold mb-4">Alege Categoria</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              <div
-                v-for="category in categories"
-                :key="category.name"
-                class="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-gray-700 transition"
-                @click="loadProducts(category.name)"
-              >
-                <img
-                  :src="category.image"
-                  :alt="category.name"
-                  class="w-full h-40 object-cover"
-                />
-                <div class="p-4">
-                  <h3 class="text-lg font-bold capitalize">
-                    {{ category.name }}
-                  </h3>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sub-vizualizare: lista de produse -->
-          <div v-else-if="view === 'products'">
-            <button
-              class="btn-orange mb-4"
-              @click="backToCategories"
-            >
-              Înapoi la Categorii
-            </button>
-            <h2 class="text-xl font-semibold mb-4">Produse ({{ displayedProducts.length }})</h2>
-
-            <!-- Listă produse afișate (filtrate) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <!-- Afișare rezultate căutare dacă searchQuery nu e gol -->
+          <div v-if="searchQuery.trim()">
+            <h2 class="text-xl font-semibold mb-4">
+              Rezultate pentru: "{{ searchQuery }}"
+            </h2>
+            <div v-if="displayedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               <div
                 v-for="product in displayedProducts"
                 :key="product.title"
@@ -231,6 +201,71 @@
                   <p class="text-orange-500 font-bold">
                     {{ product.price }} Lei
                   </p>
+                </div>
+              </div>
+            </div>
+            <div v-else>
+              <p>Nu a fost găsit niciun produs care să corespundă căutării.</p>
+            </div>
+          </div>
+
+          <!-- Dacă nu avem searchQuery, afișăm categoriile sau produsele -->
+          <div v-else>
+            <!-- Sub-vizualizare: lista de categorii -->
+            <div v-if="view === 'categories'">
+              <h2 class="text-xl font-semibold mb-4">Alege Categoria</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div
+                  v-for="category in categories"
+                  :key="category.name"
+                  class="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-gray-700 transition"
+                  @click="loadProducts(category.name)"
+                >
+                  <img
+                    :src="category.image"
+                    :alt="category.name"
+                    class="w-full h-40 object-cover"
+                  />
+                  <div class="p-4">
+                    <h3 class="text-lg font-bold capitalize">
+                      {{ category.name }}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sub-vizualizare: lista de produse din categoria curentă -->
+            <div v-else-if="view === 'products'">
+              <button
+                class="btn-orange mb-4"
+                @click="backToCategories"
+              >
+                Înapoi la Categorii
+              </button>
+              <h2 class="text-xl font-semibold mb-4">
+                Produse ({{ currentProducts.length }})
+              </h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div
+                  v-for="product in currentProducts"
+                  :key="product.title"
+                  class="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-gray-700 transition"
+                  @click="showProductDetails(product)"
+                >
+                  <img
+                    :src="product.image"
+                    :alt="product.title"
+                    class="w-full h-40 object-cover"
+                  />
+                  <div class="p-4">
+                    <h3 class="text-lg font-bold">
+                      {{ product.title }}
+                    </h3>
+                    <p class="text-orange-500 font-bold">
+                      {{ product.price }} Lei
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -404,6 +439,13 @@
   </div>
 
   <script>
+    // Funcție care elimină diacriticele pentru a face căutarea "oua" -> "ouă"
+    function removeDiacritics(str) {
+      // normalize -> transformă caracterele ă, î, â etc. în forme de bază + diacritice separate,
+      // pe care apoi le ștergem cu expresia regulată
+      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
     const app = Vue.createApp({
       data() {
         return {
@@ -453,7 +495,7 @@
             },
           ],
 
-          // Produse
+          // Produse (grupate pe categorii)
           products: {
             brunch: [
               {
@@ -575,38 +617,38 @@
             ],
           },
 
-          // Colectăm toate produsele dintr-o anumită categorie în currentProducts
+          // Ce produse sunt curente în "view=products"
           currentProducts: [],
+          // Produsul pe care îl afișăm în modal
           currentProduct: null,
 
           // Coșul curent (pentru comanda în desfășurare)
           orders: [],
 
-          // Toate comenzile finalizate (pentru "Comenzile Tale")
+          // Toate comenzile finalizate (pentru "Comenzile Tale"), salvate tot în localStorage
           myOrders: [],
         };
       },
       computed: {
-        // Produsele filtrate (când există un searchQuery).
-        // Dacă searchQuery are text => caută în toate produsele.
-        // Altfel, afișăm ce e în currentProducts (din categoria curentă).
+        // Returnează lista de produse filtrate, ignorând diacriticele.
         displayedProducts() {
-          if (this.searchQuery.trim()) {
-            const q = this.searchQuery.toLowerCase();
-            let results = [];
-            for (const catKey in this.products) {
-              const found = this.products[catKey].filter((prod) => {
-                return (
-                  prod.title.toLowerCase().includes(q) ||
-                  prod.description.toLowerCase().includes(q)
-                );
-              });
-              results = results.concat(found);
-            }
-            return results;
-          } else {
-            return this.currentProducts;
+          const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
+          if (!q) {
+            // Dacă nu avem query, ori arătăm produsele categoriei, ori nimic (dacă suntem în categories).
+            return this.view === 'products' ? this.currentProducts : [];
           }
+          let results = [];
+          // Căutăm în toate categoriile
+          for (const catKey in this.products) {
+            for (const prod of this.products[catKey]) {
+              const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
+              const descNoDiac = removeDiacritics(prod.description.toLowerCase());
+              if (titleNoDiac.includes(q) || descNoDiac.includes(q)) {
+                results.push(prod);
+              }
+            }
+          }
+          return results;
         },
         // Totalul de plată (coșul curent)
         total() {
@@ -617,7 +659,7 @@
         },
       },
       watch: {
-        // Salvăm în localStorage când se schimbă punctele, numărul de client sau comenzile finalizate.
+        // Salvăm în localStorage când se schimbă punctele, numărul de client sau comenzile finalizate
         clientPoints(newVal) {
           localStorage.setItem('clientPoints', newVal);
         },
@@ -633,11 +675,14 @@
           this.currentProducts = this.products[category] || [];
           this.view = 'products';
           this.searchQuery = '';
+          // Scroll to top
+          window.scrollTo(0, 0);
         },
         backToCategories() {
           this.view = 'categories';
           this.currentProduct = null;
           this.searchQuery = '';
+          window.scrollTo(0, 0);
         },
         showProductDetails(product) {
           this.currentProduct = product;
@@ -661,9 +706,6 @@
           setTimeout(() => {
             this.isShaking = false;
           }, 500);
-
-          // Deschidem coșul (opțional, poți comenta dacă nu vrei)
-          // this.isOrderOpen = true;
         },
         removeFromOrder(index) {
           this.orders.splice(index, 1);
@@ -687,19 +729,24 @@
           // Generăm un ID pentru comandă (ex: CMD + timestamp)
           const orderId = 'CMD' + Date.now();
 
-          // Adăugăm comanda în "myOrders" (pentru istoricul de comenzi)
+          // Adăugăm comanda în "myOrders" (ultimele 10)
           this.myOrders.push({
             orderId,
-            items: JSON.parse(JSON.stringify(this.orders)), // copiem coșul
+            items: JSON.parse(JSON.stringify(this.orders)), // clonăm coșul curent
           });
+          if (this.myOrders.length > 10) {
+            this.myOrders.shift(); // ștergem cea mai veche, păstrăm doar 10
+          }
+
+          // Salvăm comanda și cu orderId în localStorage, pt confirm.html
+          localStorage.setItem(orderId, JSON.stringify(this.orders));
 
           // Golește coșul
           this.orders = [];
           this.isOrderOpen = false;
 
-          // Poți redirecționa către o pagină de confirmare, sau doar să rămâi pe aceeași pagină
-          // window.location.href = 'confirm.html?orderId=' + orderId;
-          alert('Comanda a fost finalizată! Vezi istoricul în "Comenzile Tale".');
+          // Transfer către confirm.html
+          window.location.href = 'confirm.html?orderId=' + orderId;
         },
       },
       mounted() {
