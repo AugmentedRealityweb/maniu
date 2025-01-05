@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ro">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -35,62 +35,61 @@
     .scrollbar::-webkit-scrollbar-track {
       background-color: #1F2937;
     }
-    /* Mic efect luminos la hover pentru butoanele portocalii */
+
+    /* Efect de highlight (luminos) pentru butoanele portocalii */
     .btn-orange {
       @apply bg-orange-500 text-white py-2 px-4 rounded-lg transition-all 
-        transform shadow hover:shadow-lg hover:scale-105 
+        transform shadow hover:shadow-xl hover:scale-105 
         focus:outline-none focus:ring-2 focus:ring-orange-500;
+    }
+
+    /* Mică animație la deschiderea/închiderea sidebarului pe mobil */
+    .slide-fade-enter-active,
+    .slide-fade-leave-active {
+      transition: all .3s ease;
+    }
+    .slide-fade-enter,
+    .slide-fade-leave-to {
+      transform: translateX(-50px);
+      opacity: 0;
     }
   </style>
 </head>
 <body class="bg-gray-900 text-gray-100">
   <div id="app" class="h-screen flex overflow-hidden">
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR (vizibil permanent pe ecrane >= md) -->
     <aside
-      :class="[
-        'bg-gray-800',
-        'p-4',
-        'flex',
-        'flex-col',
-        'space-y-4',
-        'hidden',
-        'md:block',
-        'md:w-64'
-      ]"
+      class="hidden md:flex md:flex-col md:w-64 bg-gray-800 p-4 space-y-4"
     >
       <div class="text-2xl font-bold text-center mb-6">
         Jaegar Resto
       </div>
       <nav class="flex flex-col space-y-2">
-        <a
-          href="#"
+        <!-- Meniu -->
+        <button
           class="flex items-center gap-3 px-4 py-2 bg-gray-700 rounded-md hover:bg-gray-600"
+          @click="activeTab = 'meniu'"
         >
-          <span class="material-icons">home</span>
-          Dashboard
-        </a>
-        <a
-          href="#"
+          <span class="material-icons">restaurant_menu</span>
+          Meniu
+        </button>
+
+        <!-- Puncte -->
+        <button
           class="flex items-center gap-3 px-4 py-2 hover:bg-gray-600 rounded-md"
+          @click="activeTab = 'puncte'"
         >
-          <span class="material-icons">menu</span>
-          Menu
-        </a>
-        <a
-          href="#"
-          class="flex items-center gap-3 px-4 py-2 hover:bg-gray-600 rounded-md"
-        >
-          <span class="material-icons">settings</span>
-          Settings
-        </a>
+          <span class="material-icons">star</span>
+          Puncte
+        </button>
       </nav>
     </aside>
 
-    <!-- Conținut principal + Orders -->
+    <!-- CONȚINUT PRINCIPAL (Meniu / Puncte) + ORDERS -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
-      <!-- MAIN SECTION: Produsele -->
-      <main class="flex-1 p-4 overflow-y-auto scrollbar">
-        <!-- Header top bar (mobil) -->
+      <!-- SECTIUNE MENIU / PUNCTE -->
+      <main class="flex-1 p-4 overflow-y-auto scrollbar relative">
+        <!-- Buton meniu pentru mobil (deschide mini-sidebar) -->
         <div class="flex items-center justify-between mb-4 md:hidden">
           <div class="text-2xl font-bold">Jaegar Resto</div>
           <button
@@ -101,7 +100,7 @@
           </button>
         </div>
 
-        <!-- Sidebar mobil (afișat condiționat) -->
+        <!-- Sidebar mobil (slide fade) -->
         <transition name="slide-fade">
           <aside
             v-if="isSidebarVisible"
@@ -114,150 +113,170 @@
               <span class="material-icons">close</span>
             </button>
             <nav class="flex flex-col space-y-2">
-              <a
-                href="#"
+              <button
                 class="flex items-center gap-3 px-4 py-2 bg-gray-700 rounded-md hover:bg-gray-600"
+                @click="activeTab = 'meniu'; isSidebarVisible=false"
               >
-                <span class="material-icons">home</span>
-                Dashboard
-              </a>
-              <a
-                href="#"
+                <span class="material-icons">restaurant_menu</span>
+                Meniu
+              </button>
+              <button
                 class="flex items-center gap-3 px-4 py-2 hover:bg-gray-600 rounded-md"
+                @click="activeTab = 'puncte'; isSidebarVisible=false"
               >
-                <span class="material-icons">menu</span>
-                Menu
-              </a>
-              <a
-                href="#"
-                class="flex items-center gap-3 px-4 py-2 hover:bg-gray-600 rounded-md"
-              >
-                <span class="material-icons">settings</span>
-                Settings
-              </a>
+                <span class="material-icons">star</span>
+                Puncte
+              </button>
             </nav>
           </aside>
         </transition>
 
-        <!-- Bară de căutare -->
-        <div class="flex items-center justify-between mb-4">
-          <h1 class="text-2xl font-bold">Menu</h1>
-          <input
-            type="text"
-            placeholder="Search for food, coffee, etc..."
-            v-model="searchQuery"
-            class="bg-gray-800 text-gray-200 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-orange-500 w-1/2 md:w-1/3"
-          />
-        </div>
-
-        <!-- Buton back to categories (apare doar în view=products) -->
-        <button
-          v-if="view === 'products'"
-          @click="backToCategories"
-          class="btn-orange mb-4"
-        >
-          Back to Categories
-        </button>
-
-        <!-- CATEGORIES -->
-        <section v-if="view === 'categories'">
-          <h2 class="text-xl font-semibold mb-4">Choose Categories</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <div
-              v-for="category in categories"
-              :key="category.name"
-              class="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-gray-700 transition"
-              @click="loadProducts(category.name)"
-            >
-              <img
-                :src="category.image"
-                :alt="category.name"
-                class="w-full h-40 object-cover"
-              />
-              <div class="p-4">
-                <h3 class="text-lg font-bold capitalize">
-                  {{ category.name }}
-                </h3>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- PRODUCTS -->
-        <section v-else-if="view === 'products'">
-          <h2 class="text-xl font-semibold mb-4">Products</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <div
-              v-for="product in displayedProducts"
-              :key="product.title"
-              class="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-gray-700 transition"
-              @click="showProductDetails(product)"
-            >
-              <img
-                :src="product.image"
-                :alt="product.title"
-                class="w-full h-40 object-cover"
-              />
-              <div class="p-4">
-                <h3 class="text-lg font-bold">
-                  {{ product.title }}
-                </h3>
-                <p class="text-orange-500 font-bold">
-                  {{ product.price }}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Product Details Modal -->
-        <div
-          v-if="currentProduct"
-          class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-        >
-          <div class="bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 md:w-3/4 lg:w-1/2 relative">
-            <button
-              class="absolute top-4 right-4 text-gray-500 text-2xl"
-              @click="currentProduct = null"
-            >
-              &times;
-            </button>
-            <img
-              :src="currentProduct.image"
-              :alt="currentProduct.title"
-              class="w-full h-64 object-cover mb-4 rounded-lg"
-            />
-            <h2 class="text-xl font-bold mb-2">
-              {{ currentProduct.title }}
-            </h2>
-            <p class="text-orange-500 font-bold text-lg mb-4">
-              {{ currentProduct.price }}
-            </p>
-            <p class="text-gray-400 mb-4">
-              {{ currentProduct.description }}
-            </p>
-            <ul class="text-gray-300 mb-4">
-              <li
-                v-for="ingredient in currentProduct.ingredients"
-                :key="ingredient"
-                class="list-disc ml-5"
+        <!-- Afișăm tab-ul MENIU -->
+        <section v-if="activeTab === 'meniu'">
+          <!-- view: categories / products -->
+          <div v-if="view === 'categories'">
+            <h2 class="text-xl font-semibold mb-4">Alege Categoria</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div
+                v-for="category in categories"
+                :key="category.name"
+                class="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-gray-700 transition"
+                @click="loadProducts(category.name)"
               >
-                {{ ingredient }}
-              </li>
-            </ul>
-            <button
-              class="btn-orange"
-              @click="addToOrder(currentProduct)"
-            >
-              Add to Cart
-            </button>
+                <img
+                  :src="category.image"
+                  :alt="category.name"
+                  class="w-full h-40 object-cover"
+                />
+                <div class="p-4">
+                  <h3 class="text-lg font-bold capitalize">
+                    {{ category.name }}
+                  </h3>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+
+          <!-- view: products -->
+          <div v-else-if="view === 'products'">
+            <button
+              class="btn-orange mb-4"
+              @click="backToCategories"
+            >
+              Înapoi la Categorii
+            </button>
+
+            <!-- Bară de căutare produse -->
+            <div class="flex items-center gap-4 mb-4">
+              <h2 class="text-xl font-semibold">Produse</h2>
+              <input
+                type="text"
+                placeholder="Caută produse..."
+                v-model="searchQuery"
+                class="bg-gray-800 text-gray-200 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-orange-500 w-1/2 md:w-1/3"
+              />
+            </div>
+
+            <!-- Listă produse afișate (filtrate) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div
+                v-for="product in displayedProducts"
+                :key="product.title"
+                class="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:bg-gray-700 transition"
+                @click="showProductDetails(product)"
+              >
+                <img
+                  :src="product.image"
+                  :alt="product.title"
+                  class="w-full h-40 object-cover"
+                />
+                <div class="p-4">
+                  <h3 class="text-lg font-bold">
+                    {{ product.title }}
+                  </h3>
+                  <p class="text-orange-500 font-bold">
+                    {{ product.price }} Lei
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Detalii Produs -->
+          <div
+            v-if="currentProduct"
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          >
+            <div class="bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 md:w-3/4 lg:w-1/2 relative">
+              <button
+                class="absolute top-4 right-4 text-gray-500 text-2xl"
+                @click="currentProduct = null"
+              >
+                &times;
+              </button>
+              <img
+                :src="currentProduct.image"
+                :alt="currentProduct.title"
+                class="w-full h-64 object-cover mb-4 rounded-lg"
+              />
+              <h2 class="text-xl font-bold mb-2">
+                {{ currentProduct.title }}
+              </h2>
+              <p class="text-orange-500 font-bold text-lg mb-4">
+                {{ currentProduct.price }} Lei
+              </p>
+              <p class="text-gray-400 mb-4">
+                {{ currentProduct.description }}
+              </p>
+              <ul class="text-gray-300 mb-4">
+                <li
+                  v-for="ingredient in currentProduct.ingredients"
+                  :key="ingredient"
+                  class="list-disc ml-5"
+                >
+                  {{ ingredient }}
+                </li>
+              </ul>
+              <button
+                class="btn-orange"
+                @click="addToOrder(currentProduct)"
+              >
+                Adaugă în coș
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Afișăm tab-ul PUNCTE -->
+        <section v-else-if="activeTab === 'puncte'">
+          <h2 class="text-2xl font-bold mb-4">Punctele mele</h2>
+          <div class="bg-gray-800 p-4 rounded shadow max-w-md">
+            <!-- Dacă clientul încă nu are număr (0), înseamnă că nu a făcut nicio comandă finalizată -->
+            <div v-if="clientNumber === 0" class="mb-4">
+              <p class="text-gray-300">
+                Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
+              </p>
+            </div>
+            <div v-else>
+              <p class="text-gray-300 mb-2">
+                Număr client: <span class="font-bold">#{{ clientNumber }}</span>
+              </p>
+            </div>
+            <p class="text-gray-300">
+              Puncte acumulate: 
+              <span class="font-bold text-orange-500">{{ clientPoints.toFixed(2) }}</span>
+            </p>
+          </div>
+        </section>
       </main>
 
-      <!-- ORDERS: pe ecrane mari e în dreapta, pe mobil apare jos -->
-      <aside class="md:w-80 bg-gray-800 md:border-l border-gray-700 p-4 overflow-y-auto scrollbar">
-        <h3 class="text-xl font-bold mb-4">Your Order</h3>
+      <!-- ORDERS: apare DOAR dacă avem comenzi în coș -->
+      <aside
+        v-if="orders.length > 0"
+        class="md:w-80 bg-gray-800 md:border-l border-gray-700 p-4 overflow-y-auto scrollbar 
+               md:max-h-[50vh]"
+      >
+        <h3 class="text-xl font-bold mb-4">Comanda Ta</h3>
         <!-- Lista de produse din coș -->
         <div
           v-for="(order, index) in orders"
@@ -292,23 +311,33 @@
           class="btn-orange w-full mt-4"
           @click="checkout"
         >
-          Proceed to Payment
+          Finalizează Comanda
         </button>
       </aside>
     </div>
-
   </div>
 
   <script>
     const app = Vue.createApp({
       data() {
         return {
-          /* LOGICĂ GENERALĂ */
-          isSidebarVisible: false,   // pentru sidebarul mobil
-          view: 'categories',       // afișăm "categories" sau "products"
-          searchQuery: '',          // textul din input de căutare
+          // Control sidebar mobil
+          isSidebarVisible: false,
+          // Tab principal: 'meniu' / 'puncte'
+          activeTab: 'meniu',
 
-          /* CATEGORII */
+          // Sub-vizualizare meniu: 'categories' / 'products'
+          view: 'categories',
+
+          // Pentru căutarea produselor
+          searchQuery: '',
+
+          // Fidelizare
+          clientNumber: 0,       // 0 = încă niciun user nou
+          clientPoints: 0,       // puncte acumulate
+          isFirstOrder: true,    // true dacă userul încă nu a finalizat nicio comandă
+
+          // Categorii
           categories: [
             {
               name: 'brunch',
@@ -333,36 +362,36 @@
             },
           ],
 
-          /* PRODUSE */
+          // Produse
           products: {
             brunch: [
               {
-                title: 'Avocado Toast',
+                title: 'Toast cu avocado',
                 description: 'Avocado, toast, ouă poșate, roșii cherry.',
-                price: '25',
+                price: 25,
                 image: 'https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp',
                 ingredients: ['Avocado', 'Toast', 'Ouă', 'Roșii cherry'],
               },
               {
-                title: 'Eggs Benedict',
+                title: 'Ouă Benedict',
                 description: 'Ouă poșate, sos hollandaise, șuncă.',
-                price: '30',
+                price: 30,
                 image: 'https://i.giphy.com/X3E37CTy55jNK.webp',
                 ingredients: ['Ouă', 'Hollandaise', 'Șuncă'],
               },
               {
-                title: 'Pancakes',
+                title: 'Clătite',
                 description: 'Clătite, sirop de arțar, fructe proaspete.',
-                price: '20',
+                price: 20,
                 image: 'https://i.giphy.com/5zu5JovduWFBS.webp',
-                ingredients: ['Făină', 'Ouă', 'Sirop', 'Fructe'],
+                ingredients: ['Făină', 'Ouă', 'Sirop de arțar', 'Fructe'],
               },
             ],
             soups: [
               {
                 title: 'Ciorbă de burtă',
                 description: 'Tradițională, smântână, ardei iute.',
-                price: '18',
+                price: 18,
                 image:
                   'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg',
                 ingredients: ['Burtă', 'Smântână', 'Ardei iute'],
@@ -370,7 +399,7 @@
               {
                 title: 'Supă cremă de roșii',
                 description: 'Roșii proaspete, crutoane, busuioc.',
-                price: '15',
+                price: 15,
                 image:
                   'https://www.lalena.ro/images/uploaded/600x_Supa-crema-de-rosii-108.jpg',
                 ingredients: ['Roșii', 'Crutoane', 'Busuioc'],
@@ -378,7 +407,7 @@
               {
                 title: 'Ciorbă de legume',
                 description: 'Legume proaspete, zeamă de lămâie.',
-                price: '12',
+                price: 12,
                 image:
                   'https://www.prestij.ro/uploads/produse/1440/94--ciorba-taraneasca-de-legume.jpg',
                 ingredients: ['Morcovi', 'Cartofi', 'Ceapă', 'Apio'],
@@ -386,23 +415,23 @@
             ],
             pasta: [
               {
-                title: 'Spaghetti Carbonara',
+                title: 'Spaghete Carbonara',
                 description: 'Spaghetti, bacon, parmezan, ouă.',
-                price: '28',
+                price: 28,
                 image: 'https://i.giphy.com/dZRlFW1sbFEpG.webp',
                 ingredients: ['Spaghetti', 'Bacon', 'Parmezan', 'Ouă'],
               },
               {
                 title: 'Penne Arrabbiata',
                 description: 'Penne, sos de roșii picant, usturoi.',
-                price: '25',
+                price: 25,
                 image: 'https://i.giphy.com/f0N7csaAc6t60OmXkm.webp',
                 ingredients: ['Penne', 'Roșii', 'Usturoi', 'Ardei iute'],
               },
               {
                 title: 'Tagliatelle Alfredo',
                 description: 'Tagliatelle, sos Alfredo, pui.',
-                price: '30',
+                price: 30,
                 image: 'https://i.giphy.com/xOML6s8aBmAtlLwujM.webp',
                 ingredients: ['Tagliatelle', 'Pui', 'Parmezan', 'Smântână'],
               },
@@ -411,21 +440,21 @@
               {
                 title: 'Muschiuleț de porc',
                 description: 'Muschiuleț, cartofi copți, mozzarella, bacon.',
-                price: '45',
+                price: 45,
                 image: 'https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp',
                 ingredients: ['Porc', 'Cartofi', 'Mozzarella', 'Bacon'],
               },
               {
                 title: 'Tomahawk porc',
                 description: 'Carne de porc, cartofi, sos brun.',
-                price: '41',
+                price: 41,
                 image: 'https://i.giphy.com/KDskfOILt91T2.webp',
                 ingredients: ['Tomahawk', 'Cartofi', 'Sos brun'],
               },
               {
                 title: 'Ceafă sfărâmată',
                 description: 'Ceafă, piure de cartofi, ardei copți.',
-                price: '36',
+                price: 36,
                 image: 'https://i.giphy.com/l378puWI9Fpi4OApO.webp',
                 ingredients: ['Ceafă porc', 'Piure', 'Ardei copți'],
               },
@@ -434,97 +463,113 @@
               {
                 title: 'Tiramisu',
                 description: 'Prăjitură italiană cu cafea, mascarpone.',
-                price: '20',
+                price: 20,
                 image: 'https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp',
                 ingredients: ['Cafea', 'Mascarpone', 'Pișcoturi'],
               },
               {
                 title: 'Pavlova',
                 description: 'Bezea, frișcă, fructe de pădure.',
-                price: '18',
+                price: 18,
                 image: 'https://i.giphy.com/iiwu9bTOZ1HiM.webp',
                 ingredients: ['Bezea', 'Frișcă', 'Fructe de pădure'],
               },
               {
                 title: 'Cheesecake',
                 description: 'Cheesecake cu dulceață de căpșuni.',
-                price: '22',
+                price: 22,
                 image: 'https://i.giphy.com/Xi2UAW7kTQvHa.webp',
                 ingredients: ['Brânză', 'Biscuiți', 'Căpșuni'],
               },
             ],
           },
 
-          /* Stocare curentă */
+          // Stocare internă
           currentProducts: [],
           currentProduct: null,
           orders: [],
         };
       },
       computed: {
-        // Filtrează produsele dacă avem ceva în searchQuery,
-        // altfel le afișează pe cele ale categoriei curente
+        // Produsele filtrate (dacă searchQuery nu e gol, căutăm în toate categoriile)
         displayedProducts() {
           if (this.searchQuery.trim()) {
-            const query = this.searchQuery.trim().toLowerCase();
+            const q = this.searchQuery.toLowerCase();
             let results = [];
-            // căutăm în toate categoriile
-            for (const cat in this.products) {
-              const catProds = this.products[cat].filter((prod) => {
+            for (const catKey in this.products) {
+              const found = this.products[catKey].filter((prod) => {
                 return (
-                  prod.title.toLowerCase().includes(query) ||
-                  prod.description.toLowerCase().includes(query)
+                  prod.title.toLowerCase().includes(q) ||
+                  prod.description.toLowerCase().includes(q)
                 );
               });
-              results = results.concat(catProds);
+              results = results.concat(found);
             }
             return results;
           } else {
-            // fără search => afișăm produsele categoriei curente
             return this.currentProducts;
           }
         },
-        // Calculează totalul (suma prețurilor * cantități)
+        // Totalul de plată
         total() {
-          return this.orders
-            .reduce((sum, order) => {
-              return sum + parseFloat(order.price) * order.quantity;
-            }, 0)
-            .toFixed(2);
+          const s = this.orders.reduce((sum, o) => {
+            return sum + o.price * o.quantity;
+          }, 0);
+          return s.toFixed(2);
         },
       },
       methods: {
         loadProducts(category) {
           this.currentProducts = this.products[category] || [];
           this.view = 'products';
+          this.searchQuery = '';
         },
         backToCategories() {
           this.view = 'categories';
+          this.currentProduct = null;
           this.searchQuery = '';
         },
         showProductDetails(product) {
           this.currentProduct = product;
         },
         addToOrder(product) {
-          const existing = this.orders.find(
-            (o) => o.name === product.title
-          );
+          const existing = this.orders.find((o) => o.name === product.title);
           if (existing) {
             existing.quantity++;
           } else {
             this.orders.push({
               name: product.title,
-              quantity: 1,
               price: product.price,
+              quantity: 1,
             });
           }
-          this.currentProduct = null; // închide modalul
+          this.currentProduct = null; // închidem modalul
         },
         removeFromOrder(index) {
           this.orders.splice(index, 1);
         },
         checkout() {
-          alert('Proceed to Payment!');
+          // Dacă e prima oară când userul comandă
+          if (this.isFirstOrder) {
+            this.clientNumber++;     // alocăm un număr de client
+            this.isFirstOrder = false;
+          }
+
+          // Calculăm punctele pentru tot ce e în coș
+          let pointsToAdd = 0;
+          for (const item of this.orders) {
+            pointsToAdd += item.price * item.quantity * 0.05; // 5%
+          }
+          this.clientPoints += pointsToAdd;
+
+          alert(
+            `Comanda a fost finalizată!\n` +
+            `Număr client: #${this.clientNumber}\n` +
+            `Ai câștigat ${pointsToAdd.toFixed(2)} puncte.`
+          );
+
+          // Golește coșul
+          this.orders = [];
         },
       },
     });
