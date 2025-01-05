@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Restaurant Menu</title>
+  <title>Restaurant POS</title>
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
@@ -11,80 +11,129 @@
     body {
       font-family: 'Inter', sans-serif;
     }
+    .scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: #4B5563 #1F2937;
+    }
+    .scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .scrollbar::-webkit-scrollbar-thumb {
+      background-color: #4B5563;
+      border-radius: 6px;
+    }
+    .scrollbar::-webkit-scrollbar-track {
+      background-color: #1F2937;
+    }
   </style>
 </head>
-<body class="bg-gray-100">
-  <div id="app" class="min-h-screen bg-gray-100">
-    <!-- Categories -->
-    <div v-if="view === 'categories'" class="p-6 space-y-6">
-      <div
-        v-for="category in categories"
-        :key="category.name"
-        class="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer"
-        @click="loadProducts(category.name)"
-        data-aos="fade-up"
-        data-aos-duration="600"
-      >
-        <img :src="category.image" :alt="category.name" class="w-full h-40 object-cover">
-        <div class="p-4">
-          <h2 class="text-lg font-bold capitalize">{{ category.name }}</h2>
-        </div>
-      </div>
-    </div>
+<body class="bg-gray-900 text-gray-100">
+  <div id="app" class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-800 p-4 flex flex-col space-y-6">
+      <div class="text-2xl font-bold text-center">Jaegar Resto</div>
+      <nav class="flex flex-col space-y-2">
+        <a href="#" class="flex items-center gap-3 px-4 py-2 bg-gray-700 rounded-md hover:bg-gray-600">
+          <span class="material-icons">home</span>
+          Dashboard
+        </a>
+        <a href="#" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-600 rounded-md">
+          <span class="material-icons">menu</span>
+          Menu
+        </a>
+        <a href="#" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-600 rounded-md">
+          <span class="material-icons">settings</span>
+          Settings
+        </a>
+      </nav>
+    </aside>
 
-    <!-- Products List -->
-    <div v-else-if="view === 'products'" class="p-6 space-y-6">
-      <button @click="backToCategories" class="mb-4 bg-red-500 text-white py-2 px-4 rounded-lg">
-        Înapoi la Categorii
-      </button>
-      <div
-        v-for="product in currentProducts"
-        :key="product.title"
-        class="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer"
-        @click="showProductDetails(product)"
-        data-aos="fade-up"
-        data-aos-duration="600"
-      >
-        <img :src="product.image" :alt="product.title" class="w-full h-40 object-cover">
-        <div class="p-4">
-          <h2 class="text-lg font-bold">{{ product.title }}</h2>
-          <p class="text-red-500 font-bold">{{ product.price }}</p>
-        </div>
-      </div>
-    </div>
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto scrollbar">
+      <!-- Header -->
+      <header class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Dashboard</h1>
+        <input
+          type="text"
+          placeholder="Search for food, coffee, etc..."
+          class="bg-gray-800 text-gray-200 rounded-lg px-4 py-2 w-1/3 outline-none focus:ring-2 focus:ring-orange-500"
+        />
+      </header>
 
-    <!-- Product Details -->
-    <div v-else-if="view === 'details'" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div class="bg-white rounded-lg shadow-lg w-11/12 sm:w-3/4 lg:w-1/2">
-        <div class="relative">
-          <button
-            class="absolute top-4 right-4 text-gray-500 text-2xl"
-            @click="view = 'products'"
+      <!-- Categories -->
+      <section v-if="view === 'categories'">
+        <h2 class="text-xl font-semibold mb-4">Choose Categories</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            v-for="category in categories"
+            :key="category.name"
+            class="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer"
+            @click="loadProducts(category.name)"
+            data-aos="fade-up"
+            data-aos-duration="600"
           >
-            &times;
-          </button>
-          <img :src="currentProduct.image" :alt="currentProduct.title" class="w-full h-64 object-cover">
+            <img :src="category.image" :alt="category.name" class="w-full h-40 object-cover">
+            <div class="p-4">
+              <h3 class="text-lg font-bold capitalize">{{ category.name }}</h3>
+            </div>
+          </div>
         </div>
-        <div class="p-6">
-          <h2 class="text-xl font-bold mb-2">{{ currentProduct.title }}</h2>
-          <p class="text-red-500 text-lg font-bold mb-2">{{ currentProduct.price }}</p>
-          <p class="text-gray-700 text-sm mb-4">{{ currentProduct.description }}</p>
-          <button class="bg-red-500 text-white py-2 px-4 rounded-lg" @click="view = 'products'">
-            Închide
-          </button>
+      </section>
+
+      <!-- Products -->
+      <section v-else-if="view === 'products'">
+        <button @click="backToCategories" class="mb-4 bg-orange-500 text-white py-2 px-4 rounded-lg">
+          Back to Categories
+        </button>
+        <h2 class="text-xl font-semibold mb-4">Products</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            v-for="product in currentProducts"
+            :key="product.title"
+            class="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer"
+            @click="showProductDetails(product)"
+            data-aos="fade-up"
+            data-aos-duration="600"
+          >
+            <img :src="product.image" :alt="product.title" class="w-full h-40 object-cover">
+            <div class="p-4">
+              <h3 class="text-lg font-bold">{{ product.title }}</h3>
+              <p class="text-orange-500 font-bold">{{ product.price }}</p>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+
+      <!-- Product Details -->
+      <section v-else-if="view === 'details'" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-gray-800 rounded-lg shadow-lg w-11/12 sm:w-3/4 lg:w-1/2">
+          <div class="relative">
+            <button
+              class="absolute top-4 right-4 text-gray-500 text-2xl"
+              @click="view = 'products'"
+            >
+              &times;
+            </button>
+            <img :src="currentProduct.image" :alt="currentProduct.title" class="w-full h-64 object-cover">
+          </div>
+          <div class="p-6">
+            <h2 class="text-xl font-bold mb-2">{{ currentProduct.title }}</h2>
+            <p class="text-orange-500 text-lg font-bold mb-2">{{ currentProduct.price }}</p>
+            <p class="text-gray-400 text-sm mb-4">{{ currentProduct.description }}</p>
+            <button class="bg-orange-500 text-white py-2 px-4 rounded-lg" @click="view = 'products'">
+              Close
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
   <!-- Include AOS Library -->
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-
   <script>
-    // Initialize AOS
     AOS.init();
 
-    // Vue App
     const app = Vue.createApp({
       data() {
         return {
