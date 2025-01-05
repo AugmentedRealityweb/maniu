@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ro">
-<head> 
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Meniu Restaurant - Pagina Principală</title>
@@ -719,6 +719,10 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
+
+        // ====================================
+        // Metoda checkout cu console.log suplimentar
+        // ====================================
         async checkout() {
           try {
             // Dacă e prima comandă, alocăm număr client
@@ -746,9 +750,11 @@
               timestamp: serverTimestamp(),
             };
 
+            console.log("Încearcă să adauge comanda în Firestore: ", orderData);
+
             // Adăugăm comanda în Firestore
             const docRef = await addDoc(collection(db, "orders"), orderData);
-            console.log("Comandă adăugată cu ID: ", docRef.id);
+            console.log("Comandă adăugată cu ID (Firestore docRef): ", docRef.id);
 
             // Actualizăm istoricul comenzilor
             this.myOrders.push(orderData);
@@ -762,13 +768,16 @@
             this.orders = [];
             this.isOrderOpen = false;
 
+            console.log("Am ajuns la final, totul OK, orderId=", orderId);
+
             // Redirecționează către pagina de confirmare
             window.location.href = 'confirm.html?orderId=' + orderId;
-          },
+          } catch (e) {
             console.error("Eroare la finalizarea comenzii: ", e);
             alert("A apărut o eroare la plasarea comenzii. Te rugăm să încerci din nou.");
           }
         },
+
         async fetchOrders() {
           try {
             if (this.clientNumber === 0) {
