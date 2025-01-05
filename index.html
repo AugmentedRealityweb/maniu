@@ -773,5 +773,33 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
 </script>
+  <script type="module">
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+  const db = getFirestore(app);
+
+  // Funcție pentru a adăuga o comandă
+  async function addOrder(order) {
+    try {
+      const docRef = await addDoc(collection(db, "orders"), order);
+      console.log("Comanda a fost adăugată cu ID:", docRef.id);
+    } catch (e) {
+      console.error("Eroare la adăugarea comenzii:", e);
+    }
+  }
+
+  // Exemplu de comandă
+  const testOrder = {
+    orderId: "CMD001",
+    items: [
+      { name: "Pizza", price: 30, quantity: 1 },
+      { name: "Tiramisu", price: 20, quantity: 2 }
+    ],
+    total: 70,
+  };
+
+  // Testăm adăugarea comenzii
+  addOrder(testOrder);
+</script>
 </body>
 </html>
