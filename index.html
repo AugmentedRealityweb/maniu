@@ -43,18 +43,29 @@
       background-color: #f49032; /* Fundal */
       color: #fff;              /* Text alb */
       font-weight: bold;
-      border: 1px solid #f49032; /* Lățime crescută cu 1px pentru restul butoanelor */
+      border: 1px solid #f49032; 
       @apply py-2 px-6 rounded-full transition-all transform shadow 
         hover:shadow-xl hover:scale-105 
-        focus:outline-none focus:ring-2 focus:ring-[#d35400];
+        focus:outline-none focus:ring-0;
     }
-    /* Butoane mici +/- pentru cantitate, fără linii portocalii */
+    /* Butoane mici +/- pentru cantitate, fără outline */
     .btn-incdec {
       background-color: #f49032;
       color: #fff;
       font-weight: bold;
-      border: none !important; /* Eliminăm orice linie portocalie */
-      @apply w-8 h-8 rounded-full flex items-center justify-center;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+
+      /* Cu Tailwind se poate face și: 
+         @apply focus:outline-none focus:ring-0; 
+         dar lăsăm și standard CSS */
+      @apply w-8 h-8 rounded-full flex items-center justify-center focus:ring-0 focus:outline-none;
+    }
+    .btn-incdec:focus,
+    .btn-incdec:active {
+      outline: none !important;
+      box-shadow: none !important;
     }
 
     /* Animație shake pentru coș */
@@ -438,7 +449,7 @@
             { name: 'pasta', image: 'https://i.giphy.com/dZRlFW1sbFEpG.webp' },
             { name: 'main', image: 'https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp' },
             { name: 'desserts', image: 'https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp' },
-            { name: 'drinks', image: 'https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp' }, /* Noua categorie */
+            { name: 'drinks', image: 'https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp' },
           ],
 
           // Produse (pe categorii)
@@ -558,7 +569,7 @@
                 ingredients: ['Brânză', 'Biscuiți', 'Căpșuni'],
               },
             ],
-            drinks: [ /* Noua categorie */
+            drinks: [
               {
                 title: 'Cocktail',
                 description: 'Băutură răcoritoare cu fructe proaspete și alcool fin.',
@@ -616,7 +627,7 @@
         },
       },
       methods: {
-        // Pentru afișarea categoriei în română
+        // Afișare categorii cu denumiri în RO
         renameCategory(cat) {
           const dict = {
             brunch: 'Mic Dejun',
@@ -633,7 +644,7 @@
           this.view = 'produse';
           this.searchQuery = '';
 
-          // Scroll la top după schimbarea vizualizării
+          // Scroll la top
           this.$nextTick(() => {
             window.scrollTo(0, 0);
           });
@@ -643,7 +654,7 @@
           this.currentProduct = null;
           this.searchQuery = '';
 
-          // Scroll la top după schimbarea vizualizării
+          // Scroll la top
           this.$nextTick(() => {
             window.scrollTo(0, 0);
           });
@@ -664,7 +675,7 @@
           }
           this.currentProduct = null;
 
-          // Animație shake pentru coș
+          // Animație shake coș
           this.isShaking = true;
           setTimeout(() => {
             this.isShaking = false;
@@ -691,7 +702,7 @@
             this.clientNumber++;
             this.isFirstOrder = false;
           }
-          // Calculăm puncte (5%).
+          // 5% puncte
           let pointsToAdd = 0;
           for (const item of this.orders) {
             pointsToAdd += item.price * item.quantity * 0.05;
@@ -707,7 +718,7 @@
             orderId,
             items: cloneOrders,
           });
-          // Salvăm în localStorage imediat
+          // Salvăm în localStorage
           localStorage.setItem('myOrders', JSON.stringify(this.myOrders));
 
           // Salvăm comanda pt confirm.html
@@ -717,7 +728,7 @@
           this.orders = [];
           this.isOrderOpen = false;
 
-          // Redirecționează
+          // Redirect
           window.location.href = 'confirm.html?orderId=' + orderId;
         },
       },
@@ -752,54 +763,44 @@
     app.mount('#app');
   </script>
 
-  <!-- Script-ul unificat pentru Firebase (inițializare + Firestore) -->
+  <!-- Script unificat pentru Firebase, fără Analytics -->
   <script type="module">
-    // 1. Importăm funcțiile necesare
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    // 2. Configurația proiectului Firebase
+    // Config extrași din Firebase Console
+    // Verifică 100% că aceștia sunt valizi pentru proiectul tău
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2GgUW2...",
-      authDomain: "restaurantapp-d0256.firebaseapp.com",
-      projectId: "restaurantapp-d0256",
-      storageBucket: "restaurantapp-d0256.firebasestorage.app",
-      messagingSenderId: "275208346650",
-      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-      measurementId: "G-F44TB27G17"
-    };
+  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+  authDomain: "restaurantapp-d0256.firebaseapp.com",
+  projectId: "restaurantapp-d0256",
+  storageBucket: "restaurantapp-d0256.firebasestorage.app",
+  messagingSenderId: "275208346650",
+  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+  measurementId: "G-F44TB27G17"
+};
 
-    // 3. Inițializăm Firebase
+    // Inițializare Firebase (fără analytics)
     const firebaseApp = initializeApp(firebaseConfig);
-
-    // 4. (Opțional) Inițializăm Analytics
-    const analytics = getAnalytics(firebaseApp);
-
-    // 5. Inițializăm Firestore
     const db = getFirestore(firebaseApp);
 
-    // Funcție exemplu pentru a adăuga o comandă
-    async function addOrder(order) {
+    // Ex: adăugăm o comandă de test (comentează dacă nu vrei)
+    async function addTestOrder() {
       try {
-        const docRef = await addDoc(collection(db, "orders"), order);
-        console.log("Comanda a fost adăugată cu ID:", docRef.id);
+        const docRef = await addDoc(collection(db, "orders"), {
+          orderId: "CMDTEST_" + Date.now(),
+          items: [
+            { name: "Test Soup", price: 15, quantity: 2 },
+          ],
+          total: 30,
+        });
+        console.log("Test order added, ID:", docRef.id);
       } catch (e) {
-        console.error("Eroare la adăugarea comenzii:", e);
+        console.error("Error adding test order:", e);
       }
     }
 
-    // EXEMPLU: adăugăm o comandă la refresh (comentat dacă nu dorim permanent)
-    const testOrder = {
-      orderId: "CMD001",
-      items: [
-        { name: "Pizza", price: 30, quantity: 1 },
-        { name: "Tiramisu", price: 20, quantity: 2 }
-      ],
-      total: 70,
-    };
-
-    // addOrder(testOrder);
+    // addTestOrder();
   </script>
 </body>
 </html>
