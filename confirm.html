@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Comanda Ta </title>
+  <title>Comanda Ta</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -12,17 +12,16 @@
       color: #fff;
       font-family: 'Inter', sans-serif;
       margin: 0;
-      min-height: 100vh; /* ca să acopere tot ecranul */
+      min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: flex-start; /* conținutul începe de sus; setează center dacă vrei centrat vertical */
+      align-items: flex-start;
       padding: 2rem;
     }
     .container {
       max-width: 400px;
       width: 100%;
     }
-    /* Pentru text portocaliu la prețuri */
     .price {
       color: #f49032;
       font-weight: bold;
@@ -46,13 +45,12 @@
 </head>
 <body>
   <div class="container">
-    <!-- Titlul principal -->
     <h1 class="text-2xl font-bold text-center mb-6">Comanda Ta</h1>
     
-    <!-- Casetă de detalii -->
     <div class="bg-gray-800 p-4 rounded shadow">
-      <!-- Afișare ID (gen CMD...) dacă există în Firestore -->
-      <h2 id="orderId" class="text-xl font-semibold mb-4"></h2>
+      <!-- ID comandă + ID masă -->
+      <h2 id="orderId" class="text-xl font-semibold mb-2"></h2>
+      <h3 id="tableId" class="text-md mb-4"></h3>
 
       <!-- Lista de produse -->
       <div id="itemsList" class="mb-4"></div>
@@ -63,11 +61,10 @@
         <span id="orderTotal" class="price"></span>
       </div>
 
-      <!-- Text despre QR code -->
+      <!-- QR info -->
       <div class="qr-label text-center">
         Arată acest cod QR ospătarului:
       </div>
-      <!-- Container QR code (centrat) -->
       <div id="qrcode" class="flex justify-center"></div>
 
       <!-- Link Înapoi -->
@@ -77,7 +74,7 @@
     </div>
   </div>
 
-  <!-- QRCode.js (NECESAR pentru a genera codul QR) -->
+  <!-- QRCode.js (pentru generarea codului QR) -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
   <!-- Firebase + Firestore (ES module) -->
@@ -85,7 +82,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    // Configurație Firebase (trebuie să fie aceeași ca în index.html)
     const firebaseConfig = {
       apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -96,25 +92,25 @@
       measurementId: "G-F44TB27G17"
     };
 
-    // Inițializează Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Obținem docId din parametrii URL
+    // Parametrii URL
     const urlParams = new URLSearchParams(window.location.search);
     const docId = urlParams.get("docId");
 
-    // Obiecte din DOM
-    const orderIdEl   = document.getElementById("orderId");
+    // Elemente DOM
+    const orderIdEl = document.getElementById("orderId");
+    const tableIdEl = document.getElementById("tableId");
     const itemsListEl = document.getElementById("itemsList");
-    const orderTotalEl= document.getElementById("orderTotal");
+    const orderTotalEl = document.getElementById("orderTotal");
 
-    // Construim linkul complet pentru QR
+    // Link complet (cu docId), folosit la generarea QR
     let fullUrl = window.location.origin + window.location.pathname;
     fullUrl += "?docId=" + docId;
 
-    // Generăm codul QR
     if (docId) {
+      // Generăm QR
       new QRCode(document.getElementById("qrcode"), {
         text: fullUrl,
         width: 128,
@@ -125,7 +121,6 @@
       });
     }
 
-    // Citește documentul din Firestore și afișează detalii
     async function fetchOrderData() {
       if (!docId) return;
       const docRef = doc(db, "orders", docId);
@@ -136,16 +131,14 @@
       }
 
       const data = docSnap.data();
-      // Dacă ai în `orderData` un câmp cu un fel de cod gen "orderId: CMD..." îl poți afișa:
-      // De ex., data.orderId = "CMD1736076012228".
-      if (data.orderId) {
-        orderIdEl.textContent = `Detalii Comandă ${data.orderId}`;
-      } else {
-        // fallback – să zicem doar "Detalii Comandă"
-        orderIdEl.textContent = "Detalii Comandă";
+      // Afișăm "Detalii Comandă" (sau un ID custom, dacă l-ai generat tu)
+      orderIdEl.textContent = "Detalii Comandă (" + docId + ")";
+      
+      // Afișăm tableId (dacă există)
+      if (data.tableId) {
+        tableIdEl.textContent = "Masă: " + data.tableId;
       }
 
-      // Afișăm produsele
       const items = data.items || [];
       let total = 0;
       let html = "";
@@ -153,7 +146,6 @@
       items.forEach(item => {
         const subTotal = item.price * item.quantity;
         total += subTotal;
-        // structură tip flex: "Nume x Qty" stânga, "subTotal Lei" dreapta
         html += `
           <div class="product-row">
             <span class="product-name">${item.name} x ${item.quantity}</span>
@@ -162,14 +154,10 @@
         `;
       });
 
-      // Punem conținutul în #itemsList
       itemsListEl.innerHTML = html;
-
-      // Afișăm totalul
       orderTotalEl.textContent = total.toFixed(2) + " Lei";
     }
 
-    // Pornim
     fetchOrderData().catch(err => {
       console.error("Eroare la citirea comenzii:", err);
     });
