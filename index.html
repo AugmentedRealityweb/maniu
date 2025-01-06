@@ -964,6 +964,7 @@
             window.location.href = `${baseUrl}/confirm.html?sessionCode=${this.sessionCode}`;
           } catch (err) {
             console.error("Eroare la salvarea comenzii:", err);
+            console.log("Session code:", this.sessionCode);
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
