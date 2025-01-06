@@ -3,93 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Confirmare Comandă</title>
-  <!-- Tailwind (opțional, ca să ai același stil) -->
+  <title>Comanda Ta </title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #111827;
+      background-color: #111827; /* același fond închis ca în index.html */
       color: #fff;
+      font-family: 'Inter', sans-serif;
       margin: 0;
-      padding: 50px;
-      text-align: center;
+      min-height: 100vh; /* ca să acopere tot ecranul */
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* conținutul începe de sus; setează center dacă vrei centrat vertical */
+      padding: 2rem;
     }
-    a {
+    .container {
+      max-width: 400px;
+      width: 100%;
+    }
+    /* Pentru text portocaliu la prețuri */
+    .price {
       color: #f49032;
-      text-decoration: none;
+      font-weight: bold;
     }
-    h1 {
-      font-size: 1.5rem;
+    .product-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    .product-name {
+      margin-right: 1rem;
+    }
+    .qr-label {
+      margin-top: 1rem;
       margin-bottom: 1rem;
     }
     #qrcode {
-      margin-top: 20px;
-      margin-bottom: 20px;
-    }
-    .summary-container {
-      background-color: #1f2937;
-      max-width: 400px;
-      margin: 0 auto;
-      margin-top: 30px;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: left;
-    }
-    .summary-container h2 {
-      text-align: center;
-      color: #f49032;
       margin-bottom: 1rem;
-    }
-    .summary-container ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-    .summary-container li {
-      margin-bottom: 0.5rem;
-    }
-    .item-name {
-      font-weight: bold;
-    }
-    .item-total {
-      float: right;
-      color: #f49032;
-      font-weight: bold;
-    }
-    .summary-total {
-      border-top: 1px solid #333;
-      padding-top: 1rem;
-      text-align: right;
-      font-weight: bold;
-      color: #f49032;
-      margin-top: 1rem;
     }
   </style>
 </head>
 <body>
-  <h1>Comanda a fost plasată cu succes!</h1>
-  <p>ID Document Firestore: <span id="docId"></span></p>
+  <div class="container">
+    <!-- Titlul principal -->
+    <h1 class="text-2xl font-bold text-center mb-6">Comanda Ta</h1>
+    
+    <!-- Casetă de detalii -->
+    <div class="bg-gray-800 p-4 rounded shadow">
+      <!-- Afișare ID (gen CMD...) dacă există în Firestore -->
+      <h2 id="orderId" class="text-xl font-semibold mb-4"></h2>
 
-  <!-- Container Rezumat Comandă -->
-  <div id="orderSummary" class="summary-container" style="display: none;"></div>
+      <!-- Lista de produse -->
+      <div id="itemsList" class="mb-4"></div>
 
-  <!-- Container Cod QR -->
-  <div id="qrcode"></div>
+      <!-- Total -->
+      <div class="product-row border-t border-gray-700 pt-2">
+        <span class="font-semibold">Total:</span>
+        <span id="orderTotal" class="price"></span>
+      </div>
 
-  <p style="margin-top: 20px;">
-    <a href="index.html">Înapoi la Meniu</a>
-  </p>
+      <!-- Text despre QR code -->
+      <div class="qr-label text-center">
+        Arată acest cod QR ospătarului:
+      </div>
+      <!-- Container QR code (centrat) -->
+      <div id="qrcode" class="flex justify-center"></div>
 
-  <!-- QRCode.js (NECESAR ca să generezi codul QR) -->
+      <!-- Link Înapoi -->
+      <div class="text-center mt-4">
+        <a href="index.html" class="text-[#f49032] underline">Înapoi la Meniu</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- QRCode.js (NECESAR pentru a genera codul QR) -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  
+
   <!-- Firebase + Firestore (ES module) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    // Aceeași config ca în index.html
+    // Configurație Firebase (trebuie să fie aceeași ca în index.html)
     const firebaseConfig = {
       apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -104,18 +100,20 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 1) Luăm docId din URL
+    // Obținem docId din parametrii URL
     const urlParams = new URLSearchParams(window.location.search);
     const docId = urlParams.get("docId");
-    const docIdEl = document.getElementById("docId");
-    if (docId) {
-      docIdEl.textContent = docId;
-    }
 
-    // 2) Construim link-ul complet pentru QR (ca să trimită tot la confirm.html?docId=...)
-    const fullUrl = window.location.origin + window.location.pathname + "?docId=" + docId;
+    // Obiecte din DOM
+    const orderIdEl   = document.getElementById("orderId");
+    const itemsListEl = document.getElementById("itemsList");
+    const orderTotalEl= document.getElementById("orderTotal");
 
-    // 3) Generăm codul QR
+    // Construim linkul complet pentru QR
+    let fullUrl = window.location.origin + window.location.pathname;
+    fullUrl += "?docId=" + docId;
+
+    // Generăm codul QR
     if (docId) {
       new QRCode(document.getElementById("qrcode"), {
         text: fullUrl,
@@ -127,10 +125,9 @@
       });
     }
 
-    // 4) Citește datele comenzii din Firestore și afișează rezumatul
+    // Citește documentul din Firestore și afișează detalii
     async function fetchOrderData() {
       if (!docId) return;
-
       const docRef = doc(db, "orders", docId);
       const docSnap = await getDoc(docRef);
       if (!docSnap.exists()) {
@@ -138,36 +135,41 @@
         return;
       }
 
-      // Avem datele comenzii
-      const orderData = docSnap.data();
-      const items = orderData.items || [];
-      let html = `<h2>Rezumat Comandă</h2><ul>`;
-      let totalPrice = 0;
+      const data = docSnap.data();
+      // Dacă ai în `orderData` un câmp cu un fel de cod gen "orderId: CMD..." îl poți afișa:
+      // De ex., data.orderId = "CMD1736076012228".
+      if (data.orderId) {
+        orderIdEl.textContent = `Detalii Comandă ${data.orderId}`;
+      } else {
+        // fallback – să zicem doar "Detalii Comandă"
+        orderIdEl.textContent = "Detalii Comandă";
+      }
+
+      // Afișăm produsele
+      const items = data.items || [];
+      let total = 0;
+      let html = "";
 
       items.forEach(item => {
-        const itemSubtotal = item.price * item.quantity;
-        totalPrice += itemSubtotal;
+        const subTotal = item.price * item.quantity;
+        total += subTotal;
+        // structură tip flex: "Nume x Qty" stânga, "subTotal Lei" dreapta
         html += `
-          <li>
-            <span class="item-name">${item.name}</span> 
-             x ${item.quantity}
-            <span class="item-total">${itemSubtotal.toFixed(2)} Lei</span>
-          </li>
+          <div class="product-row">
+            <span class="product-name">${item.name} x ${item.quantity}</span>
+            <span class="price">${subTotal.toFixed(2)} Lei</span>
+          </div>
         `;
       });
 
-      html += `</ul>
-        <div class="summary-total">
-          Total: ${totalPrice.toFixed(2)} Lei
-        </div>
-      `;
+      // Punem conținutul în #itemsList
+      itemsListEl.innerHTML = html;
 
-      const summaryEl = document.getElementById("orderSummary");
-      summaryEl.style.display = "block";
-      summaryEl.innerHTML = html;
+      // Afișăm totalul
+      orderTotalEl.textContent = total.toFixed(2) + " Lei";
     }
 
-    // 5) Afișăm comanda
+    // Pornim
     fetchOrderData().catch(err => {
       console.error("Eroare la citirea comenzii:", err);
     });
