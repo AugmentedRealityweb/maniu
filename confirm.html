@@ -70,7 +70,7 @@
 </head>
 <body>
   <h1>Comanda a fost plasată cu succes!</h1>
-  <p>ID Comandă: <span id="orderId"></span></p>
+  <p>ID Document Firestore: <span id="docId"></span></p>
   
   <!-- Container Rezumat Comandă -->
   <div id="orderSummary" class="summary-container" style="display: none;"></div>
@@ -83,56 +83,99 @@
     <a href="index.html">Înapoi la Meniu</a>
   </p>
 
-  <!-- QRCode.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script>
-    // Obține ID-ul comenzii din URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const orderId = urlParams.get('orderId');
-    document.getElementById('orderId').textContent = orderId;
+  <!-- Importăm Firebase (ES Module) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import QRCode from "https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js";
 
-    // Dacă avem orderId, generăm codul QR
-    if (orderId) {
-      const qrcode = new QRCode(document.getElementById("qrcode"), {
-        text: orderId,
+    // 1. Configurația Firebase (aceeași ca în index.html)
+    const firebaseConfig = {
+  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+  authDomain: "restaurantapp-d0256.firebaseapp.com",
+  projectId: "restaurantapp-d0256",
+  storageBucket: "restaurantapp-d0256.firebasestorage.app",
+  messagingSenderId: "275208346650",
+  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+  measurementId: "G-F44TB27G17"
+};
+
+    // 2. Inițializează Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 3. Obține docId din URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const docId = urlParams.get("docId");
+    document.getElementById("docId").textContent = docId || "(lipsește)";
+
+    // 4. Generează URL complet pentru codul QR (pentru waiter)
+    //    Exemplu: https://site-ul-tau.ro/confirm.html?docId=DOCID
+    //    -> oricine scanează vede exact rezumatul acestei comenzi
+    let fullUrl = window.location.origin + window.location.pathname;
+    // Dacă pagina confirm.html e într-un subfolder, ajustează calea
+    // ex:  + "/confirm.html"
+    // dar de obicei, confirm.html e fix la același nivel
+    fullUrl += "?docId=" + docId;
+
+    // 5. Generează codul QR cu linkul complet
+    if (docId) {
+      new QRCode(document.getElementById("qrcode"), {
+        text: fullUrl,
         width: 128,
         height: 128,
-        colorDark : "#f49032",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
+        colorDark: "#f49032",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
       });
     }
 
-    // Afișăm rezumatul comenzii din localStorage
-    const storedOrder = localStorage.getItem(orderId);
-    if (storedOrder) {
-      const orderItems = JSON.parse(storedOrder);
-      let totalPrice = 0;
-      let html = `<h2>Rezumat Comandă</h2><ul>`;
+    // 6. Citește datele comenzii din Firestore și afișează rezumatul
+    async function fetchOrderData() {
+      if (!docId) return;
 
-      // Pentru fiecare produs din comandă
-      orderItems.forEach(item => {
-        const itemSubtotal = item.price * item.quantity;
-        totalPrice += itemSubtotal;
-        html += `
-          <li>
-            <span class="item-name">${item.name}</span> 
-            x ${item.quantity}
-            <span class="item-total">${itemSubtotal.toFixed(2)} Lei</span>
-          </li>
+      const docRef = doc(db, "orders", docId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const orderData = docSnap.data();
+        // Avem items, total etc. conform structurii din index.html
+
+        // Construieste rezumatul
+        const items = orderData.items || [];
+        let html = `<h2>Rezumat Comandă</h2><ul>`;
+        let totalPrice = 0;
+
+        items.forEach(item => {
+          const itemSubtotal = item.price * item.quantity;
+          totalPrice += itemSubtotal;
+          html += `
+            <li>
+              <span class="item-name">${item.name}</span>
+               x ${item.quantity}
+              <span class="item-total">${itemSubtotal.toFixed(2)} Lei</span>
+            </li>
+          `;
+        });
+
+        html += `</ul>
+          <div class="summary-total">
+            Total: ${totalPrice.toFixed(2)} Lei
+          </div>
         `;
-      });
-
-      html += `</ul>
-        <div class="summary-total">
-          Total: ${totalPrice.toFixed(2)} Lei
-        </div>
-      `;
-
-      const orderSummaryEl = document.getElementById('orderSummary');
-      orderSummaryEl.style.display = 'block';   // facem containerul vizibil
-      orderSummaryEl.innerHTML = html;
+        
+        const orderSummaryEl = document.getElementById("orderSummary");
+        orderSummaryEl.style.display = "block";
+        orderSummaryEl.innerHTML = html;
+      } else {
+        // Documentul nu există
+        console.warn("Nu am găsit comanda cu docId =", docId);
+      }
     }
+
+    // 7. Afișăm comanda
+    fetchOrderData().catch(err => {
+      console.error("Eroare la preluarea comenzii:", err);
+    });
   </script>
 </body>
 </html>
