@@ -554,6 +554,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
+    /* Configurarea Firebase (înlocuiește cu datele tale) */
     const firebaseConfig = {
       apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -567,7 +568,7 @@
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    // Eliminare diacritice pentru căutare
+    // Funcție pentru a elimina diacriticele, folosită la căutare
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
@@ -586,7 +587,7 @@
           activeTab: 'meniu',
           view: 'categorii', // 'categorii' / 'produse'
 
-          // Produse curente
+          // Produse curente (listă de iteme când intrăm într-o categorie)
           currentProducts: [],
           currentProduct: null,
 
@@ -598,10 +599,10 @@
           clientPoints: 0,
           isFirstOrder: true,
 
-          // ID-ul mesei (ex "Masa16")
+          // ID-ul mesei (ex. "Masa16")
           tableId: '',
 
-          // Categorii
+          // Categorii + Produse
           categories: [
             { name: 'brunch', image: 'https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp' },
             { name: 'soups', image: 'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg' },
@@ -752,14 +753,18 @@
             ],
           },
 
+          // Coș (local)
           orders: [],
+          // Istoric comenzi (preluat din Firestore + localStorage)
           myOrders: [],
         };
       },
       computed: {
+        // Produsele filtrate la căutare
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
+            // dacă nu e nimic în căutare, afișăm produsele categoriei curente (dacă e 'produse')
             return this.view === 'produse' ? this.currentProducts : [];
           }
           const results = [];
@@ -774,6 +779,7 @@
           }
           return results;
         },
+        // Totalul coșului
         total() {
           return this.orders
             .reduce((sum, o) => sum + o.price * o.quantity, 0)
@@ -781,6 +787,7 @@
         },
       },
       methods: {
+        // Traducere categorii
         renameCategory(cat) {
           const dict = {
             brunch: 'Mic Dejun',
@@ -796,6 +803,7 @@
           this.currentProducts = this.products[categoryName] || [];
           this.view = 'produse';
           this.searchQuery = '';
+          // Scroll la top
           this.$nextTick(() => {
             window.scrollTo(0, 0);
           });
@@ -823,13 +831,13 @@
             });
           }
           this.currentProduct = null;
-
-          // Animație shake pentru coș
+          // Animație shake
           this.isShaking = true;
           setTimeout(() => {
             this.isShaking = false;
           }, 500);
         },
+        // +/- în coș
         incrementQuantity(index) {
           this.orders[index].quantity++;
         },
@@ -845,32 +853,32 @@
           this.isOrderOpen = !this.isOrderOpen;
         },
 
-        // Finalizează Comanda (checkout)
+        // Finalizare comanda (checkout)
         async checkout() {
           try {
-            // Validăm tableId:
+            // Verificăm dacă a fost introdus un ID al mesei
             if (!this.tableId.trim()) {
               alert("Te rugăm să introduci un ID al mesei (ex: Masa16)!");
               return;
             }
 
-            // Calculăm puncte (5% din total)
+            // Calcul puncte (5% din total)
             let pointsToAdd = 0;
             for (const item of this.orders) {
               pointsToAdd += item.price * item.quantity * 0.05;
             }
             this.clientPoints += pointsToAdd;
 
-            // Pregătim datele de comandă, inclusiv tableId
+            // Obiectul comenzii
             const orderData = {
-              tableId: this.tableId,
+              tableId: this.tableId.trim(), // "Masa16" etc.
               clientNumber: this.clientNumber,
               items: this.orders,
               total: parseFloat(this.total),
               timestamp: serverTimestamp(),
             };
 
-            // Adăugăm comanda în Firestore
+            // Salvăm în Firestore
             const docRef = await addDoc(collection(db, "orders"), orderData);
             console.log("Comanda salvată cu docRef.id:", docRef.id);
 
@@ -878,30 +886,32 @@
             this.orders = [];
             this.isOrderOpen = false;
 
-            // Redirecționează către confirm.html
-            const baseUrl = window.location.origin; // https://restaurant.com sau http://localhost
-window.location.href = `${baseUrl}/confirm.html?docId=${docRef.id}`;
+            // Redirecționează către confirm.html cu docId
+            const baseUrl = window.location.origin; 
+            window.location.href = `${baseUrl}/confirm.html?docId=${docRef.id}`;
 
           } catch (e) {
             console.error("Eroare la finalizarea comenzii:", e);
             alert("A apărut o eroare la plasarea comenzii. Te rugăm să încerci din nou.");
           }
         },
+
+        // Preluare comenzile deja plasate (în funcție de clientNumber)
         async fetchOrders() {
           try {
             if (this.clientNumber === 0) {
               this.myOrders = [];
               return;
             }
-            const q = query(
+            const qRef = query(
               collection(db, "orders"),
               where("clientNumber", "==", this.clientNumber)
             );
-            const querySnapshot = await getDocs(q);
+            const snap = await getDocs(qRef);
             this.myOrders = [];
-            querySnapshot.forEach((doc) => {
-              const data = doc.data();
-              data.orderId = doc.id;
+            snap.forEach((docSnap) => {
+              const data = docSnap.data();
+              data.orderId = docSnap.id; 
               this.myOrders.push(data);
             });
           } catch (e) {
@@ -910,7 +920,7 @@ window.location.href = `${baseUrl}/confirm.html?docId=${docRef.id}`;
         },
       },
       mounted() {
-        // Citește clientNumber din localStorage (generat unic la prima accesare)
+        // ClientNumber din localStorage
         const storedNumber = localStorage.getItem('clientNumber');
         if (storedNumber) {
           this.clientNumber = parseInt(storedNumber);
@@ -918,26 +928,26 @@ window.location.href = `${baseUrl}/confirm.html?docId=${docRef.id}`;
             this.isFirstOrder = false;
           }
         } else {
-          // Dacă nu există, generăm random (între 10000 și 99999)
+          // Generăm random (10000-99999)
           const randomClientNumber = Math.floor(Math.random() * 90000) + 10000;
           this.clientNumber = randomClientNumber;
           localStorage.setItem('clientNumber', randomClientNumber);
           this.isFirstOrder = false;
         }
 
-        // Puncte
+        // Puncte stocate
         const storedPoints = localStorage.getItem('clientPoints');
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
         }
 
-        // Istoric comenzi
+        // Comenzi stocate local
         const storedMyOrders = localStorage.getItem('myOrders');
         if (storedMyOrders) {
           this.myOrders = JSON.parse(storedMyOrders);
         }
 
-        // Preia comenzile din Firestore
+        // Fetch actual din Firestore
         this.fetchOrders();
       },
       watch: {
