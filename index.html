@@ -108,10 +108,12 @@
     }
 
     /* Slide-fade pentru sidebar mobil */
-    .slide-fade-enter-active, .slide-fade-leave-active {
+    .slide-fade-enter-active,
+    .slide-fade-leave-active {
       transition: all 0.3s ease;
     }
-    .slide-fade-enter, .slide-fade-leave-to {
+    .slide-fade-enter,
+    .slide-fade-leave-to {
       transform: translateX(-50px);
       opacity: 0;
     }
@@ -504,7 +506,7 @@
         </button>
       </div>
 
-      <!-- Bara COMANDA TA -->
+      <!-- Bara COMANDA TA (slide-cart) -->
       <transition name="slide-cart">
         <aside
           v-show="isOrderOpen && orders.length > 0"
@@ -566,26 +568,26 @@
       serverTimestamp 
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    // Aceeași config ca la început (înlocuiește cu datele tale)
+    /* Configurația Firebase (înlocuiește cu datele tale). */
     const firebaseConfig = {
-      apiKey: "XXX",
-      authDomain: "XXX.firebaseapp.com",
-      projectId: "XXX",
-      storageBucket: "XXX.appspot.com",
-      messagingSenderId: "XXX",
-      appId: "XXX",
-      measurementId: "XXX"
+      apiKey: "AIzaSy...TU_CHEIA_TA...",
+      authDomain: "restaurantapp-xxxx.firebaseapp.com",
+      projectId: "restaurantapp-xxxx",
+      storageBucket: "restaurantapp-xxxx.appspot.com",
+      messagingSenderId: "xxxx",
+      appId: "1:xxxx:web:xxxx",
+      measurementId: "G-xxxxx"
     };
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    // Eliminare diacritice la căutare
+    // Funcție pt. a elimina diacritice (folosită la căutare)
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
-    // Generăm un cod random (5-6 caractere) ex: "Z14AB"
+    // Generăm un cod random ex. "X7VH5"
     function generateSessionCode(length = 5) {
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
       let code = "";
@@ -595,26 +597,25 @@
       return code;
     }
 
+    // Obținem sau creăm un sessionCode la "sessions/tableId"
     async function getOrCreateSessionCode(tableId) {
-      // Documentul "sessions/tableId"
       const docRef = doc(db, "sessions", tableId);
       const snap = await getDoc(docRef);
 
       let sessionCode = null;
 
       if (snap.exists()) {
-        // are deja ceva
         const data = snap.data();
+        // dacă sessionCode e definit și status="active", îl folosim
         if (data.sessionCode && data.status === "active") {
-          // Folosim același cod
           sessionCode = data.sessionCode;
         } else {
-          // fie sessionCode=null sau status="closed", generăm altul
+          // generăm un nou cod
           sessionCode = generateSessionCode();
           await setDoc(docRef, { sessionCode, status: "active" });
         }
       } else {
-        // Nu există încă doc -> creăm
+        // nu există doc, creăm
         sessionCode = generateSessionCode();
         await setDoc(docRef, { sessionCode, status: "active" });
       }
@@ -625,7 +626,10 @@
     const app = Vue.createApp({
       data() {
         return {
+          // Sidebar mobil
           isSidebarVisible: false,
+
+          // Coș
           isOrderOpen: false,
           isShaking: false,
 
@@ -634,7 +638,6 @@
 
           currentProducts: [],
           currentProduct: null,
-
           searchQuery: '',
 
           clientNumber: 0,
@@ -645,17 +648,164 @@
           tableId: '',
           sessionCode: '',
 
-          categories: [ /* ... */ ],
-          products: { /* ... */ },
-
+          categories: [
+            { name: 'brunch', image: 'https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp' },
+            { name: 'soups',  image: 'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg' },
+            { name: 'pasta',  image: 'https://i.giphy.com/dZRlFW1sbFEpG.webp' },
+            { name: 'main',   image: 'https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp' },
+            { name: 'desserts', image: 'https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp' },
+            { name: 'drinks',   image: 'https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp' },
+          ],
+          products: {
+            brunch: [
+              {
+                title: 'Toast cu avocado',
+                description: 'Avocado, toast, ouă poșate, roșii cherry.',
+                price: 25,
+                image: 'https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp',
+                ingredients: ['Avocado', 'Toast', 'Ouă', 'Roșii cherry'],
+              },
+              {
+                title: 'Ouă Benedict',
+                description: 'Ouă poșate, sos hollandaise, șuncă.',
+                price: 30,
+                image: 'https://i.giphy.com/X3E37CTy55jNK.webp',
+                ingredients: ['Ouă', 'Hollandaise', 'Șuncă'],
+              },
+              {
+                title: 'Clătite',
+                description: 'Clătite, sirop de arțar, fructe proaspete.',
+                price: 20,
+                image: 'https://i.giphy.com/5zu5JovduWFBS.webp',
+                ingredients: ['Făină', 'Ouă', 'Sirop de arțar', 'Fructe'],
+              },
+            ],
+            soups: [
+              {
+                title: 'Ciorbă de burtă',
+                description: 'Tradițională, smântână, ardei iute.',
+                price: 18,
+                image: 'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg',
+                ingredients: ['Burtă', 'Smântână', 'Ardei iute'],
+              },
+              {
+                title: 'Supă cremă de roșii',
+                description: 'Roșii proaspete, crutoane, busuioc.',
+                price: 15,
+                image: 'https://www.lalena.ro/images/uploaded/600x_Supa-crema-de-rosii-108.jpg',
+                ingredients: ['Roșii', 'Crutoane', 'Busuioc'],
+              },
+              {
+                title: 'Ciorbă de legume',
+                description: 'Legume proaspete, zeamă de lămâie.',
+                price: 12,
+                image: 'https://www.prestij.ro/uploads/produse/1440/94--ciorba-taraneasca-de-legume.jpg',
+                ingredients: ['Morcovi', 'Cartofi', 'Ceapă', 'Apio'],
+              },
+            ],
+            pasta: [
+              {
+                title: 'Spaghete Carbonara',
+                description: 'Spaghetti, bacon, parmezan, ouă.',
+                price: 28,
+                image: 'https://i.giphy.com/dZRlFW1sbFEpG.webp',
+                ingredients: ['Spaghetti', 'Bacon', 'Parmezan', 'Ouă'],
+              },
+              {
+                title: 'Penne Arrabbiata',
+                description: 'Penne, sos de roșii picant, usturoi.',
+                price: 25,
+                image: 'https://i.giphy.com/f0N7csaAc6t60OmXkm.webp',
+                ingredients: ['Penne', 'Roșii', 'Usturoi', 'Ardei iute'],
+              },
+              {
+                title: 'Tagliatelle Alfredo',
+                description: 'Tagliatelle, sos Alfredo, pui.',
+                price: 30,
+                image: 'https://i.giphy.com/xOML6s8aBmAtlLwujM.webp',
+                ingredients: ['Tagliatelle', 'Pui', 'Parmezan', 'Smântână'],
+              },
+            ],
+            main: [
+              {
+                title: 'Mușchiuleț de porc',
+                description: 'Mușchiuleț, cartofi copți, mozzarella, bacon.',
+                price: 45,
+                image: 'https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp',
+                ingredients: ['Porc', 'Cartofi', 'Mozzarella', 'Bacon'],
+              },
+              {
+                title: 'Tomahawk porc',
+                description: 'Carne de porc, cartofi, sos brun.',
+                price: 41,
+                image: 'https://i.giphy.com/KDskfOILt91T2.webp',
+                ingredients: ['Tomahawk', 'Cartofi', 'Sos brun'],
+              },
+              {
+                title: 'Ceafă sfărâmată',
+                description: 'Ceafă, piure de cartofi, ardei copți.',
+                price: 36,
+                image: 'https://i.giphy.com/l378puWI9Fpi4OApO.webp',
+                ingredients: ['Ceafă porc', 'Piure', 'Ardei copți'],
+              },
+            ],
+            desserts: [
+              {
+                title: 'Tiramisu',
+                description: 'Prăjitură italiană cu cafea, mascarpone.',
+                price: 20,
+                image: 'https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp',
+                ingredients: ['Cafea', 'Mascarpone', 'Pișcoturi'],
+              },
+              {
+                title: 'Pavlova',
+                description: 'Bezea, frișcă, fructe de pădure.',
+                price: 18,
+                image: 'https://i.giphy.com/iiwu9bTOZ1HiM.webp',
+                ingredients: ['Bezea', 'Frișcă', 'Fructe de pădure'],
+              },
+              {
+                title: 'Cheesecake',
+                description: 'Cheesecake cu dulceață de căpșuni.',
+                price: 22,
+                image: 'https://i.giphy.com/Xi2UAW7kTQvHa.webp',
+                ingredients: ['Brânză', 'Biscuiți', 'Căpșuni'],
+              },
+            ],
+            drinks: [
+              {
+                title: 'Cocktail',
+                description: 'Băutură răcoritoare cu fructe proaspete și alcool fin.',
+                price: 28,
+                image: 'https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp',
+                ingredients: ['Rom', 'Fructe', 'Gheață'],
+              },
+              {
+                title: 'Ciocolată caldă',
+                description: 'Cremă fierbinte de ciocolată cu topping de frișcă.',
+                price: 15,
+                image: 'https://i.giphy.com/hPFKu8dKRRNgQ.webp',
+                ingredients: ['Ciocolată', 'Lapte', 'Frișcă'],
+              },
+              {
+                title: 'Bere',
+                description: 'Bere artizanală rece și spumoasă.',
+                price: 10,
+                image: 'https://i.giphy.com/RkhJPJQJ2GPn02GMy6.webp',
+                ingredients: ['Malț', 'Hamei', 'Apă'],
+              },
+            ],
+          },
           orders: [],
           myOrders: [],
         };
       },
       computed: {
-        displayedProducts() { /* identic cu înainte */ 
+        displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
-          if (!q) return this.view === 'produse' ? this.currentProducts : [];
+          if (!q) {
+            return this.view === 'produse' ? this.currentProducts : [];
+          }
           const results = [];
           for (const catKey in this.products) {
             for (const prod of this.products[catKey]) {
@@ -675,36 +825,110 @@
         },
       },
       methods: {
-        renameCategory(cat) { /* ... la fel */ },
-        enterCategory(catName) { /* ... identic */ },
-        backToCategories() { /* ... identic */ },
-        showProductDetails(product) { /* ... identic */ },
-        addToOrder(product) { /* ... identic */ },
-        incrementQuantity(i) { /* ... identic */ },
-        decrementQuantity(i) { /* ... identic */ },
-        removeFromOrder(i) { /* ... identic */ },
-        toggleOrderBar() { /* ... identic */ },
+        renameCategory(cat) {
+          const dict = {
+            brunch: 'Mic Dejun',
+            soups: 'Supe',
+            pasta: 'Paste',
+            main: 'Fel Principal',
+            desserts: 'Deserturi',
+            drinks: 'Băuturi',
+          };
+          return dict[cat] || cat;
+        },
+        enterCategory(categoryName) {
+          this.currentProducts = this.products[categoryName] || [];
+          this.view = 'produse';
+          this.searchQuery = '';
+          this.$nextTick(() => {
+            window.scrollTo(0, 0);
+          });
+        },
+        backToCategories() {
+          this.view = 'categorii';
+          this.currentProduct = null;
+          this.searchQuery = '';
+          this.$nextTick(() => {
+            window.scrollTo(0, 0);
+          });
+        },
+        showProductDetails(product) {
+          this.currentProduct = product;
+        },
+        addToOrder(product) {
+          const existing = this.orders.find(o => o.name === product.title);
+          if (existing) {
+            existing.quantity++;
+          } else {
+            this.orders.push({ name: product.title, price: product.price, quantity: 1 });
+          }
+          this.currentProduct = null;
+          // Animație shake
+          this.isShaking = true;
+          setTimeout(() => {
+            this.isShaking = false;
+          }, 500);
+        },
+        incrementQuantity(index) {
+          this.orders[index].quantity++;
+        },
+        decrementQuantity(index) {
+          if (this.orders[index].quantity > 1) {
+            this.orders[index].quantity--;
+          }
+        },
+        removeFromOrder(index) {
+          this.orders.splice(index, 1);
+        },
+        toggleOrderBar() {
+          this.isOrderOpen = !this.isOrderOpen;
+        },
 
+        // Obține sau creează un sessionCode
+        async getOrCreateSessionCode(tableId) {
+          const docRef = doc(db, "sessions", tableId);
+          const snap = await getDoc(docRef);
+
+          let sessionCode = null;
+          if (snap.exists()) {
+            const data = snap.data();
+            // Dacă sessionCode există și e "active", folosim același
+            if (data.sessionCode && data.status === "active") {
+              sessionCode = data.sessionCode;
+            } else {
+              // generăm nou
+              sessionCode = generateSessionCode();
+              await setDoc(docRef, { sessionCode, status: "active" });
+            }
+          } else {
+            // creăm documentul
+            sessionCode = generateSessionCode();
+            await setDoc(docRef, { sessionCode, status: "active" });
+          }
+          return sessionCode;
+        },
+
+        // Finalizează Comanda
         async checkout() {
           if (!this.tableId.trim()) {
             alert("Te rugăm să introduci un ID al mesei (ex: Masa16)!");
             return;
           }
 
-          // (1) Preluăm sau creăm sessionCode din Firestore (colecția "sessions")
-          this.sessionCode = await getOrCreateSessionCode(this.tableId.trim());
+          // 1) Luăm/generăm sessionCode din Firestore (sessions/tableId)
+          this.sessionCode = await this.getOrCreateSessionCode(this.tableId.trim());
 
-          // (2) Calculăm puncte
+          // 2) Calculăm puncte (5% din total)
           let pointsToAdd = 0;
           for (const item of this.orders) {
             pointsToAdd += (item.price * item.quantity * 0.05);
           }
           this.clientPoints += pointsToAdd;
 
-          // (3) Creăm obiectul comenzii
+          // 3) Creăm obiectul comenzii
           const orderData = {
             tableId: this.tableId.trim(),
-            sessionCode: this.sessionCode,    // Ex. "X7VH5"
+            sessionCode: this.sessionCode,
             clientNumber: this.clientNumber,
             items: this.orders,
             total: parseFloat(this.total),
@@ -713,24 +937,24 @@
           };
 
           try {
-            // (4) Salvăm comanda în Firestore (colecția "orders")
+            // 4) Salvăm comanda în Firestore
             await addDoc(collection(db, "orders"), orderData);
 
             // Golește coșul
             this.orders = [];
             this.isOrderOpen = false;
 
-            // (5) Redirecționează către confirm.html?sessionCode=...
+            // 5) Redirecționează la confirm.html?sessionCode=...
             const baseUrl = window.location.origin;
             window.location.href = `${baseUrl}/confirm.html?sessionCode=${this.sessionCode}`;
-          } catch (e) {
-            console.error("Eroare la salvarea comenzii:", e);
+          } catch (err) {
+            console.error("Eroare la salvarea comenzii:", err);
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
 
-        async fetchOrders() { 
-          // la fel, doar pentru a prelua comezile user-ului curent
+        // Preia comenzile deja plasate (pe baza clientNumber)
+        async fetchOrders() {
           try {
             if (this.clientNumber === 0) {
               this.myOrders = [];
@@ -753,40 +977,44 @@
         },
       },
       mounted() {
-        // (A) Preluăm clientNumber din localStorage
+        // CITIM clientNumber din localStorage
         const storedNumber = localStorage.getItem('clientNumber');
         if (storedNumber) {
           this.clientNumber = parseInt(storedNumber);
-          if (this.clientNumber > 0) this.isFirstOrder = false;
+          if (this.clientNumber > 0) {
+            this.isFirstOrder = false;
+          }
         } else {
-          const rnd = Math.floor(Math.random() * 90000) + 10000;
-          this.clientNumber = rnd;
-          localStorage.setItem('clientNumber', rnd);
+          const randomNum = Math.floor(Math.random() * 90000) + 10000;
+          this.clientNumber = randomNum;
+          localStorage.setItem('clientNumber', randomNum);
           this.isFirstOrder = false;
         }
 
-        // (B) Preluăm punctele & myOrders
-        const storedPoints   = localStorage.getItem('clientPoints');
+        // CITIM punctele stocate
+        const storedPoints = localStorage.getItem('clientPoints');
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
         }
+
+        // CITIM comenzile stocate local
         const storedMyOrders = localStorage.getItem('myOrders');
         if (storedMyOrders) {
           this.myOrders = JSON.parse(storedMyOrders);
         }
 
-        // (C) Afișăm categoriile
+        // Preluăm comenzile din Firestore (pentru clientNumber)
         this.fetchOrders();
       },
       watch: {
-        clientPoints(nVal) {
-          localStorage.setItem('clientPoints', nVal);
+        clientPoints(newVal) {
+          localStorage.setItem('clientPoints', newVal);
         },
-        clientNumber(nVal) {
-          localStorage.setItem('clientNumber', nVal);
+        clientNumber(newVal) {
+          localStorage.setItem('clientNumber', newVal);
         },
-        myOrders(nVal) {
-          localStorage.setItem('myOrders', JSON.stringify(nVal));
+        myOrders(newVal) {
+          localStorage.setItem('myOrders', JSON.stringify(newVal));
         },
       },
     });
