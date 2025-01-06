@@ -17,13 +17,18 @@
     rel="stylesheet"
   />
 
+  <!-- Font de tip “scris de mână” (ex.: Dancing Script) -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap"
+    rel="stylesheet"
+  />
+
   <style>
-    /* Import font Inter (optional) */
+    /* Font principal + handwriting */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
     body {
       font-family: 'Inter', sans-serif;
-      /* Gradient de fundal: negru -> #e78c00 */
       background: linear-gradient(135deg, #000000 0%, #e78c00 100%);
       color: #fff;
     }
@@ -43,7 +48,7 @@
       background-color: #000000;
     }
 
-    /* Păstrăm butoanele portocalii */
+    /* Butoane portocalii + Glow la hover */
     .btn-orange {
       background: linear-gradient(to right, #f49032, #d35400);
       color: #fff;
@@ -52,15 +57,15 @@
       padding: 0.5rem 1.2rem;
       border-radius: 0.75rem;
       font-size: 0.875rem;
-      transition: all 0.3s ease;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     .btn-orange:hover {
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
       transform: scale(1.05);
+      box-shadow: 0 0 8px #f49032, 0 0 20px #d35400; /* Glow mai pronunțat */
     }
 
-    /* Butoane +/- pentru cantitate, tot portocalii, rotunde */
+    /* Butoane +/- pentru cantitate */
     .btn-incdec {
       background: linear-gradient(to right, #f49032, #d35400);
       color: #fff;
@@ -73,10 +78,10 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
     .btn-incdec:hover {
-      background: linear-gradient(to right, #d35400, #f49032);
+      transform: scale(1.1);
     }
 
     /* Animație shake pentru coș */
@@ -89,74 +94,94 @@
       animation: shake 0.5s;
     }
 
-    /* Slide-cart (comanda ta) */
+    /* Slide-cart (tranziție mai lentă) */
     .slide-cart-enter-active, .slide-cart-leave-active {
-      transition: max-height 0.3s ease;
+      transition: max-height 0.5s ease, opacity 0.5s ease;
       overflow: hidden;
     }
     .slide-cart-enter-from, .slide-cart-leave-to {
       max-height: 0;
+      opacity: 0;
     }
 
     /* Slide-fade pentru sidebar mobil */
-    .slide-fade-enter-active,
-    .slide-fade-leave-active {
-      transition: all .3s ease;
+    .slide-fade-enter-active, .slide-fade-leave-active {
+      transition: all 0.3s ease;
     }
-    .slide-fade-enter,
-    .slide-fade-leave-to {
+    .slide-fade-enter, .slide-fade-leave-to {
       transform: translateX(-50px);
       opacity: 0;
     }
 
-    /* Cardurile (categorii/produse): margini subțiri în #e78c00 și efect hover */
-    .card-hover {
-      border: 1px solid #e78c00;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .card-hover:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 8px 16px rgba(222, 165, 1, 0.3);
-    }
-
-    /*
-      Dungile de zgârieturi: 
-      - Folosim un repeating-linear-gradient cu opacitate mică (0.03)
-      - Ajustează culorile și distanțele pt. a obține efectul dorit
-    */
+    /* Zgârieturi oranj mai vizibile */
     .scratches {
-      position: relative;
-      background-color: #000; /* fallback */
+      background-color: #000;
       background-image: repeating-linear-gradient(
         45deg,
-        rgba(255,255,255,0.03),
-        rgba(255,255,255,0.03) 1px,
-        transparent 1px,
-        transparent 10px
+        rgba(231, 140, 0, 0.15),
+        rgba(231, 140, 0, 0.15) 2px,
+        transparent 2px,
+        transparent 20px
       );
     }
 
-    /* Sidebar: negru intens + .scratches, border-right portocaliu, hover subtil */
+    /* Sidebar (coloană stânga) */
     .sidebar {
       border-right: 2px solid #e78c00;
       box-shadow: 4px 0 8px rgba(0,0,0,0.3);
     }
     .sidebar-btn {
-      transition: background 0.2s ease, color 0.2s ease;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
     .sidebar-btn:hover {
       background-color: #e78c00;
       color: #000;
+      transform: scale(1.03);
     }
 
-    /* Container principal cu .scratches + border */
+    /* Container principal */
     .main-container {
       border: 2px solid #e78c00;
       border-radius: 0.5rem;
       padding: 1rem;
     }
 
-    /* Modal Detalii Produs: fundal semitransparent + border portocaliu + .scratches? */
+    /* Card container: border radius 1rem + hover cu umbra mai proeminentă */
+    .card-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1rem;
+      border: 1px solid #e78c00;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-container:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 24px rgba(255, 140, 0, 0.3);
+    }
+    .card-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+    }
+
+    /* Afișăm denumirea și prețul sub imagine (ca înainte) */
+    .card-details {
+      padding: 0.75rem;
+    }
+    .card-details h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+    .card-details p {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f49032;
+    }
+
+    /* Modal Detalii Produs */
     .modal-product {
       background-color: #0d0d0d;
       border: 2px solid #e78c00;
@@ -166,17 +191,26 @@
       overflow-y: auto;
     }
 
-    /*
-      Efect de "respirație" (pulse) pentru meniuri (cardurile).
-      - Animăm transform (ușor) pe 2s, infinite, cu un "middle step" la 1.03.
-      - Aplicați clasa .pulse-menu pe elementele care să pulseze.
-    */
-    @keyframes menuPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.01); }
+    /* Efect fade in-left la intrarea pe pagină, doar o singură dată */
+    @keyframes fadeInLeft {
+      0% {
+        transform: translateX(-50px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
     }
-    .pulse-menu {
-      animation: menuPulse 7s infinite;
+    .fade-in-left {
+      animation: fadeInLeft 2s ease forwards;
+    }
+
+    /* Titlu scris de mână (Dancing Script) */
+    .handwriting-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      font-weight: 700;
     }
   </style>
 </head>
@@ -186,7 +220,7 @@
     <aside
       class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches"
     >
-      <div class="text-2xl font-bold text-center mb-6">
+      <div class="text-2xl font-bold text-center mb-6 handwriting-title fade-in-left">
         Meniu Restaurant
       </div>
       <nav class="flex flex-col space-y-2">
@@ -216,11 +250,14 @@
 
     <!-- CONȚINUT PRINCIPAL -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-2">
-      <!-- Container care conține tot conținutul -->
+      <!-- Container principal -->
       <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
-        <!-- Buton meniu mobil -->
+        <!-- Buton meniu mobil (apare doar pe ecrane mici) -->
         <div class="flex items-center justify-between mb-4 md:hidden">
-          <div class="text-2xl font-bold">Meniu Restaurant</div>
+          <!-- Titlu manuscris + fade-in -->
+          <div class="handwriting-title text-2xl font-bold fade-in-left">
+            Meniu Restaurant
+          </div>
           <button
             class="bg-black border-2 border-[#e78c00] hover:bg-[#e78c00] hover:text-black text-white p-2 rounded-full"
             @click="isSidebarVisible = !isSidebarVisible"
@@ -288,13 +325,13 @@
               <div
                 v-for="product in displayedProducts"
                 :key="product.title"
-                class="rounded-lg shadow-lg overflow-hidden cursor-pointer card-hover pulse-menu"
+                class="card-container cursor-pointer"
                 @click="showProductDetails(product)"
               >
-                <img :src="product.image" :alt="product.title" class="w-full h-40 object-cover"/>
-                <div class="p-4">
-                  <h3 class="text-lg font-bold">{{ product.title }}</h3>
-                  <p class="text-[#f49032] font-bold">{{ product.price }} Lei</p>
+                <img :src="product.image" :alt="product.title" class="card-img"/>
+                <div class="card-details">
+                  <h3>{{ product.title }}</h3>
+                  <p>{{ product.price }} Lei</p>
                 </div>
               </div>
             </div>
@@ -303,7 +340,7 @@
             </div>
           </div>
 
-          <!-- Categoriile sau produsele categoriei selectate -->
+          <!-- CATEGORII / PRODUSE PE CATEGORIE -->
           <div v-else>
             <!-- Lista de categorii -->
             <div v-if="view === 'categorii'">
@@ -312,18 +349,18 @@
                 <div
                   v-for="category in categories"
                   :key="category.name"
-                  class="rounded-lg shadow-lg overflow-hidden cursor-pointer card-hover pulse-menu"
+                  class="card-container cursor-pointer"
                   @click="enterCategory(category.name)"
                 >
-                  <img :src="category.image" :alt="category.name" class="w-full h-40 object-cover"/>
-                  <div class="p-4">
-                    <h3 class="text-lg font-bold capitalize">{{ renameCategory(category.name) }}</h3>
+                  <img :src="category.image" :alt="category.name" class="card-img"/>
+                  <div class="card-details">
+                    <h3 class="capitalize">{{ renameCategory(category.name) }}</h3>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Lista de produse -->
+            <!-- Lista de produse din categoria selectată -->
             <div v-else-if="view === 'produse'">
               <button class="btn-orange mb-4 rounded-full" @click="backToCategories">
                 Înapoi la Categorii
@@ -333,20 +370,20 @@
                 <div
                   v-for="product in currentProducts"
                   :key="product.title"
-                  class="rounded-lg shadow-lg overflow-hidden cursor-pointer card-hover pulse-menu"
+                  class="card-container cursor-pointer"
                   @click="showProductDetails(product)"
                 >
-                  <img :src="product.image" :alt="product.title" class="w-full h-40 object-cover"/>
-                  <div class="p-4">
-                    <h3 class="text-lg font-bold">{{ product.title }}</h3>
-                    <p class="text-[#f49032] font-bold">{{ product.price }} Lei</p>
+                  <img :src="product.image" :alt="product.title" class="card-img"/>
+                  <div class="card-details">
+                    <h3>{{ product.title }}</h3>
+                    <p>{{ product.price }} Lei</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Modal Detalii Produs -->
+          <!-- MODAL Detalii Produs -->
           <div
             v-if="currentProduct"
             class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
@@ -424,8 +461,7 @@
                 </li>
               </ul>
               <div class="mt-2 font-bold text-[#f49032]">
-                Total:
-                {{ order.total }} Lei
+                Total: {{ order.total }} Lei
               </div>
               <div class="text-sm text-gray-400">
                 ID comandă: {{ order.orderId }}
@@ -435,7 +471,7 @@
         </section>
       </main>
 
-      <!-- Buton Coș, doar dacă există produse -->
+      <!-- Buton Coș (doar dacă există produse) -->
       <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
         <button
           @click="toggleOrderBar"
@@ -495,11 +531,9 @@
 
   <!-- Firebase + Vue Integration -->
   <script type="module">
-    // Importă funcțiile necesare din SDK-ul Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    // Configurația Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -510,11 +544,9 @@
       measurementId: "G-F44TB27G17"
     };
 
-    // Inițializează Firebase
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    // Funcție utilă: eliminăm diacriticele pentru căutare
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
@@ -555,7 +587,6 @@
             { name: 'drinks', image: 'https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp' },
           ],
 
-          // Produse (pe categorii)
           products: {
             brunch: [
               {
@@ -697,14 +728,11 @@
             ],
           },
 
-          // Coș
           orders: [],
-          // Istoric comenzi
           myOrders: [],
         };
       },
       computed: {
-        // Filtrare produse (căutare)
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
@@ -722,7 +750,6 @@
           }
           return results;
         },
-        // Total în coș
         total() {
           return this.orders
             .reduce((sum, o) => sum + o.price * o.quantity, 0)
@@ -730,7 +757,6 @@
         },
       },
       methods: {
-        // Pentru afișarea categoriei în română
         renameCategory(cat) {
           const dict = {
             brunch: 'Mic Dejun',
@@ -746,8 +772,6 @@
           this.currentProducts = this.products[categoryName] || [];
           this.view = 'produse';
           this.searchQuery = '';
-
-          // Scroll la top după schimbarea vizualizării
           this.$nextTick(() => {
             window.scrollTo(0, 0);
           });
@@ -756,8 +780,6 @@
           this.view = 'categorii';
           this.currentProduct = null;
           this.searchQuery = '';
-
-          // Scroll la top după schimbarea vizualizării
           this.$nextTick(() => {
             window.scrollTo(0, 0);
           });
@@ -777,14 +799,12 @@
             });
           }
           this.currentProduct = null;
-
           // Animație shake pentru coș
           this.isShaking = true;
           setTimeout(() => {
             this.isShaking = false;
           }, 500);
         },
-        // Butoane +/- în coș
         incrementQuantity(index) {
           this.orders[index].quantity++;
         },
@@ -799,8 +819,6 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
-
-        // Finalizează Comanda (checkout)
         async checkout() {
           try {
             // Dacă e prima comandă, alocăm un număr de client
@@ -816,7 +834,6 @@
             }
             this.clientPoints += pointsToAdd;
 
-            // Obiectul comenzii (fără ID local, îl generăm prin Firestore)
             const orderData = {
               items: this.orders,
               total: parseFloat(this.total),
@@ -824,17 +841,13 @@
               timestamp: serverTimestamp(),
             };
 
-            console.log("Trimit comanda la Firestore:", orderData);
-
-            // Adăugăm comanda în colecția "orders"
             const docRef = await addDoc(collection(db, "orders"), orderData);
             console.log("Comanda salvată cu docRef.id:", docRef.id);
 
-            // Golește coșul
             this.orders = [];
             this.isOrderOpen = false;
 
-            // Redirecționează către confirm.html cu docId (pentru afișarea comenzii)
+            // Redirecționează către confirm.html
             window.location.href = "confirm.html?docId=" + docRef.id;
 
           } catch (e) {
@@ -842,8 +855,6 @@
             alert("A apărut o eroare la plasarea comenzii. Te rugăm să încerci din nou.");
           }
         },
-
-        // Preia comenzile deja plasate (pe baza clientNumber)
         async fetchOrders() {
           try {
             if (this.clientNumber === 0) {
@@ -864,7 +875,6 @@
         },
       },
       mounted() {
-        // Citim datele existente din localStorage (pentru fidelizare)
         const storedPoints = localStorage.getItem('clientPoints');
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
@@ -876,17 +886,13 @@
             this.isFirstOrder = false;
           }
         }
-
         const storedMyOrders = localStorage.getItem('myOrders');
         if (storedMyOrders) {
           this.myOrders = JSON.parse(storedMyOrders);
         }
-
-        // Preluăm comenzile din Firestore
         this.fetchOrders();
       },
       watch: {
-        // Salvăm în localStorage anumite date (pentru fidelizare)
         clientPoints(newVal) {
           localStorage.setItem('clientPoints', newVal);
         },
