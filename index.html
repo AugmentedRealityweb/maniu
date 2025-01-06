@@ -43,7 +43,7 @@
       background-color: #f49032; /* Fundal */
       color: #fff;              /* Text alb */
       font-weight: bold;
-      border: 1px solid #f49032; /* Lățime crescută cu 1px pentru restul butoanelor */
+      border: 0.5px solid #f49032; /* Lățime crescută cu 1px pentru restul butoanelor */
       padding: 0.5rem 1.5rem;
       border-radius: 9999px;
       transition: all 0.3s ease;
@@ -356,7 +356,7 @@
       </main>
 
       <!-- Buton Coș, doar dacă există produse -->
-      <div v-if="orders.length > 0" class="fixed bottom-3 right-6 z-50">
+      <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
         <button
           @click="toggleOrderBar"
           class="btn-orange flex items-center relative rounded-full"
@@ -372,7 +372,7 @@
         <aside
           v-show="isOrderOpen && orders.length > 0"
           class="fixed bottom-0 left-0 w-full bg-gray-800 border-t border-gray-700 p-4 overflow-y-auto scrollbar"
-          style="max-height:10vh;"
+          style="max-height:40vh;"
         >
           <div class="flex flex-col">
             <h3 class="text-xl font-bold mb-4">Comanda Ta</h3>
