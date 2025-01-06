@@ -879,7 +879,8 @@
             this.isOrderOpen = false;
 
             // Redirecționează către confirm.html
-            window.location.href = "confirm.html?docId=" + docRef.id;
+            const baseUrl = window.location.origin; // https://restaurant.com sau http://localhost
+window.location.href = `${baseUrl}/confirm.html?docId=${docRef.id}`;
 
           } catch (e) {
             console.error("Eroare la finalizarea comenzii:", e);
