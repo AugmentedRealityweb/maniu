@@ -17,7 +17,7 @@
     rel="stylesheet"
   />
 
-  <!-- Font de tip “scris de mână” (ex.: Dancing Script) -->
+  <!-- Font “scris de mână” (Dancing Script) -->
   <link
     href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap"
     rel="stylesheet"
@@ -31,20 +31,14 @@
       font-family: 'Inter', sans-serif;
       background: linear-gradient(135deg, #000000 0%, #e78c00 100%);
       color: #fff;
-      margin: 0;
-      padding: 0;
     }
 
-    /* Scrollbar portocaliu și pe desktop, și pe mobile (acolo unde este suportat) */
     .scrollbar {
-      scrollbar-width: thin;               /* Firefox */
-      scrollbar-color: #e78c00 #000;       /* Firefox */
-      -webkit-overflow-scrolling: touch;   /* iOS / Mobile support */
+      scrollbar-width: thin;
+      scrollbar-color: #e78c00 #000;
     }
-    /* Chrome, Safari, Opera */
     .scrollbar::-webkit-scrollbar {
       width: 6px;
-      background-color: #000000;
     }
     .scrollbar::-webkit-scrollbar-thumb {
       background-color: #e78c00;
@@ -159,12 +153,14 @@
       border-radius: 1rem;
       border: 1px solid #e78c00;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      text-align: center; /* Centrează conținutul din .card-details */
+      text-align: center; /* centrează conținutul cardului */
     }
     .card-container:hover {
       transform: translateY(-4px) scale(1.02);
       box-shadow: 0 12px 24px rgba(255, 140, 0, 0.3);
     }
+
+    /* Imagine */
     .card-img {
       width: 100%;
       height: 200px;
@@ -173,33 +169,24 @@
       border-top-right-radius: 1rem;
     }
 
+    /* Detalii card + handwriting + centrare */
     .card-details {
       padding: 0.75rem;
+      text-align: center;
     }
     .card-details h3 {
       font-size: 1.1rem;
-      font-weight: 700;
       margin-bottom: 0.2rem;
-      text-align: center; /* Centrare */
+      font-family: 'Dancing Script', cursive; /* scris de mână */
     }
     .card-details p {
       font-size: 1rem;
       font-weight: 600;
       color: #f49032;
-      text-align: center; /* Centrare */
+      text-align: center;
     }
 
-    /* Modal Detalii Produs */
-    .modal-product {
-      background-color: #0d0d0d;
-      border: 2px solid #e78c00;
-      border-radius: 0.5rem;
-      position: relative;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    /* Efect fade in-left la intrarea pe pagină, doar o singură dată */
+    /* Titlu scris de mână (Dancing Script) + fade in-left la intrarea pe pagină */
     @keyframes fadeInLeft {
       0% {
         transform: translateX(-50px);
@@ -213,20 +200,27 @@
     .fade-in-left {
       animation: fadeInLeft 2s ease forwards;
     }
-
-    /* Titlu scris de mână (Dancing Script) */
     .handwriting-title {
       font-family: 'Dancing Script', cursive;
       font-size: 2rem;
       font-weight: 700;
-      text-align: center; /* Centrează titlul pe desktop */
-    }
-
-    /* Centrează textul la mobil (la butonul meniu) */
-    .mobile-title {
       text-align: center;
     }
 
+    /* Centrăm textul în secțiuni – ex. “Alege Categoria”, “Rezultate pentru…” etc. */
+    h2, h3, .text-center {
+      text-align: center;
+    }
+
+    /* Modal Detalii Produs */
+    .modal-product {
+      background-color: #0d0d0d;
+      border: 2px solid #e78c00;
+      border-radius: 0.5rem;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -235,31 +229,30 @@
     <aside
       class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches"
     >
-      <!-- Titlu fancy, centrat -->
-      <div class="text-2xl font-bold handwriting-title fade-in-left mb-6">
-        {{ fancyText('Meniu Restaurant') }}
+      <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">
+        Meniu Restaurant
       </div>
       <nav class="flex flex-col space-y-2">
         <button
-          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full justify-center"
+          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
           @click="activeTab = 'meniu'"
         >
           <span class="material-icons">restaurant_menu</span>
-          {{ fancyText('Meniu') }}
+          Meniu
         </button>
         <button
-          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full justify-center"
+          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
           @click="activeTab = 'puncte'"
         >
           <span class="material-icons">star</span>
-          {{ fancyText('Puncte') }}
+          Puncte
         </button>
         <button
-          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full justify-center"
+          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
           @click="activeTab = 'comenzileTale'"
         >
           <span class="material-icons">receipt</span>
-          {{ fancyText('Comenzile Tale') }}
+          Comenzile Tale
         </button>
       </nav>
     </aside>
@@ -270,9 +263,9 @@
       <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
         <!-- Buton meniu mobil (apare doar pe ecrane mici) -->
         <div class="flex items-center justify-between mb-4 md:hidden">
-          <!-- Titlu manuscris + fade-in, fancy + centrat -->
-          <div class="handwriting-title text-2xl font-bold fade-in-left mobile-title w-full">
-            {{ fancyText('Meniu Restaurant') }}
+          <!-- Titlu manuscris + fade-in -->
+          <div class="handwriting-title text-2xl font-bold fade-in-left">
+            Meniu Restaurant
           </div>
           <button
             class="bg-black border-2 border-[#e78c00] hover:bg-[#e78c00] hover:text-black text-white p-2 rounded-full"
@@ -296,25 +289,25 @@
             </button>
             <nav class="flex flex-col space-y-2">
               <button
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full justify-center"
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
                 @click="activeTab = 'meniu'; isSidebarVisible=false"
               >
                 <span class="material-icons">restaurant_menu</span>
-                {{ fancyText('Meniu') }}
+                Meniu
               </button>
               <button
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full justify-center"
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
                 @click="activeTab = 'puncte'; isSidebarVisible=false"
               >
                 <span class="material-icons">star</span>
-                {{ fancyText('Puncte') }}
+                Puncte
               </button>
               <button
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full justify-center"
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
                 @click="activeTab = 'comenzileTale'; isSidebarVisible=false"
               >
                 <span class="material-icons">receipt</span>
-                {{ fancyText('Comenzile Tale') }}
+                Comenzile Tale
               </button>
             </nav>
           </aside>
@@ -326,7 +319,7 @@
           <div class="flex items-center gap-4 mb-4">
             <input
               type="text"
-              :placeholder="fancyText('Caută produse...')"
+              placeholder="Caută produse..."
               v-model="searchQuery"
               class="bg-black text-gray-200 border border-[#e78c00] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[#e78c00] w-full md:w-1/2"
             />
@@ -335,7 +328,7 @@
           <!-- Rezultate căutare -->
           <div v-if="searchQuery.trim()">
             <h2 class="text-xl font-semibold mb-4 text-center">
-              {{ fancyText('Rezultate pentru:') }} "{{ fancyText(searchQuery) }}"
+              Rezultate pentru: "{{ searchQuery }}"
             </h2>
             <div v-if="displayedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               <div
@@ -346,15 +339,13 @@
               >
                 <img :src="product.image" :alt="product.title" class="card-img"/>
                 <div class="card-details">
-                  <h3>{{ fancyText(product.title) }}</h3>
+                  <h3>{{ product.title }}</h3>
                   <p>{{ product.price }} Lei</p>
                 </div>
               </div>
             </div>
             <div v-else>
-              <p class="text-center">
-                {{ fancyText('Nu am găsit nimic!') }}
-              </p>
+              <p class="text-center">Nu a fost găsit niciun produs care să corespundă căutării.</p>
             </div>
           </div>
 
@@ -362,9 +353,7 @@
           <div v-else>
             <!-- Lista de categorii -->
             <div v-if="view === 'categorii'">
-              <h2 class="text-xl font-semibold mb-4 text-center">
-                {{ fancyText('Alege Categoria') }}
-              </h2>
+              <h2 class="text-xl font-semibold mb-4 text-center">Alege Categoria</h2>
               <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <div
                   v-for="category in categories"
@@ -374,7 +363,8 @@
                 >
                   <img :src="category.image" :alt="category.name" class="card-img"/>
                   <div class="card-details">
-                    <h3>{{ fancyText(renameCategory(category.name)) }}</h3>
+                    <!-- Handwriting + center -->
+                    <h3>{{ renameCategory(category.name) }}</h3>
                   </div>
                 </div>
               </div>
@@ -383,11 +373,9 @@
             <!-- Lista de produse din categoria selectată -->
             <div v-else-if="view === 'produse'">
               <button class="btn-orange mb-4 rounded-full" @click="backToCategories">
-                {{ fancyText('Înapoi la Categorii') }}
+                Înapoi la Categorii
               </button>
-              <h2 class="text-xl font-semibold mb-4 text-center">
-                {{ fancyText('Produse') }} ({{ currentProducts.length }})
-              </h2>
+              <h2 class="text-xl font-semibold mb-4 text-center">Produse ({{ currentProducts.length }})</h2>
               <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <div
                   v-for="product in currentProducts"
@@ -397,7 +385,7 @@
                 >
                   <img :src="product.image" :alt="product.title" class="card-img"/>
                   <div class="card-details">
-                    <h3>{{ fancyText(product.title) }}</h3>
+                    <h3>{{ product.title }}</h3>
                     <p>{{ product.price }} Lei</p>
                   </div>
                 </div>
@@ -418,11 +406,9 @@
                 &times;
               </button>
               <img :src="currentProduct.image" :alt="currentProduct.title" class="w-full h-64 object-cover mb-4 rounded-lg" />
-              <h2 class="text-xl font-bold mb-2 text-center">
-                {{ fancyText(currentProduct.title) }}
-              </h2>
-              <p class="text-[#f49032] font-bold text-lg mb-4 text-center">{{ currentProduct.price }} Lei</p>
-              <p class="text-gray-400 mb-4 text-center">{{ currentProduct.description }}</p>
+              <h2 class="text-xl font-bold mb-2 handwriting-title">{{ currentProduct.title }}</h2>
+              <p class="text-[#f49032] font-bold text-lg mb-4">{{ currentProduct.price }} Lei</p>
+              <p class="text-gray-400 mb-4">{{ currentProduct.description }}</p>
               <ul class="text-gray-300 mb-4">
                 <li
                   v-for="ingredient in currentProduct.ingredients"
@@ -432,33 +418,29 @@
                   {{ ingredient }}
                 </li>
               </ul>
-              <div class="flex justify-center">
-                <button class="btn-orange rounded-full" @click="addToOrder(currentProduct)">
-                  {{ fancyText('Adaugă în coș') }}
-                </button>
-              </div>
+              <button class="btn-orange rounded-full" @click="addToOrder(currentProduct)">
+                Adaugă în coș
+              </button>
             </div>
           </div>
         </section>
 
         <!-- TAB PUNCTE -->
         <section v-else-if="activeTab === 'puncte'">
-          <h2 class="text-2xl font-bold mb-4 text-center">
-            {{ fancyText('Punctele Mele') }}
-          </h2>
+          <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
           <div class="bg-black p-4 rounded border border-[#e78c00] shadow max-w-md scratches mx-auto">
-            <div v-if="clientNumber === 0" class="mb-4 text-center">
-              <p class="text-gray-300">
-                {{ fancyText('Ești un client nou, nu ai încă un număr alocat. Plasează prima comandă!') }}
+            <div v-if="clientNumber === 0" class="mb-4">
+              <p class="text-gray-300 text-center">
+                Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
               </p>
             </div>
-            <div v-else class="text-center">
-              <p class="text-gray-300 mb-2">
-                {{ fancyText('Număr client:') }} <span class="font-bold">#{{ clientNumber }}</span>
+            <div v-else>
+              <p class="text-gray-300 mb-2 text-center">
+                Număr client: <span class="font-bold">#{{ clientNumber }}</span>
               </p>
             </div>
             <p class="text-gray-300 text-center">
-              {{ fancyText('Puncte acumulate:') }}
+              Puncte acumulate:
               <span class="font-bold text-[#f49032]">{{ clientPoints.toFixed(2) }}</span>
             </p>
           </div>
@@ -466,34 +448,32 @@
 
         <!-- TAB COMENZILE TALE -->
         <section v-else-if="activeTab === 'comenzileTale'">
-          <h2 class="text-2xl font-bold mb-4 text-center">
-            {{ fancyText('Comenzile Tale') }}
-          </h2>
+          <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
           <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
-            {{ fancyText('Nu ai nicio comandă finalizată încă.') }}
+            Nu ai nicio comandă finalizată încă.
           </div>
-          <div v-else class="space-y-4 max-w-2xl mx-auto">
+          <div v-else class="space-y-4">
             <div
               v-for="(order, idx) in myOrders"
               :key="order.orderId"
               class="bg-black p-4 rounded border border-[#e78c00] scratches"
             >
-              <h3 class="text-lg font-semibold mb-2 text-center">
-                {{ fancyText('Comanda') }} #{{ idx + 1 }}
+              <h3 class="text-lg font-semibold mb-2">
+                Comanda #{{ idx + 1 }}
               </h3>
-              <ul class="list-disc list-inside text-gray-300 text-center">
+              <ul class="list-disc list-inside text-gray-300">
                 <li
                   v-for="(prod, pidx) in order.items"
                   :key="pidx"
                 >
-                  {{ fancyText(prod.name) }} x {{ prod.quantity }}
+                  {{ prod.name }} x {{ prod.quantity }}
                   – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
                 </li>
               </ul>
-              <div class="mt-2 font-bold text-[#f49032] text-center">
-                {{ fancyText('Total:') }} {{ order.total }} Lei
+              <div class="mt-2 font-bold text-[#f49032]">
+                Total: {{ order.total }} Lei
               </div>
-              <div class="text-sm text-gray-400 text-center">
+              <div class="text-sm text-gray-400">
                 ID comandă: {{ order.orderId }}
               </div>
             </div>
@@ -509,7 +489,7 @@
           :class="{ 'animate-shake': isShaking }"
         >
           <span class="material-icons mr-2 text-white">shopping_cart</span>
-          <span class="text-white">{{ fancyText('Coș') }} ({{ orders.length }})</span>
+          <span class="text-white">Coș ({{ orders.length }})</span>
         </button>
       </div>
 
@@ -521,20 +501,16 @@
           style="max-height:100vh;"
         >
           <div class="flex flex-col">
-            <h3 class="text-xl font-bold mb-4 text-center">
-              {{ fancyText('Comanda Ta') }}
-            </h3>
+            <h3 class="text-xl font-bold mb-4 text-center">Comanda Ta</h3>
             <!-- Lista de produse din coș -->
             <div
               v-for="(order, index) in orders"
               :key="index"
               class="flex justify-between items-center bg-black border border-[#e78c00] p-4 rounded-lg mb-2 scratches"
             >
-              <div class="flex flex-col text-center">
-                <span class="font-bold">
-                  {{ fancyText(order.name) }}
-                </span>
-                <div class="flex items-center gap-2 mt-1 justify-center">
+              <div class="flex flex-col">
+                <span class="font-bold">{{ order.name }}</span>
+                <div class="flex items-center gap-2 mt-1">
                   <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
                   <span class="text-gray-400">x{{ order.quantity }}</span>
                   <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
@@ -550,11 +526,11 @@
             <!-- Total + buton Finalizează Comanda dedesubt -->
             <div class="mt-4">
               <div class="flex justify-between items-center">
-                <span class="text-lg font-semibold">{{ fancyText('Total:') }}</span>
+                <span class="text-lg font-semibold">Total:</span>
                 <span class="text-[#f49032] text-xl font-bold">{{ total }}</span>
               </div>
               <button class="btn-orange mt-4 rounded-full self-end" @click="checkout">
-                {{ fancyText('Finalizează Comanda') }}
+                Finalizează Comanda
               </button>
             </div>
           </div>
@@ -581,19 +557,7 @@
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    // Dicționar minimal pentru transformare fancy
-    // Poți adăuga mai multe caractere și variante (inclusiv cifre, diacritice etc.)
-    const fancyMap = {
-      'a':'𝒶','b':'𝒷','c':'𝒸','d':'𝒹','e':'𝑒','f':'𝒻','g':'𝑔','h':'𝒽',
-      'i':'𝒾','j':'𝒿','k':'𝓀','l':'𝓁','m':'𝓂','n':'𝓃','o':'𝑜','p':'𝓅',
-      'q':'𝓆','r':'𝓇','s':'𝓈','t':'𝓉','u':'𝓊','v':'𝓋','w':'𝓌','x':'𝓍',
-      'y':'𝓎','z':'𝓏',
-      'A':'𝒜','B':'𝐵','C':'𝒞','D':'𝒟','E':'𝐸','F':'𝐹','G':'𝒢','H':'𝐻',
-      'I':'𝐼','J':'𝒥','K':'𝒦','L':'𝐿','M':'𝑀','N':'𝒩','O':'𝒪','P':'𝒫',
-      'Q':'𝒬','R':'𝑅','S':'𝒮','T':'𝒯','U':'𝒰','V':'𝒱','W':'𝒲','X':'𝒳',
-      'Y':'𝒴','Z':'𝒵'
-    };
-
+    // Eliminare diacritice pentru căutare
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
@@ -601,22 +565,30 @@
     const app = Vue.createApp({
       data() {
         return {
-          isSidebarVisible: false, // Sidebar mobil
-          isOrderOpen: false,     // Panou coș
-          isShaking: false,       // Animație coș
+          // Sidebar mobil
+          isSidebarVisible: false,
 
+          // Coș
+          isOrderOpen: false,
+          isShaking: false,
+
+          // Tablouri
           activeTab: 'meniu',
           view: 'categorii', // 'categorii' / 'produse'
 
+          // Produse curente
           currentProducts: [],
           currentProduct: null,
 
+          // Căutare
           searchQuery: '',
 
+          // Fidelizare
           clientNumber: 0,
           clientPoints: 0,
           isFirstOrder: true,
 
+          // Categorii
           categories: [
             { name: 'brunch', image: 'https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp' },
             { name: 'soups', image: 'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg' },
@@ -796,22 +768,7 @@
         },
       },
       methods: {
-        fancyText(text) {
-          // Transformă textul în lowercase + remove diacritice, apoi mapează fiecare caracter
-          // la echivalentul fancy (dacă există).
-          let result = '';
-          for (let char of text) {
-            const noDiac = removeDiacritics(char);
-            if (fancyMap[noDiac]) {
-              result += fancyMap[noDiac];
-            } else {
-              result += char; // Dacă nu e în map, îl lăsăm neschimbat (sau poți omite)
-            }
-          }
-          return result;
-        },
         renameCategory(cat) {
-          // Ex. soups -> 'Supe', main -> 'Fel Principal'
           const dict = {
             brunch: 'Mic Dejun',
             soups: 'Supe',
@@ -826,7 +783,6 @@
           this.currentProducts = this.products[categoryName] || [];
           this.view = 'produse';
           this.searchQuery = '';
-          // Scroll top
           this.$nextTick(() => {
             window.scrollTo(0, 0);
           });
@@ -835,7 +791,6 @@
           this.view = 'categorii';
           this.currentProduct = null;
           this.searchQuery = '';
-          // Scroll top
           this.$nextTick(() => {
             window.scrollTo(0, 0);
           });
@@ -855,6 +810,7 @@
             });
           }
           this.currentProduct = null;
+
           // Animație shake pentru coș
           this.isShaking = true;
           setTimeout(() => {
@@ -875,14 +831,10 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
+
+        // Finalizează Comanda (checkout)
         async checkout() {
           try {
-            // Dacă e prima comandă, alocăm un număr de client
-            if (this.isFirstOrder) {
-              this.clientNumber++;
-              this.isFirstOrder = false;
-            }
-
             // Calculăm puncte (5% din total)
             let pointsToAdd = 0;
             for (const item of this.orders) {
@@ -890,6 +842,7 @@
             }
             this.clientPoints += pointsToAdd;
 
+            // Pregătim datele de comandă
             const orderData = {
               items: this.orders,
               total: parseFloat(this.total),
@@ -897,9 +850,11 @@
               timestamp: serverTimestamp(),
             };
 
+            // Salvează în Firestore
             const docRef = await addDoc(collection(db, "orders"), orderData);
             console.log("Comanda salvată cu docRef.id:", docRef.id);
 
+            // Golește coșul
             this.orders = [];
             this.isOrderOpen = false;
 
@@ -911,13 +866,18 @@
             alert("A apărut o eroare la plasarea comenzii. Te rugăm să încerci din nou.");
           }
         },
+
+        // Preia comenzile deja plasate (pe baza clientNumber)
         async fetchOrders() {
           try {
             if (this.clientNumber === 0) {
               this.myOrders = [];
               return;
             }
-            const q = query(collection(db, "orders"), where("clientNumber", "==", this.clientNumber));
+            const q = query(
+              collection(db, "orders"),
+              where("clientNumber", "==", this.clientNumber)
+            );
             const querySnapshot = await getDocs(q);
             this.myOrders = [];
             querySnapshot.forEach((doc) => {
@@ -931,22 +891,37 @@
         },
       },
       mounted() {
-        // Citim datele existente
+        // 1. Verificăm dacă există deja un clientNumber în localStorage
+        const storedNumber = localStorage.getItem('clientNumber');
+        if (storedNumber) {
+          // Dacă există, îl folosim
+          this.clientNumber = parseInt(storedNumber);
+          // Orice număr >0 înseamnă că nu e "prima" accesare
+          if (this.clientNumber > 0) {
+            this.isFirstOrder = false;
+          }
+        } else {
+          // 2. Dacă NU există, generăm un număr de client UNIC pentru acest user
+          //    EX: un număr random între 10000 și 99999
+          const randomClientNumber = Math.floor(Math.random() * 90000) + 10000;
+          this.clientNumber = randomClientNumber;
+          localStorage.setItem('clientNumber', randomClientNumber);
+          this.isFirstOrder = false;
+        }
+
+        // Puncte
         const storedPoints = localStorage.getItem('clientPoints');
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
         }
-        const storedNumber = localStorage.getItem('clientNumber');
-        if (storedNumber) {
-          this.clientNumber = parseInt(storedNumber);
-          if (this.clientNumber > 0) {
-            this.isFirstOrder = false;
-          }
-        }
+
+        // Istoric comenzi
         const storedMyOrders = localStorage.getItem('myOrders');
         if (storedMyOrders) {
           this.myOrders = JSON.parse(storedMyOrders);
         }
+
+        // Preia comenzile din Firestore (pentru clientNumber actual)
         this.fetchOrders();
       },
       watch: {
