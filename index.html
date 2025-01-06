@@ -31,6 +31,8 @@
       font-family: 'Inter', sans-serif;
       background: linear-gradient(135deg, #000000 0%, #e78c00 100%);
       color: #fff;
+      margin: 0;
+      min-height: 100vh;
     }
 
     .scrollbar {
@@ -59,10 +61,11 @@
       font-size: 0.875rem;
       transition: box-shadow 0.3s ease, transform 0.3s ease;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
     }
     .btn-orange:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 8px #f49032, 0 0 20px #d35400; /* Glow mai pronunțat */
+      box-shadow: 0 0 8px #f49032, 0 0 20px #d35400;
     }
 
     /* Butoane +/- pentru cantitate */
@@ -146,14 +149,14 @@
       padding: 1rem;
     }
 
-    /* Card container: border radius 1rem + hover cu umbra mai proeminentă */
+    /* Card container */
     .card-container {
       position: relative;
       overflow: hidden;
       border-radius: 1rem;
       border: 1px solid #e78c00;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      text-align: center; /* centrează conținutul cardului */
+      text-align: center;
     }
     .card-container:hover {
       transform: translateY(-4px) scale(1.02);
@@ -177,7 +180,7 @@
     .card-details h3 {
       font-size: 1.1rem;
       margin-bottom: 0.2rem;
-      font-family: 'Dancing Script', cursive; /* scris de mână */
+      font-family: 'Dancing Script', cursive;
     }
     .card-details p {
       font-size: 1rem;
@@ -186,7 +189,7 @@
       text-align: center;
     }
 
-    /* Titlu scris de mână (Dancing Script) + fade in-left la intrarea pe pagină */
+    /* Animatie fade-in stânga */
     @keyframes fadeInLeft {
       0% {
         transform: translateX(-50px);
@@ -263,7 +266,6 @@
       <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
         <!-- Buton meniu mobil (apare doar pe ecrane mici) -->
         <div class="flex items-center justify-between mb-4 md:hidden">
-          <!-- Titlu manuscris + fade-in -->
           <div class="handwriting-title text-2xl font-bold fade-in-left">
             Meniu Restaurant
           </div>
@@ -503,7 +505,7 @@
         </button>
       </div>
 
-      <!-- Bara COMANDA TA -->
+      <!-- Bara COMANDA TA (slide-cart) -->
       <transition name="slide-cart">
         <aside
           v-show="isOrderOpen && orders.length > 0"
@@ -554,23 +556,33 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    /* Configurarea Firebase (înlocuiește cu datele tale) */
+    /* Configurația Firebase */
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-      authDomain: "restaurantapp-d0256.firebaseapp.com",
-      projectId: "restaurantapp-d0256",
-      storageBucket: "restaurantapp-d0256.firebasestorage.app",
-      messagingSenderId: "275208346650",
-      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-      measurementId: "G-F44TB27G17"
+      apiKey: "XXX",
+      authDomain: "XXX.firebaseapp.com",
+      projectId: "XXX",
+      storageBucket: "XXX.appspot.com",
+      messagingSenderId: "XXX",
+      appId: "XXX",
+      measurementId: "XXX"
     };
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    // Funcție pentru a elimina diacriticele, folosită la căutare
+    // Eliminare diacritice la căutare
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    // Funcție pt a genera un sessionCode random (5-6 caractere)
+    function generateSessionCode(length = 5) {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let code = "";
+      for (let i = 0; i < length; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
     }
 
     const app = Vue.createApp({
@@ -587,7 +599,7 @@
           activeTab: 'meniu',
           view: 'categorii', // 'categorii' / 'produse'
 
-          // Produse curente (listă de iteme când intrăm într-o categorie)
+          // Produse curente (când intrăm într-o categorie)
           currentProducts: [],
           currentProduct: null,
 
@@ -599,17 +611,20 @@
           clientPoints: 0,
           isFirstOrder: true,
 
-          // ID-ul mesei (ex. "Masa16")
+          // ID-ul mesei (ex "Masa16")
           tableId: '',
 
-          // Categorii + Produse
+          // sessionCode - cod unic pentru sesiune (ex "X7VH5")
+          sessionCode: '',
+
+          // Categorii
           categories: [
             { name: 'brunch', image: 'https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp' },
-            { name: 'soups', image: 'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg' },
-            { name: 'pasta', image: 'https://i.giphy.com/dZRlFW1sbFEpG.webp' },
-            { name: 'main', image: 'https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp' },
+            { name: 'soups',  image: 'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg' },
+            { name: 'pasta',  image: 'https://i.giphy.com/dZRlFW1sbFEpG.webp' },
+            { name: 'main',   image: 'https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp' },
             { name: 'desserts', image: 'https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp' },
-            { name: 'drinks', image: 'https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp' },
+            { name: 'drinks',   image: 'https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp' },
           ],
 
           products: {
@@ -753,25 +768,24 @@
             ],
           },
 
-          // Coș (local)
+          // Coș local
           orders: [],
-          // Istoric comenzi (preluat din Firestore + localStorage)
+          // Istoric comenzi
           myOrders: [],
         };
       },
       computed: {
-        // Produsele filtrate la căutare
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
-            // dacă nu e nimic în căutare, afișăm produsele categoriei curente (dacă e 'produse')
+            // dacă nu e nimic de căutat, întoarcem produsele categoriei curente (dacă view==='produse')
             return this.view === 'produse' ? this.currentProducts : [];
           }
           const results = [];
           for (const catKey in this.products) {
             for (const prod of this.products[catKey]) {
               const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
-              const descNoDiac = removeDiacritics(prod.description.toLowerCase());
+              const descNoDiac  = removeDiacritics(prod.description.toLowerCase());
               if (titleNoDiac.includes(q) || descNoDiac.includes(q)) {
                 results.push(prod);
               }
@@ -779,7 +793,6 @@
           }
           return results;
         },
-        // Totalul coșului
         total() {
           return this.orders
             .reduce((sum, o) => sum + o.price * o.quantity, 0)
@@ -787,15 +800,14 @@
         },
       },
       methods: {
-        // Traducere categorii
         renameCategory(cat) {
           const dict = {
-            brunch: 'Mic Dejun',
-            soups: 'Supe',
-            pasta: 'Paste',
-            main: 'Fel Principal',
+            brunch:   'Mic Dejun',
+            soups:    'Supe',
+            pasta:    'Paste',
+            main:     'Fel Principal',
             desserts: 'Deserturi',
-            drinks: 'Băuturi',
+            drinks:   'Băuturi',
           };
           return dict[cat] || cat;
         },
@@ -803,41 +815,31 @@
           this.currentProducts = this.products[categoryName] || [];
           this.view = 'produse';
           this.searchQuery = '';
-          // Scroll la top
-          this.$nextTick(() => {
-            window.scrollTo(0, 0);
-          });
+          this.$nextTick(() => window.scrollTo(0, 0));
         },
         backToCategories() {
           this.view = 'categorii';
           this.currentProduct = null;
           this.searchQuery = '';
-          this.$nextTick(() => {
-            window.scrollTo(0, 0);
-          });
+          this.$nextTick(() => window.scrollTo(0, 0));
         },
         showProductDetails(product) {
           this.currentProduct = product;
         },
         addToOrder(product) {
-          const existing = this.orders.find((o) => o.name === product.title);
+          const existing = this.orders.find(o => o.name === product.title);
           if (existing) {
             existing.quantity++;
           } else {
-            this.orders.push({
-              name: product.title,
-              price: product.price,
-              quantity: 1,
-            });
+            this.orders.push({ name: product.title, price: product.price, quantity: 1 });
           }
           this.currentProduct = null;
-          // Animație shake
+          // animatie shake
           this.isShaking = true;
           setTimeout(() => {
             this.isShaking = false;
           }, 500);
         },
-        // +/- în coș
         incrementQuantity(index) {
           this.orders[index].quantity++;
         },
@@ -853,50 +855,63 @@
           this.isOrderOpen = !this.isOrderOpen;
         },
 
-        // Finalizare comanda (checkout)
+        // Generăm / obținem un sessionCode pt masa curentă
+        getSessionCodeForTable(table) {
+          // Cheie unică in localStorage ex: "sessionCode_Masa16"
+          const localKey = "sessionCode_" + table;
+          let existingSessionCode = localStorage.getItem(localKey);
+
+          if (!existingSessionCode) {
+            // generăm un nou cod
+            existingSessionCode = generateSessionCode(5); // ex. "X7VH5"
+            localStorage.setItem(localKey, existingSessionCode);
+          }
+          return existingSessionCode;
+        },
+
+        // Finalizează Comanda
         async checkout() {
+          // Validăm tableId
+          if (!this.tableId.trim()) {
+            alert("Te rugăm să introduci un ID al mesei (ex: Masa16)!");
+            return;
+          }
+          // Obținem codul de sesiune (poate e deja generat)
+          this.sessionCode = this.getSessionCodeForTable(this.tableId.trim());
+
+          // Calculăm puncte (5% din total)
+          let pointsToAdd = 0;
+          for (const item of this.orders) {
+            pointsToAdd += item.price * item.quantity * 0.05;
+          }
+          this.clientPoints += pointsToAdd;
+
+          const orderData = {
+            tableId: this.tableId.trim(),
+            sessionCode: this.sessionCode, // EX: "X7VH5"
+            clientNumber: this.clientNumber,
+            items: this.orders,
+            total: parseFloat(this.total),
+            status: "open",            // Masa e încă "deschisă"
+            timestamp: serverTimestamp(),
+          };
+
           try {
-            // Verificăm dacă a fost introdus un ID al mesei
-            if (!this.tableId.trim()) {
-              alert("Te rugăm să introduci un ID al mesei (ex: Masa16)!");
-              return;
-            }
-
-            // Calcul puncte (5% din total)
-            let pointsToAdd = 0;
-            for (const item of this.orders) {
-              pointsToAdd += item.price * item.quantity * 0.05;
-            }
-            this.clientPoints += pointsToAdd;
-
-            // Obiectul comenzii
-            const orderData = {
-              tableId: this.tableId.trim(), // "Masa16" etc.
-              clientNumber: this.clientNumber,
-              items: this.orders,
-              total: parseFloat(this.total),
-              timestamp: serverTimestamp(),
-            };
-
-            // Salvăm în Firestore
-            const docRef = await addDoc(collection(db, "orders"), orderData);
-            console.log("Comanda salvată cu docRef.id:", docRef.id);
-
+            await addDoc(collection(db, "orders"), orderData);
             // Golește coșul
             this.orders = [];
             this.isOrderOpen = false;
 
-            // Redirecționează către confirm.html cu docId
+            // Redirecționează către confirm.html?sessionCode= ...
             const baseUrl = window.location.origin; 
-            window.location.href = `${baseUrl}/confirm.html?docId=${docRef.id}`;
-
-          } catch (e) {
-            console.error("Eroare la finalizarea comenzii:", e);
-            alert("A apărut o eroare la plasarea comenzii. Te rugăm să încerci din nou.");
+            window.location.href = `${baseUrl}/confirm.html?sessionCode=${this.sessionCode}`;
+          } catch (err) {
+            console.error("Eroare la salvarea comenzii:", err);
+            alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
 
-        // Preluare comenzile deja plasate (în funcție de clientNumber)
+        // Preluarea comenzilor deja plasate (pe baza clientNumber)
         async fetchOrders() {
           try {
             if (this.clientNumber === 0) {
@@ -909,9 +924,9 @@
             );
             const snap = await getDocs(qRef);
             this.myOrders = [];
-            snap.forEach((docSnap) => {
+            snap.forEach(docSnap => {
               const data = docSnap.data();
-              data.orderId = docSnap.id; 
+              data.orderId = docSnap.id;
               this.myOrders.push(data);
             });
           } catch (e) {
@@ -920,7 +935,7 @@
         },
       },
       mounted() {
-        // ClientNumber din localStorage
+        // Citește clientNumber din localStorage
         const storedNumber = localStorage.getItem('clientNumber');
         if (storedNumber) {
           this.clientNumber = parseInt(storedNumber);
@@ -928,7 +943,6 @@
             this.isFirstOrder = false;
           }
         } else {
-          // Generăm random (10000-99999)
           const randomClientNumber = Math.floor(Math.random() * 90000) + 10000;
           this.clientNumber = randomClientNumber;
           localStorage.setItem('clientNumber', randomClientNumber);
@@ -947,7 +961,7 @@
           this.myOrders = JSON.parse(storedMyOrders);
         }
 
-        // Fetch actual din Firestore
+        // Afișăm categoriile (implicit)
         this.fetchOrders();
       },
       watch: {
