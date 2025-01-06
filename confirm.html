@@ -48,22 +48,23 @@
     <h1 class="text-2xl font-bold text-center mb-6">Comanda Ta</h1>
     
     <div class="bg-gray-800 p-4 rounded shadow">
-      <!-- ID comandă + ID masă -->
+      <!-- Afișăm ID Comandă + Masă -->
       <h2 id="orderId" class="text-xl font-semibold mb-2"></h2>
       <h3 id="tableId" class="text-md mb-4"></h3>
 
       <!-- Lista de produse -->
       <div id="itemsList" class="mb-4"></div>
 
-      <!-- Total -->
+      <!-- Total final -->
       <div class="product-row border-t border-gray-700 pt-2">
         <span class="font-semibold">Total:</span>
         <span id="orderTotal" class="price"></span>
       </div>
 
-      <!-- QR info -->
+      <!-- Opțional: text și cod QR (dacă totuși vrei să scanezi ceva, ex. docId) -->
       <div class="qr-label text-center">
-        Arată acest cod QR ospătarului:
+        Arată acest cod QR ospătarului
+        <br>(dacă dorești un flux de scanare):
       </div>
       <div id="qrcode" class="flex justify-center"></div>
 
@@ -82,6 +83,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
+    /* Configurația Firebase (înlocuiește cu datele tale) */
     const firebaseConfig = {
       apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -95,23 +97,25 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Parametrii URL
+    // Preluăm docId din URL
     const urlParams = new URLSearchParams(window.location.search);
     const docId = urlParams.get("docId");
 
-    // Elemente DOM
-    const orderIdEl = document.getElementById("orderId");
-    const tableIdEl = document.getElementById("tableId");
-    const itemsListEl = document.getElementById("itemsList");
+    // Elemente HTML
+    const orderIdEl    = document.getElementById("orderId");
+    const tableIdEl    = document.getElementById("tableId");
+    const itemsListEl  = document.getElementById("itemsList");
     const orderTotalEl = document.getElementById("orderTotal");
+    const qrcodeEl     = document.getElementById("qrcode");
 
-    // Link complet (cu docId), folosit la generarea QR
+    // Generăm linkul complet pt QR
+    // (dacă docId e null, nu generăm nimic)
     let fullUrl = window.location.origin + window.location.pathname;
-    fullUrl += "?docId=" + docId;
-
     if (docId) {
-      // Generăm QR
-      new QRCode(document.getElementById("qrcode"), {
+      fullUrl += "?docId=" + docId;
+
+      // Construim QR
+      new QRCode(qrcodeEl, {
         text: fullUrl,
         width: 128,
         height: 128,
@@ -122,26 +126,27 @@
     }
 
     async function fetchOrderData() {
-      if (!docId) return;
+      if (!docId) {
+        return;
+      }
       const docRef = doc(db, "orders", docId);
-      const docSnap = await getDoc(docRef);
-      if (!docSnap.exists()) {
+      const snap = await getDoc(docRef);
+      if (!snap.exists()) {
         console.warn("Nu există comanda cu docId=", docId);
         return;
       }
 
-      const data = docSnap.data();
-      // Afișăm "Detalii Comandă" (sau un ID custom, dacă l-ai generat tu)
+      const data = snap.data();
+      // Afișăm docId-ul (sau un alt ID generat)
       orderIdEl.textContent = "Detalii Comandă (" + docId + ")";
-      
-      // Afișăm tableId (dacă există)
+      // Afișăm "Masă: XXX"
       if (data.tableId) {
         tableIdEl.textContent = "Masă: " + data.tableId;
       }
 
       const items = data.items || [];
       let total = 0;
-      let html = "";
+      let html  = "";
 
       items.forEach(item => {
         const subTotal = item.price * item.quantity;
@@ -158,6 +163,7 @@
       orderTotalEl.textContent = total.toFixed(2) + " Lei";
     }
 
+    // Pornim
     fetchOrderData().catch(err => {
       console.error("Eroare la citirea comenzii:", err);
     });
