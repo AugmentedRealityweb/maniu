@@ -31,14 +31,20 @@
       font-family: 'Inter', sans-serif;
       background: linear-gradient(135deg, #000000 0%, #e78c00 100%);
       color: #fff;
+      margin: 0;
+      padding: 0;
     }
 
+    /* Scrollbar portocaliu și pe desktop, și pe mobile (acolo unde este suportat) */
     .scrollbar {
-      scrollbar-width: thin;
-      scrollbar-color: #e78c00 #000;
+      scrollbar-width: thin;               /* Firefox */
+      scrollbar-color: #e78c00 #000;       /* Firefox */
+      -webkit-overflow-scrolling: touch;   /* iOS / Mobile support */
     }
+    /* Chrome, Safari, Opera */
     .scrollbar::-webkit-scrollbar {
       width: 6px;
+      background-color: #000000;
     }
     .scrollbar::-webkit-scrollbar-thumb {
       background-color: #e78c00;
@@ -153,6 +159,7 @@
       border-radius: 1rem;
       border: 1px solid #e78c00;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-align: center; /* Centrează conținutul din .card-details */
     }
     .card-container:hover {
       transform: translateY(-4px) scale(1.02);
@@ -166,7 +173,6 @@
       border-top-right-radius: 1rem;
     }
 
-    /* Afișăm denumirea și prețul sub imagine (ca înainte) */
     .card-details {
       padding: 0.75rem;
     }
@@ -174,11 +180,13 @@
       font-size: 1.1rem;
       font-weight: 700;
       margin-bottom: 0.2rem;
+      text-align: center; /* Centrare */
     }
     .card-details p {
       font-size: 1rem;
       font-weight: 600;
       color: #f49032;
+      text-align: center; /* Centrare */
     }
 
     /* Modal Detalii Produs */
@@ -211,7 +219,14 @@
       font-family: 'Dancing Script', cursive;
       font-size: 2rem;
       font-weight: 700;
+      text-align: center; /* Centrează titlul pe desktop */
     }
+
+    /* Centrează textul la mobil (la butonul meniu) */
+    .mobile-title {
+      text-align: center;
+    }
+
   </style>
 </head>
 <body>
@@ -220,30 +235,31 @@
     <aside
       class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches"
     >
-      <div class="text-2xl font-bold text-center mb-6 handwriting-title fade-in-left">
-        Meniu Restaurant
+      <!-- Titlu fancy, centrat -->
+      <div class="text-2xl font-bold handwriting-title fade-in-left mb-6">
+        {{ fancyText('Meniu Restaurant') }}
       </div>
       <nav class="flex flex-col space-y-2">
         <button
-          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
+          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full justify-center"
           @click="activeTab = 'meniu'"
         >
           <span class="material-icons">restaurant_menu</span>
-          Meniu
+          {{ fancyText('Meniu') }}
         </button>
         <button
-          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
+          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full justify-center"
           @click="activeTab = 'puncte'"
         >
           <span class="material-icons">star</span>
-          Puncte
+          {{ fancyText('Puncte') }}
         </button>
         <button
-          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
+          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full justify-center"
           @click="activeTab = 'comenzileTale'"
         >
           <span class="material-icons">receipt</span>
-          Comenzile Tale
+          {{ fancyText('Comenzile Tale') }}
         </button>
       </nav>
     </aside>
@@ -254,9 +270,9 @@
       <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
         <!-- Buton meniu mobil (apare doar pe ecrane mici) -->
         <div class="flex items-center justify-between mb-4 md:hidden">
-          <!-- Titlu manuscris + fade-in -->
-          <div class="handwriting-title text-2xl font-bold fade-in-left">
-            Meniu Restaurant
+          <!-- Titlu manuscris + fade-in, fancy + centrat -->
+          <div class="handwriting-title text-2xl font-bold fade-in-left mobile-title w-full">
+            {{ fancyText('Meniu Restaurant') }}
           </div>
           <button
             class="bg-black border-2 border-[#e78c00] hover:bg-[#e78c00] hover:text-black text-white p-2 rounded-full"
@@ -280,25 +296,25 @@
             </button>
             <nav class="flex flex-col space-y-2">
               <button
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full justify-center"
                 @click="activeTab = 'meniu'; isSidebarVisible=false"
               >
                 <span class="material-icons">restaurant_menu</span>
-                Meniu
+                {{ fancyText('Meniu') }}
               </button>
               <button
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full justify-center"
                 @click="activeTab = 'puncte'; isSidebarVisible=false"
               >
                 <span class="material-icons">star</span>
-                Puncte
+                {{ fancyText('Puncte') }}
               </button>
               <button
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full justify-center"
                 @click="activeTab = 'comenzileTale'; isSidebarVisible=false"
               >
                 <span class="material-icons">receipt</span>
-                Comenzile Tale
+                {{ fancyText('Comenzile Tale') }}
               </button>
             </nav>
           </aside>
@@ -310,7 +326,7 @@
           <div class="flex items-center gap-4 mb-4">
             <input
               type="text"
-              placeholder="Caută produse..."
+              :placeholder="fancyText('Caută produse...')"
               v-model="searchQuery"
               class="bg-black text-gray-200 border border-[#e78c00] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[#e78c00] w-full md:w-1/2"
             />
@@ -318,8 +334,8 @@
 
           <!-- Rezultate căutare -->
           <div v-if="searchQuery.trim()">
-            <h2 class="text-xl font-semibold mb-4">
-              Rezultate pentru: "{{ searchQuery }}"
+            <h2 class="text-xl font-semibold mb-4 text-center">
+              {{ fancyText('Rezultate pentru:') }} "{{ fancyText(searchQuery) }}"
             </h2>
             <div v-if="displayedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               <div
@@ -330,13 +346,15 @@
               >
                 <img :src="product.image" :alt="product.title" class="card-img"/>
                 <div class="card-details">
-                  <h3>{{ product.title }}</h3>
+                  <h3>{{ fancyText(product.title) }}</h3>
                   <p>{{ product.price }} Lei</p>
                 </div>
               </div>
             </div>
             <div v-else>
-              <p>Nu a fost găsit niciun produs care să corespundă căutării.</p>
+              <p class="text-center">
+                {{ fancyText('Nu am găsit nimic!') }}
+              </p>
             </div>
           </div>
 
@@ -344,7 +362,9 @@
           <div v-else>
             <!-- Lista de categorii -->
             <div v-if="view === 'categorii'">
-              <h2 class="text-xl font-semibold mb-4">Alege Categoria</h2>
+              <h2 class="text-xl font-semibold mb-4 text-center">
+                {{ fancyText('Alege Categoria') }}
+              </h2>
               <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <div
                   v-for="category in categories"
@@ -354,7 +374,7 @@
                 >
                   <img :src="category.image" :alt="category.name" class="card-img"/>
                   <div class="card-details">
-                    <h3 class="capitalize">{{ renameCategory(category.name) }}</h3>
+                    <h3>{{ fancyText(renameCategory(category.name)) }}</h3>
                   </div>
                 </div>
               </div>
@@ -363,9 +383,11 @@
             <!-- Lista de produse din categoria selectată -->
             <div v-else-if="view === 'produse'">
               <button class="btn-orange mb-4 rounded-full" @click="backToCategories">
-                Înapoi la Categorii
+                {{ fancyText('Înapoi la Categorii') }}
               </button>
-              <h2 class="text-xl font-semibold mb-4">Produse ({{ currentProducts.length }})</h2>
+              <h2 class="text-xl font-semibold mb-4 text-center">
+                {{ fancyText('Produse') }} ({{ currentProducts.length }})
+              </h2>
               <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <div
                   v-for="product in currentProducts"
@@ -375,7 +397,7 @@
                 >
                   <img :src="product.image" :alt="product.title" class="card-img"/>
                   <div class="card-details">
-                    <h3>{{ product.title }}</h3>
+                    <h3>{{ fancyText(product.title) }}</h3>
                     <p>{{ product.price }} Lei</p>
                   </div>
                 </div>
@@ -396,9 +418,11 @@
                 &times;
               </button>
               <img :src="currentProduct.image" :alt="currentProduct.title" class="w-full h-64 object-cover mb-4 rounded-lg" />
-              <h2 class="text-xl font-bold mb-2">{{ currentProduct.title }}</h2>
-              <p class="text-[#f49032] font-bold text-lg mb-4">{{ currentProduct.price }} Lei</p>
-              <p class="text-gray-400 mb-4">{{ currentProduct.description }}</p>
+              <h2 class="text-xl font-bold mb-2 text-center">
+                {{ fancyText(currentProduct.title) }}
+              </h2>
+              <p class="text-[#f49032] font-bold text-lg mb-4 text-center">{{ currentProduct.price }} Lei</p>
+              <p class="text-gray-400 mb-4 text-center">{{ currentProduct.description }}</p>
               <ul class="text-gray-300 mb-4">
                 <li
                   v-for="ingredient in currentProduct.ingredients"
@@ -408,29 +432,33 @@
                   {{ ingredient }}
                 </li>
               </ul>
-              <button class="btn-orange rounded-full" @click="addToOrder(currentProduct)">
-                Adaugă în coș
-              </button>
+              <div class="flex justify-center">
+                <button class="btn-orange rounded-full" @click="addToOrder(currentProduct)">
+                  {{ fancyText('Adaugă în coș') }}
+                </button>
+              </div>
             </div>
           </div>
         </section>
 
         <!-- TAB PUNCTE -->
         <section v-else-if="activeTab === 'puncte'">
-          <h2 class="text-2xl font-bold mb-4">Punctele Mele</h2>
-          <div class="bg-black p-4 rounded border border-[#e78c00] shadow max-w-md scratches">
-            <div v-if="clientNumber === 0" class="mb-4">
+          <h2 class="text-2xl font-bold mb-4 text-center">
+            {{ fancyText('Punctele Mele') }}
+          </h2>
+          <div class="bg-black p-4 rounded border border-[#e78c00] shadow max-w-md scratches mx-auto">
+            <div v-if="clientNumber === 0" class="mb-4 text-center">
               <p class="text-gray-300">
-                Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
+                {{ fancyText('Ești un client nou, nu ai încă un număr alocat. Plasează prima comandă!') }}
               </p>
             </div>
-            <div v-else>
+            <div v-else class="text-center">
               <p class="text-gray-300 mb-2">
-                Număr client: <span class="font-bold">#{{ clientNumber }}</span>
+                {{ fancyText('Număr client:') }} <span class="font-bold">#{{ clientNumber }}</span>
               </p>
             </div>
-            <p class="text-gray-300">
-              Puncte acumulate:
+            <p class="text-gray-300 text-center">
+              {{ fancyText('Puncte acumulate:') }}
               <span class="font-bold text-[#f49032]">{{ clientPoints.toFixed(2) }}</span>
             </p>
           </div>
@@ -438,32 +466,34 @@
 
         <!-- TAB COMENZILE TALE -->
         <section v-else-if="activeTab === 'comenzileTale'">
-          <h2 class="text-2xl font-bold mb-4">Comenzile Tale</h2>
-          <div v-if="myOrders.length === 0" class="text-gray-300">
-            Nu ai nicio comandă finalizată încă.
+          <h2 class="text-2xl font-bold mb-4 text-center">
+            {{ fancyText('Comenzile Tale') }}
+          </h2>
+          <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
+            {{ fancyText('Nu ai nicio comandă finalizată încă.') }}
           </div>
-          <div v-else class="space-y-4">
+          <div v-else class="space-y-4 max-w-2xl mx-auto">
             <div
               v-for="(order, idx) in myOrders"
               :key="order.orderId"
               class="bg-black p-4 rounded border border-[#e78c00] scratches"
             >
-              <h3 class="text-lg font-semibold mb-2">
-                Comanda #{{ idx + 1 }}
+              <h3 class="text-lg font-semibold mb-2 text-center">
+                {{ fancyText('Comanda') }} #{{ idx + 1 }}
               </h3>
-              <ul class="list-disc list-inside text-gray-300">
+              <ul class="list-disc list-inside text-gray-300 text-center">
                 <li
                   v-for="(prod, pidx) in order.items"
                   :key="pidx"
                 >
-                  {{ prod.name }} x {{ prod.quantity }}
+                  {{ fancyText(prod.name) }} x {{ prod.quantity }}
                   – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
                 </li>
               </ul>
-              <div class="mt-2 font-bold text-[#f49032]">
-                Total: {{ order.total }} Lei
+              <div class="mt-2 font-bold text-[#f49032] text-center">
+                {{ fancyText('Total:') }} {{ order.total }} Lei
               </div>
-              <div class="text-sm text-gray-400">
+              <div class="text-sm text-gray-400 text-center">
                 ID comandă: {{ order.orderId }}
               </div>
             </div>
@@ -479,7 +509,7 @@
           :class="{ 'animate-shake': isShaking }"
         >
           <span class="material-icons mr-2 text-white">shopping_cart</span>
-          <span class="text-white">Coș ({{ orders.length }})</span>
+          <span class="text-white">{{ fancyText('Coș') }} ({{ orders.length }})</span>
         </button>
       </div>
 
@@ -491,16 +521,20 @@
           style="max-height:100vh;"
         >
           <div class="flex flex-col">
-            <h3 class="text-xl font-bold mb-4">Comanda Ta</h3>
+            <h3 class="text-xl font-bold mb-4 text-center">
+              {{ fancyText('Comanda Ta') }}
+            </h3>
             <!-- Lista de produse din coș -->
             <div
               v-for="(order, index) in orders"
               :key="index"
               class="flex justify-between items-center bg-black border border-[#e78c00] p-4 rounded-lg mb-2 scratches"
             >
-              <div class="flex flex-col">
-                <span class="font-bold">{{ order.name }}</span>
-                <div class="flex items-center gap-2 mt-1">
+              <div class="flex flex-col text-center">
+                <span class="font-bold">
+                  {{ fancyText(order.name) }}
+                </span>
+                <div class="flex items-center gap-2 mt-1 justify-center">
                   <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
                   <span class="text-gray-400">x{{ order.quantity }}</span>
                   <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
@@ -516,11 +550,11 @@
             <!-- Total + buton Finalizează Comanda dedesubt -->
             <div class="mt-4">
               <div class="flex justify-between items-center">
-                <span class="text-lg font-semibold">Total:</span>
+                <span class="text-lg font-semibold">{{ fancyText('Total:') }}</span>
                 <span class="text-[#f49032] text-xl font-bold">{{ total }}</span>
               </div>
               <button class="btn-orange mt-4 rounded-full self-end" @click="checkout">
-                Finalizează Comanda
+                {{ fancyText('Finalizează Comanda') }}
               </button>
             </div>
           </div>
@@ -547,6 +581,19 @@
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
+    // Dicționar minimal pentru transformare fancy
+    // Poți adăuga mai multe caractere și variante (inclusiv cifre, diacritice etc.)
+    const fancyMap = {
+      'a':'𝒶','b':'𝒷','c':'𝒸','d':'𝒹','e':'𝑒','f':'𝒻','g':'𝑔','h':'𝒽',
+      'i':'𝒾','j':'𝒿','k':'𝓀','l':'𝓁','m':'𝓂','n':'𝓃','o':'𝑜','p':'𝓅',
+      'q':'𝓆','r':'𝓇','s':'𝓈','t':'𝓉','u':'𝓊','v':'𝓋','w':'𝓌','x':'𝓍',
+      'y':'𝓎','z':'𝓏',
+      'A':'𝒜','B':'𝐵','C':'𝒞','D':'𝒟','E':'𝐸','F':'𝐹','G':'𝒢','H':'𝐻',
+      'I':'𝐼','J':'𝒥','K':'𝒦','L':'𝐿','M':'𝑀','N':'𝒩','O':'𝒪','P':'𝒫',
+      'Q':'𝒬','R':'𝑅','S':'𝒮','T':'𝒯','U':'𝒰','V':'𝒱','W':'𝒲','X':'𝒳',
+      'Y':'𝒴','Z':'𝒵'
+    };
+
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
@@ -554,30 +601,22 @@
     const app = Vue.createApp({
       data() {
         return {
-          // Sidebar mobil
-          isSidebarVisible: false,
+          isSidebarVisible: false, // Sidebar mobil
+          isOrderOpen: false,     // Panou coș
+          isShaking: false,       // Animație coș
 
-          // Coș
-          isOrderOpen: false,
-          isShaking: false,
-
-          // Tablouri
           activeTab: 'meniu',
           view: 'categorii', // 'categorii' / 'produse'
 
-          // Produse curente
           currentProducts: [],
           currentProduct: null,
 
-          // Căutare
           searchQuery: '',
 
-          // Fidelizare
           clientNumber: 0,
           clientPoints: 0,
           isFirstOrder: true,
 
-          // Categorii
           categories: [
             { name: 'brunch', image: 'https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp' },
             { name: 'soups', image: 'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg' },
@@ -757,7 +796,22 @@
         },
       },
       methods: {
+        fancyText(text) {
+          // Transformă textul în lowercase + remove diacritice, apoi mapează fiecare caracter
+          // la echivalentul fancy (dacă există).
+          let result = '';
+          for (let char of text) {
+            const noDiac = removeDiacritics(char);
+            if (fancyMap[noDiac]) {
+              result += fancyMap[noDiac];
+            } else {
+              result += char; // Dacă nu e în map, îl lăsăm neschimbat (sau poți omite)
+            }
+          }
+          return result;
+        },
         renameCategory(cat) {
+          // Ex. soups -> 'Supe', main -> 'Fel Principal'
           const dict = {
             brunch: 'Mic Dejun',
             soups: 'Supe',
@@ -772,6 +826,7 @@
           this.currentProducts = this.products[categoryName] || [];
           this.view = 'produse';
           this.searchQuery = '';
+          // Scroll top
           this.$nextTick(() => {
             window.scrollTo(0, 0);
           });
@@ -780,6 +835,7 @@
           this.view = 'categorii';
           this.currentProduct = null;
           this.searchQuery = '';
+          // Scroll top
           this.$nextTick(() => {
             window.scrollTo(0, 0);
           });
@@ -875,6 +931,7 @@
         },
       },
       mounted() {
+        // Citim datele existente
         const storedPoints = localStorage.getItem('clientPoints');
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
