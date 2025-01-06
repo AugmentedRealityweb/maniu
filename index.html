@@ -599,29 +599,44 @@
 
     // Obținem sau creăm un sessionCode la "sessions/tableId"
     async function getOrCreateSessionCode(tableId) {
-      const docRef = doc(db, "sessions", tableId);
-      const snap = await getDoc(docRef);
+  if (!tableId) {
+    throw new Error("Table ID este necesar pentru a genera un session code.");
+  }
 
-      let sessionCode = null;
+  const docRef = doc(db, "sessions", tableId);
 
-      if (snap.exists()) {
-        const data = snap.data();
-        // dacă sessionCode e definit și status="active", îl folosim
-        if (data.sessionCode && data.status === "active") {
-          sessionCode = data.sessionCode;
-        } else {
-          // generăm un nou cod
-          sessionCode = generateSessionCode();
-          await setDoc(docRef, { sessionCode, status: "active" });
-        }
-      } else {
-        // nu există doc, creăm
-        sessionCode = generateSessionCode();
-        await setDoc(docRef, { sessionCode, status: "active" });
+  try {
+    // Verificăm dacă documentul există deja în Firestore
+    const snap = await getDoc(docRef);
+
+    if (snap.exists()) {
+      const data = snap.data();
+
+      // Dacă există un sessionCode activ, îl folosim
+      if (data.sessionCode && data.status === "active") {
+        console.log(`Session code activ găsit pentru ${tableId}: ${data.sessionCode}`);
+        return data.sessionCode;
       }
 
-      return sessionCode;
+      // Dacă documentul există, dar sessionCode-ul nu este activ, generăm unul nou
+      const newSessionCode = generateSessionCode();
+      await setDoc(docRef, { sessionCode: newSessionCode, status: "active" }, { merge: true });
+      console.log(`Session code regenerat pentru ${tableId}: ${newSessionCode}`);
+      return newSessionCode;
     }
+
+    // Dacă documentul nu există, creăm unul nou cu un sessionCode activ
+    const newSessionCode = generateSessionCode();
+    await setDoc(docRef, { sessionCode: newSessionCode, status: "active" });
+    console.log(`Session code nou creat pentru ${tableId}: ${newSessionCode}`);
+    return newSessionCode;
+
+  } catch (error) {
+    console.error(`Eroare la obținerea/crearea session code pentru ${tableId}:`, error);
+    throw new Error("A apărut o eroare la obținerea/crearea session code-ului.");
+  }
+}
+
 
     const app = Vue.createApp({
       data() {
