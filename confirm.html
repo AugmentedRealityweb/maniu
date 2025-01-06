@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Comanda Ta</title>
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     body {
-      background-color: #111827; /* același fond închis ca în index.html */
+      background-color: #111827; 
       color: #fff;
       font-family: 'Inter', sans-serif;
       margin: 0;
@@ -34,39 +36,24 @@
     .product-name {
       margin-right: 1rem;
     }
-    .qr-label {
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-    }
-    #qrcode {
-      margin-bottom: 1rem;
-    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1 class="text-2xl font-bold text-center mb-6">Comanda Ta</h1>
-    
-    <div class="bg-gray-800 p-4 rounded shadow">
-      <!-- Afișăm ID Comandă + Masă -->
-      <h2 id="orderId" class="text-xl font-semibold mb-2"></h2>
-      <h3 id="tableId" class="text-md mb-4"></h3>
 
+    <div class="bg-gray-800 p-4 rounded shadow">
+      <!-- Afișăm sessionCode, ex: "Cod Sesiune: X7VH5" -->
+      <h2 id="sessionCodeElem" class="text-xl font-semibold mb-2"></h2>
+      
       <!-- Lista de produse -->
       <div id="itemsList" class="mb-4"></div>
 
       <!-- Total final -->
       <div class="product-row border-t border-gray-700 pt-2">
-        <span class="font-semibold">Total:</span>
+        <span class="font-semibold">Total Comenzi:</span>
         <span id="orderTotal" class="price"></span>
       </div>
-
-      <!-- Opțional: text și cod QR (dacă totuși vrei să scanezi ceva, ex. docId) -->
-      <div class="qr-label text-center">
-        Arată acest cod QR ospătarului
-        <br>(dacă dorești un flux de scanare):
-      </div>
-      <div id="qrcode" class="flex justify-center"></div>
 
       <!-- Link Înapoi -->
       <div class="text-center mt-4">
@@ -75,98 +62,96 @@
     </div>
   </div>
 
-  <!-- QRCode.js (pentru generarea codului QR) -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-
   <!-- Firebase + Firestore (ES module) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import { 
+      getFirestore, 
+      collection, 
+      query, 
+      where, 
+      getDocs 
+    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    /* Configurația Firebase (înlocuiește cu datele tale) */
+    /*
+      Configurația Firebase (înlocuiește cu datele tale).
+      Asigură-te că e identică cu ce ai în index.html
+    */
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-      authDomain: "restaurantapp-d0256.firebaseapp.com",
-      projectId: "restaurantapp-d0256",
-      storageBucket: "restaurantapp-d0256.firebasestorage.app",
-      messagingSenderId: "275208346650",
-      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-      measurementId: "G-F44TB27G17"
+      apiKey: "XXX",
+      authDomain: "XXX.firebaseapp.com",
+      projectId: "XXX",
+      storageBucket: "XXX.appspot.com",
+      messagingSenderId: "XXX",
+      appId: "XXX",
+      measurementId: "XXX"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Preluăm docId din URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const docId = urlParams.get("docId");
+    // Citim din URL sessionCode=? 
+    const params = new URLSearchParams(window.location.search);
+    const sessionCode = params.get("sessionCode");
 
     // Elemente HTML
-    const orderIdEl    = document.getElementById("orderId");
-    const tableIdEl    = document.getElementById("tableId");
-    const itemsListEl  = document.getElementById("itemsList");
-    const orderTotalEl = document.getElementById("orderTotal");
-    const qrcodeEl     = document.getElementById("qrcode");
+    const sessionCodeElem = document.getElementById("sessionCodeElem");
+    const itemsListElem   = document.getElementById("itemsList");
+    const orderTotalElem  = document.getElementById("orderTotal");
 
-    // Generăm linkul complet pt QR
-    // (dacă docId e null, nu generăm nimic)
-    let fullUrl = window.location.origin + window.location.pathname;
-    if (docId) {
-      fullUrl += "?docId=" + docId;
-
-      // Construim QR
-      new QRCode(qrcodeEl, {
-        text: fullUrl,
-        width: 128,
-        height: 128,
-        colorDark: "#f49032",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
+    // Afișăm codul
+    if (sessionCode) {
+      sessionCodeElem.textContent = "Codul Sesiunii: " + sessionCode;
+    } else {
+      sessionCodeElem.textContent = "Nu există niciun cod de sesiune!";
     }
 
-    async function fetchOrderData() {
-      if (!docId) {
+    // Preluăm toate comenzile din Firestore care au sessionCode = X
+    async function fetchSessionOrders() {
+      if (!sessionCode) {
         return;
       }
-      const docRef = doc(db, "orders", docId);
-      const snap = await getDoc(docRef);
-      if (!snap.exists()) {
-        console.warn("Nu există comanda cu docId=", docId);
-        return;
+      try {
+        const cRef = collection(db, "orders");
+        const qRef = query(cRef, where("sessionCode", "==", sessionCode));
+        const snap = await getDocs(qRef);
+
+        let totalAll = 0;
+        let htmlRows = "";
+
+        snap.forEach(docSnap => {
+          const data = docSnap.data();
+          // Fiecare doc = o comandă
+          const items = data.items || [];
+          let subTotal = 0;
+          items.forEach(item => {
+            subTotal += item.price * item.quantity;
+          });
+          totalAll += subTotal;
+
+          // Afișăm un heading "Comanda: docSnap.id" (opțional)
+          htmlRows += `<h3 class="text-lg font-semibold mt-3 mb-2">Comanda #${docSnap.id}</h3>`;
+
+          items.forEach(item => {
+            const thisSum = item.price * item.quantity;
+            htmlRows += `
+              <div class="product-row">
+                <span class="product-name">${item.name} x ${item.quantity}</span>
+                <span class="price">${thisSum.toFixed(2)} Lei</span>
+              </div>
+            `;
+          });
+          htmlRows += `<hr class="border-gray-700 my-2"/>`;
+        });
+
+        itemsListElem.innerHTML = htmlRows;
+        orderTotalElem.textContent = totalAll.toFixed(2) + " Lei";
+      } catch (err) {
+        console.error("Eroare la fetchSessionOrders:", err);
       }
-
-      const data = snap.data();
-      // Afișăm docId-ul (sau un alt ID generat)
-      orderIdEl.textContent = "Detalii Comandă (" + docId + ")";
-      // Afișăm "Masă: XXX"
-      if (data.tableId) {
-        tableIdEl.textContent = "Masă: " + data.tableId;
-      }
-
-      const items = data.items || [];
-      let total = 0;
-      let html  = "";
-
-      items.forEach(item => {
-        const subTotal = item.price * item.quantity;
-        total += subTotal;
-        html += `
-          <div class="product-row">
-            <span class="product-name">${item.name} x ${item.quantity}</span>
-            <span class="price">${subTotal.toFixed(2)} Lei</span>
-          </div>
-        `;
-      });
-
-      itemsListEl.innerHTML = html;
-      orderTotalEl.textContent = total.toFixed(2) + " Lei";
     }
 
-    // Pornim
-    fetchOrderData().catch(err => {
-      console.error("Eroare la citirea comenzii:", err);
-    });
+    fetchSessionOrders();
   </script>
 </body>
 </html>
