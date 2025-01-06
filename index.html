@@ -597,6 +597,19 @@
       return code;
     }
 
+// Obține parametrul "tableId" din URL
+function getTableIdFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("tableId") || ""; // Returnează "" dacă nu există "tableId"
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const tableId = getTableIdFromUrl();
+  if (tableId) {
+    // Setează valoarea câmpului `tableId` din aplicație
+    const app = Vue.createApp({}).mount("#app");
+    app.tableId = tableId; // Precompletăm câmpul
+  }    
     // Obținem sau creăm un sessionCode la "sessions/tableId"
     async function getOrCreateSessionCode(tableId) {
   if (!tableId) {
