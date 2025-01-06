@@ -740,44 +740,29 @@
             this.clientPoints += pointsToAdd;
 
             // Generăm ID comandă
-            const orderId = 'CMD' + Date.now();
-
-            // Structura comenzii
             const orderData = {
-              orderId,
-              items: this.orders,
-              total: parseFloat(this.total),
-              clientNumber: this.clientNumber,
-              timestamp: serverTimestamp(),
-            };
+      // În loc de orderId: docRef.id devine "cheia"
+      items: this.orders,
+      total: parseFloat(this.total),
+      clientNumber: this.clientNumber,
+      timestamp: serverTimestamp(),
+    };
 
-            console.log("Încearcă să adauge comanda în Firestore: ", orderData);
+    // 1. Adăugăm comanda în Firestore
+    const docRef = await addDoc(collection(db, "orders"), orderData);
+    console.log("Comanda salvată cu docRef.id:", docRef.id);
 
-            // Adăugăm comanda în Firestore
-            const docRef = await addDoc(collection(db, "orders"), orderData);
-            console.log("Comandă adăugată cu ID (Firestore docRef): ", docRef.id);
+    // 2. Golește coșul, etc.
+    this.orders = [];
+    this.isOrderOpen = false;
 
-            // Actualizăm istoricul comenzilor
-            this.myOrders.push(orderData);
-
-            localStorage.setItem(orderId, JSON.stringify(this.orders));// Salvăm în localStorage imediat pentru puncte și număr client
-            localStorage.setItem('myOrders', JSON.stringify(this.myOrders));
-            localStorage.setItem('clientPoints', this.clientPoints);
-            localStorage.setItem('clientNumber', this.clientNumber);
-
-            // Golește coșul
-            this.orders = [];
-            this.isOrderOpen = false;
-
-            console.log("Am ajuns la final, totul OK, orderId=", orderId);
-
-            // Redirecționează către pagina de confirmare
-            window.location.href = 'confirm.html?orderId=' + orderId;
-          } catch (e) {
-            console.error("Eroare la finalizarea comenzii: ", e);
-            alert("A apărut o eroare la plasarea comenzii. Te rugăm să încerci din nou.");
-          }
-        },
+    // 3. Redirecționează către confirm.html?docId=DOCID
+    window.location.href = "confirm.html?docId=" + docRef.id;
+  } catch (e) {
+    console.error("Eroare la finalizarea comenzii:", e);
+    alert("A apărut o eroare la plasarea comenzii. Te rugăm să încerci din nou.");
+  }
+}
 
         async fetchOrders() {
           try {
