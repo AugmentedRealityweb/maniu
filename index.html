@@ -40,20 +40,21 @@
 
     /* Butoane moderne, rotunjite, cu highlight #d35400 */
     .btn-orange {
-  background-color: #f49032; /* Fundal */
-  color: #fff; /* Text alb */
-  font-weight: bold;
-  border: 1px solid #f49032;
-  padding: 0.35rem 1.05rem; /* Diminuat cu 30% */
-  border-radius: 0.375rem; /* Colțuri mai puțin rotunjite */
-  font-size: 0.875rem; /* Dimensiunea textului redusă */
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+      background-color: #f49032; /* Fundal */
+      color: #fff;              /* Text alb */
+      font-weight: bold;
+      border: 1px solid #f49032;
+      padding: 0.35rem 1.05rem; /* Diminuat cu 30% */
+      border-radius: 0.375rem;  /* Colțuri mai puțin rotunjite */
+      font-size: 0.875rem;      /* Dimensiunea textului redusă */
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
     .btn-orange:hover {
       box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
       transform: scale(1.05);
     }
+
     /* Butoane mici +/- pentru cantitate, fără linii portocalii */
     .btn-incdec {
       background-color: #f49032;
@@ -422,20 +423,20 @@
 
     // Configurația Firebase
     const firebaseConfig = {
-  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-  authDomain: "restaurantapp-d0256.firebaseapp.com",
-  projectId: "restaurantapp-d0256",
-  storageBucket: "restaurantapp-d0256.firebasestorage.app",
-  messagingSenderId: "275208346650",
-  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-  measurementId: "G-F44TB27G17"
-};
+      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+      authDomain: "restaurantapp-d0256.firebaseapp.com",
+      projectId: "restaurantapp-d0256",
+      storageBucket: "restaurantapp-d0256.firebasestorage.app",
+      messagingSenderId: "275208346650",
+      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+      measurementId: "G-F44TB27G17"
+    };
 
     // Inițializează Firebase
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    // Eliminăm diacriticele pentru căutare
+    // Funcție utilă: eliminăm diacriticele pentru căutare
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
@@ -593,7 +594,7 @@
                 ingredients: ['Brânză', 'Biscuiți', 'Căpșuni'],
               },
             ],
-            drinks: [ /* Noua categorie */
+            drinks: [
               {
                 title: 'Cocktail',
                 description: 'Băutură răcoritoare cu fructe proaspete și alcool fin.',
@@ -625,13 +626,13 @@
         };
       },
       computed: {
-        // Produsele filtrate
+        // Filtrare produse (căutare)
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
             return this.view === 'produse' ? this.currentProducts : [];
           }
-          let results = [];
+          const results = [];
           for (const catKey in this.products) {
             for (const prod of this.products[catKey]) {
               const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
@@ -643,7 +644,7 @@
           }
           return results;
         },
-        // Total coș
+        // Total în coș
         total() {
           return this.orders
             .reduce((sum, o) => sum + o.price * o.quantity, 0)
@@ -721,49 +722,50 @@
           this.isOrderOpen = !this.isOrderOpen;
         },
 
-        // ====================================
-        // Metoda checkout cu console.log suplimentar
-        // ====================================
+        // Finalizează Comanda (checkout)
         async checkout() {
           try {
-            // Dacă e prima comandă, alocăm număr client
+            // Dacă e prima comandă, alocăm un număr de client
             if (this.isFirstOrder) {
               this.clientNumber++;
               this.isFirstOrder = false;
             }
 
-            // Calculăm puncte (5%)
+            // Calculăm puncte (5% din total)
             let pointsToAdd = 0;
             for (const item of this.orders) {
               pointsToAdd += item.price * item.quantity * 0.05;
             }
             this.clientPoints += pointsToAdd;
 
-            // Generăm ID comandă
+            // Obiectul comenzii (fără ID local, îl generăm prin Firestore)
             const orderData = {
-      // În loc de orderId: docRef.id devine "cheia"
-      items: this.orders,
-      total: parseFloat(this.total),
-      clientNumber: this.clientNumber,
-      timestamp: serverTimestamp(),
-    };
+              items: this.orders,
+              total: parseFloat(this.total),
+              clientNumber: this.clientNumber,
+              timestamp: serverTimestamp(),
+            };
 
-    // 1. Adăugăm comanda în Firestore
-    const docRef = await addDoc(collection(db, "orders"), orderData);
-    console.log("Comanda salvată cu docRef.id:", docRef.id);
+            console.log("Trimit comanda la Firestore:", orderData);
 
-    // 2. Golește coșul, etc.
-    this.orders = [];
-    this.isOrderOpen = false;
+            // Adăugăm comanda în colecția "orders"
+            const docRef = await addDoc(collection(db, "orders"), orderData);
+            console.log("Comanda salvată cu docRef.id:", docRef.id);
 
-    // 3. Redirecționează către confirm.html?docId=DOCID
-    window.location.href = "confirm.html?docId=" + docRef.id;
-  } catch (e) {
-    console.error("Eroare la finalizarea comenzii:", e);
-    alert("A apărut o eroare la plasarea comenzii. Te rugăm să încerci din nou.");
-  }
-}
+            // Golește coșul
+            this.orders = [];
+            this.isOrderOpen = false;
 
+            // Redirecționează către confirm.html cu docId (pentru afișarea comenzii)
+            window.location.href = "confirm.html?docId=" + docRef.id;
+
+          } catch (e) {
+            console.error("Eroare la finalizarea comenzii:", e);
+            alert("A apărut o eroare la plasarea comenzii. Te rugăm să încerci din nou.");
+          }
+        },
+
+        // Preia comenzile deja plasate (pe baza clientNumber)
         async fetchOrders() {
           try {
             if (this.clientNumber === 0) {
@@ -774,18 +776,20 @@
             const querySnapshot = await getDocs(q);
             this.myOrders = [];
             querySnapshot.forEach((doc) => {
-              this.myOrders.push(doc.data());
+              // Observă că doc.data() nu are neapărat "orderId";
+              // dacă vrei un camp "orderId", fie îl salvezi la scriere, fie folosești doc.id
+              const data = doc.data();
+              // În codul original era un orderId - dacă vrei să-l afișezi, îl setăm direct:
+              data.orderId = doc.id;
+              this.myOrders.push(data);
             });
           } catch (e) {
-            console.error("Eroare la preluarea comenzilor: ", e);
+            console.error("Eroare la preluarea comenzilor:", e);
           }
         },
       },
       mounted() {
-        // Inițializează Firestore
-        // (db este deja inițializat în scriptul de mai sus)
-
-        // Citiți datele existente din localStorage
+        // Citim datele existente din localStorage (pentru fidelizare)
         const storedPoints = localStorage.getItem('clientPoints');
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
@@ -803,15 +807,20 @@
           this.myOrders = JSON.parse(storedMyOrders);
         }
 
-        // Fetch orders din Firestore
+        // Preluăm comenzile din Firestore (opțional, doar dacă vrei să le vezi local)
         this.fetchOrders();
       },
       watch: {
+        // Salvăm în localStorage anumite date (pentru fidelizare)
         clientPoints(newVal) {
           localStorage.setItem('clientPoints', newVal);
         },
         clientNumber(newVal) {
           localStorage.setItem('clientNumber', newVal);
+        },
+        myOrders(newVal) {
+          // Dacă vrei să salvezi local istoricul
+          localStorage.setItem('myOrders', JSON.stringify(newVal));
         },
       },
     });
