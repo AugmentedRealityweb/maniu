@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Comanda Ta</title>
 
-  <!-- Tailwind CSS (atenție: versiunea CDN e pentru prototipare) -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
@@ -94,19 +94,19 @@
       Configurația Firebase (trebuie să fie identică cu ce ai în index.html)
     */
     const firebaseConfig = {
-  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-  authDomain: "restaurantapp-d0256.firebaseapp.com",
-  projectId: "restaurantapp-d0256",
-  storageBucket: "restaurantapp-d0256.firebasestorage.app",
-  messagingSenderId: "275208346650",
-  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-  measurementId: "G-F44TB27G17"
-};
+      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+      authDomain: "restaurantapp-d0256.firebaseapp.com",
+      projectId: "restaurantapp-d0256",
+      storageBucket: "restaurantapp-d0256.firebaseapp.com",
+      messagingSenderId: "275208346650",
+      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+      measurementId: "G-F44TB27G17"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Citim din URL: sessionCode=? si masa=?
+    // Citim din URL: sessionCode=? și masa=?
     const params = new URLSearchParams(window.location.search);
     const sessionCode = params.get("sessionCode");
     const masaNumber  = params.get("masa"); // ex: "5"
@@ -118,7 +118,7 @@
     const orderTotalElem  = document.getElementById("orderTotal");
     const backLinkElem    = document.getElementById("backLinkElem");
 
-    // 1. Afișăm codul sesiunii
+    // Afișăm codul sesiunii
     if (sessionCode) {
       sessionCodeElem.textContent = "Codul Sesiunii: " + sessionCode;
       sessionSubText.textContent  = "Spune acest cod ospătarului";
@@ -127,14 +127,14 @@
       sessionSubText.textContent  = "";
     }
 
-    // 2. Link "Înapoi la Meniu" -> adaugă param. ?masa=...
+    // Link "Înapoi la Meniu" -> adaugă parametru ?masa=
     let backLink = "https://meniu-test.vercel.app/";
     if (masaNumber) {
       backLink += `?masa=${masaNumber}`;
     }
     backLinkElem.href = backLink;
 
-    // 3. Preluăm comenzile ordonate crescător după "timestamp"
+    // Preluăm comenzile ordonate crescător după "timestamp"
     async function fetchSessionOrders() {
       if (!sessionCode) return;
       try {
