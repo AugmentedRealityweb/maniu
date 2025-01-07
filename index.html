@@ -318,16 +318,7 @@
 
         <!-- TAB MENIU -->
         <section v-if="activeTab === 'meniu'">
-          <!-- Câmp Table ID (ex. Masa16) -->
-          <div class="mb-4 text-center">
-            <label class="block mb-2">Introdu ID Masă (ex: "Masa16"):</label>
-            <input
-              type="text"
-              v-model="tableId"
-              placeholder="Masa16"
-              class="bg-black text-gray-200 border border-[#e78c00] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[#e78c00]"
-            />
-          </div>
+          <!-- (Eliminat câmpul de introducere a ID-ului mesei) -->
 
           <!-- Căutare -->
           <div class="flex items-center gap-4 mb-4">
@@ -570,14 +561,14 @@
 
     /* Configurația Firebase (înlocuiește cu datele tale). */
     const firebaseConfig = {
-  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-  authDomain: "restaurantapp-d0256.firebaseapp.com",
-  projectId: "restaurantapp-d0256",
-  storageBucket: "restaurantapp-d0256.firebasestorage.app",
-  messagingSenderId: "275208346650",
-  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-  measurementId: "G-F44TB27G17"
-};
+      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+      authDomain: "restaurantapp-d0256.firebaseapp.com",
+      projectId: "restaurantapp-d0256",
+      storageBucket: "restaurantapp-d0256.firebasestorage.app",
+      messagingSenderId: "275208346650",
+      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+      measurementId: "G-F44TB27G17"
+    };
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
@@ -597,47 +588,44 @@
       return code;
     }
 
-    
     // Obținem sau creăm un sessionCode la "sessions/tableId"
     async function getOrCreateSessionCode(tableId) {
-  if (!tableId) {
-    throw new Error("Table ID este necesar pentru a genera un session code.");
-  }
-
-  const docRef = doc(db, "sessions", tableId);
-
-  try {
-    // Verificăm dacă documentul există deja în Firestore
-    const snap = await getDoc(docRef);
-
-    if (snap.exists()) {
-      const data = snap.data();
-
-      // Dacă există un sessionCode activ, îl folosim
-      if (data.sessionCode && data.status === "active") {
-        console.log(`Session code activ găsit pentru ${tableId}: ${data.sessionCode}`);
-        return data.sessionCode;
+      if (!tableId) {
+        throw new Error("Nu există parametru pentru masă în URL.");
       }
+      const docRef = doc(db, "sessions", tableId);
 
-      // Dacă documentul există, dar sessionCode-ul nu este activ, generăm unul nou
-      const newSessionCode = generateSessionCode();
-      await setDoc(docRef, { sessionCode: newSessionCode, status: "active" }, { merge: true });
-      console.log(`Session code regenerat pentru ${tableId}: ${newSessionCode}`);
-      return newSessionCode;
+      try {
+        // Verificăm dacă documentul există deja în Firestore
+        const snap = await getDoc(docRef);
+
+        if (snap.exists()) {
+          const data = snap.data();
+
+          // Dacă există un sessionCode activ, îl folosim
+          if (data.sessionCode && data.status === "active") {
+            console.log(`Session code activ găsit pentru ${tableId}: ${data.sessionCode}`);
+            return data.sessionCode;
+          }
+
+          // Dacă documentul există, dar sessionCode-ul nu este activ, generăm unul nou
+          const newSessionCode = generateSessionCode();
+          await setDoc(docRef, { sessionCode: newSessionCode, status: "active" }, { merge: true });
+          console.log(`Session code regenerat pentru ${tableId}: ${newSessionCode}`);
+          return newSessionCode;
+        }
+
+        // Dacă documentul nu există, creăm unul nou cu un sessionCode activ
+        const newSessionCode = generateSessionCode();
+        await setDoc(docRef, { sessionCode: newSessionCode, status: "active" });
+        console.log(`Session code nou creat pentru ${tableId}: ${newSessionCode}`);
+        return newSessionCode;
+
+      } catch (error) {
+        console.error(`Eroare la obținerea/crearea session code pentru ${tableId}:`, error);
+        throw new Error("A apărut o eroare la obținerea/crearea session code-ului.");
+      }
     }
-
-    // Dacă documentul nu există, creăm unul nou cu un sessionCode activ
-    const newSessionCode = generateSessionCode();
-    await setDoc(docRef, { sessionCode: newSessionCode, status: "active" });
-    console.log(`Session code nou creat pentru ${tableId}: ${newSessionCode}`);
-    return newSessionCode;
-
-  } catch (error) {
-    console.error(`Eroare la obținerea/crearea session code pentru ${tableId}:`, error);
-    throw new Error("A apărut o eroare la obținerea/crearea session code-ului.");
-  }
-}
-
 
     const app = Vue.createApp({
       data() {
@@ -893,9 +881,6 @@
             this.orders[index].quantity--;
           }
         },
-        removeFromOrder(index) {
-          this.orders.splice(index, 1);
-        },
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
@@ -926,13 +911,8 @@
 
         // Finalizează Comanda
         async checkout() {
-          if (!this.tableId.trim()) {
-            alert("Te rugăm să introduci un ID al mesei (ex: Masa16)!");
-            return;
-          }
-
           // 1) Luăm/generăm sessionCode din Firestore (sessions/tableId)
-          this.sessionCode = await this.getOrCreateSessionCode(this.tableId.trim());
+          this.sessionCode = await getOrCreateSessionCode(this.tableId);
 
           // 2) Calculăm puncte (5% din total)
           let pointsToAdd = 0;
@@ -943,7 +923,7 @@
 
           // 3) Creăm obiectul comenzii
           const orderData = {
-            tableId: this.tableId.trim(),
+            tableId: this.tableId,
             sessionCode: this.sessionCode,
             clientNumber: this.clientNumber,
             items: this.orders,
@@ -994,6 +974,16 @@
         },
       },
       mounted() {
+        // Obținem parametru "masa" din URL:
+        const urlParams = new URLSearchParams(window.location.search);
+        const masaParam = urlParams.get('masa');
+        if (masaParam) {
+          this.tableId = `Masa numărul ${masaParam}`;
+        } else {
+          // fallback - dacă nu există parametru, default la "Masa numărul 1" (sau ce vrei tu)
+          this.tableId = 'Masa numărul 1';
+        }
+
         // CITIM clientNumber din localStorage
         const storedNumber = localStorage.getItem('clientNumber');
         if (storedNumber) {
