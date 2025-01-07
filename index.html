@@ -164,19 +164,6 @@
       color: #f49032;
       text-align: center;
     }
-    @keyframes fadeInLeft {
-      0% {
-        transform: translateX(-50px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-    .fade-in-left {
-      animation: fadeInLeft 2s ease forwards;
-    }
     .handwriting-title {
       font-family: 'Dancing Script', cursive;
       font-size: 2rem;
@@ -197,7 +184,7 @@
   <div id="app" class="h-screen flex overflow-hidden">
     <!-- SIDEBAR (desktop) -->
     <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
-      <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">Meniu Restaurant</div>
+      <div class="text-2xl font-bold mb-6 handwriting-title">Meniu Restaurant</div>
       <nav class="flex flex-col space-y-2">
         <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'">
           <span class="material-icons">restaurant_menu</span>Meniu
@@ -216,9 +203,9 @@
       <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
         <!-- Buton și titlu (mobile) -->
         <div class="flex items-center justify-between mb-4 md:hidden">
-          <div class="handwriting-title text-2xl font-bold fade-in-left">Meniu Restaurant</div>
-          <button 
-            class="bg-black border-2 border-[#e78c00] hover:bg-[#e78c00] hover:text-black text-white p-2 rounded-full" 
+          <div class="handwriting-title text-2xl font-bold">Meniu Restaurant</div>
+          <button
+            class="bg-black border-2 border-[#e78c00] hover:bg-[#e78c00] hover:text-black text-white p-2 rounded-full"
             @click="isSidebarVisible = !isSidebarVisible"
           >
             <span class="material-icons">menu</span>
@@ -227,28 +214,28 @@
 
         <!-- Sidebar mobil (afișat condiționat) -->
         <transition name="slide-fade">
-          <aside 
-            v-if="isSidebarVisible" 
+          <aside
+            v-if="isSidebarVisible"
             class="absolute top-0 left-0 w-48 p-4 z-50 rounded-tr-lg rounded-br-lg sidebar scratches"
           >
             <button class="text-white mb-2" @click="isSidebarVisible = false">
               <span class="material-icons">close</span>
             </button>
             <nav class="flex flex-col space-y-2">
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+              <button
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
                 @click="activeTab='meniu'; isSidebarVisible=false"
               >
                 <span class="material-icons">restaurant_menu</span>Meniu
               </button>
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+              <button
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
                 @click="activeTab='puncte'; isSidebarVisible=false"
               >
                 <span class="material-icons">star</span>Puncte
               </button>
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+              <button
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
                 @click="activeTab='comenzileTale'; isSidebarVisible=false"
               >
                 <span class="material-icons">receipt</span>Comenzile Tale
@@ -257,15 +244,14 @@
           </aside>
         </transition>
 
-        <!-- Conținut pe tab-uri -->
         <!-- TAB: Meniu -->
         <section v-if="activeTab === 'meniu'">
           <!-- Căutare produse -->
           <div class="flex items-center gap-4 mb-4">
-            <input 
-              type="text" 
-              placeholder="Caută produse..." 
-              v-model="searchQuery" 
+            <input
+              type="text"
+              placeholder="Caută produse..."
+              v-model="searchQuery"
               class="bg-black text-gray-200 border border-[#e78c00] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[#e78c00] w-full md:w-1/2"
             />
           </div>
@@ -275,11 +261,11 @@
             <h2 class="text-xl font-semibold mb-4 text-center">
               Rezultate pentru: "{{ searchQuery }}"
             </h2>
-            <div v-if="displayedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" style="overflow-y:auto;">
-              <div 
-                v-for="product in displayedProducts" 
-                :key="product.title" 
-                class="card-container cursor-pointer" 
+            <div v-if="displayedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div
+                v-for="product in displayedProducts"
+                :key="product.title"
+                class="card-container cursor-pointer"
                 @click="showProductDetails(product)"
               >
                 <img :src="product.image" :alt="product.title" class="card-img"/>
@@ -290,20 +276,18 @@
               </div>
             </div>
             <div v-else>
-              <p class="text-center">
-                Nu a fost găsit niciun produs care să corespundă căutării.
-              </p>
+              <p class="text-center">Nu a fost găsit niciun produs care să corespundă căutării.</p>
             </div>
           </div>
           <!-- Afișarea categoriilor / produselor -->
           <div v-else>
             <div v-if="view === 'categorii'">
               <h2 class="text-xl font-semibold mb-4 text-center">Alege Categoria</h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" style="overflow-y: auto;">
-                <div 
-                  v-for="category in categories" 
-                  :key="category.name" 
-                  class="card-container cursor-pointer" 
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div
+                  v-for="category in categories"
+                  :key="category.name"
+                  class="card-container cursor-pointer"
                   @click="enterCategory(category.name)"
                 >
                   <img :src="category.image" :alt="category.name" class="card-img"/>
@@ -317,14 +301,12 @@
               <button class="btn-orange mb-4 rounded-full" @click="backToCategories">
                 Înapoi la Categorii
               </button>
-              <h2 class="text-xl font-semibold mb-4 text-center">
-                Produse ({{ currentProducts.length }})
-              </h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" style="overflow-y:auto;">
-                <div 
-                  v-for="product in currentProducts" 
-                  :key="product.title" 
-                  class="card-container cursor-pointer" 
+              <h2 class="text-xl font-semibold mb-4 text-center">Produse ({{ currentProducts.length }})</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div
+                  v-for="product in currentProducts"
+                  :key="product.title"
+                  class="card-container cursor-pointer"
                   @click="showProductDetails(product)"
                 >
                   <img :src="product.image" :alt="product.title" class="card-img"/>
@@ -338,9 +320,15 @@
           </div>
 
           <!-- Modal Detalii Produs -->
-          <div v-if="currentProduct" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div
+            v-if="currentProduct"
+            class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+          >
             <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
-              <button class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[#e78c00]" @click="currentProduct = null">
+              <button
+                class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[#e78c00]"
+                @click="currentProduct = null"
+              >
                 &times;
               </button>
               <img :src="currentProduct.image" :alt="currentProduct.title" class="w-full h-64 object-cover mb-4 rounded-lg"/>
@@ -348,7 +336,11 @@
               <p class="text-[#f49032] font-bold text-lg mb-4">{{ currentProduct.price }} Lei</p>
               <p class="text-gray-400 mb-4">{{ currentProduct.description }}</p>
               <ul class="text-gray-300 mb-4">
-                <li v-for="ingredient in currentProduct.ingredients" :key="ingredient" class="list-disc ml-5">
+                <li
+                  v-for="ingredient in currentProduct.ingredients"
+                  :key="ingredient"
+                  class="list-disc ml-5"
+                >
                   {{ ingredient }}
                 </li>
               </ul>
@@ -374,7 +366,7 @@
               </p>
             </div>
             <p class="text-gray-300 text-center">
-              Puncte acumulate: 
+              Puncte acumulate:
               <span class="font-bold text-[#f49032]">
                 {{ clientPoints.toFixed(2) }}
               </span>
@@ -382,23 +374,26 @@
           </div>
         </section>
 
-        <!-- TAB: Comenzile Tale -->
+        <!-- TAB: Comenzile Tale (cele finalizate sau istoricul) -->
         <section v-else-if="activeTab === 'comenzileTale'">
           <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
           <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
             Nu ai nicio comandă finalizată încă.
           </div>
           <div v-else class="space-y-4">
-            <div 
-              v-for="(order, idx) in myOrders" 
-              :key="order.orderId" 
+            <div
+              v-for="(order, idx) in myOrders"
+              :key="order.orderId"
               class="bg-black p-4 rounded border border-[#e78c00] scratches"
             >
               <h3 class="text-lg font-semibold mb-2">
                 Comanda #{{ idx + 1 }}
               </h3>
               <ul class="list-disc list-inside text-gray-300">
-                <li v-for="(prod, pidx) in order.items" :key="pidx">
+                <li
+                  v-for="(prod, pidx) in order.items"
+                  :key="pidx"
+                >
                   {{ prod.name }} x {{ prod.quantity }} – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
                 </li>
               </ul>
@@ -415,9 +410,9 @@
 
       <!-- Buton Coș (apare doar dacă ai produse) -->
       <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
-        <button 
-          @click="toggleOrderBar" 
-          class="btn-orange flex items-center relative rounded-full" 
+        <button
+          @click="toggleOrderBar"
+          class="btn-orange flex items-center relative rounded-full"
           :class="{'animate-shake': isShaking}"
         >
           <span class="material-icons mr-2 text-white">shopping_cart</span>
@@ -427,16 +422,16 @@
 
       <!-- Bara laterală de comenzi (coș) -->
       <transition name="slide-cart">
-        <aside 
-          v-show="isOrderOpen && orders.length > 0" 
+        <aside
+          v-show="isOrderOpen && orders.length > 0"
           class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[#e78c00] p-4 overflow-y-auto scrollbar"
           style="max-height: 100vh;"
         >
           <div class="flex flex-col">
             <h3 class="text-xl font-bold mb-4 text-center">Comanda Ta</h3>
-            <div 
-              v-for="(order, index) in orders" 
-              :key="index" 
+            <div
+              v-for="(order, index) in orders"
+              :key="index"
               class="flex justify-between items-center bg-black border border-[#e78c00] p-4 rounded-lg mb-2 scratches"
             >
               <div class="flex flex-col">
@@ -488,6 +483,7 @@
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
+    // Config Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -497,11 +493,10 @@
       appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
       measurementId: "G-F44TB27G17"
     };
-
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    // Funcție auxiliară
+    // Funcție auxiliară (șterge diacritice pentru căutare)
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
@@ -518,29 +513,22 @@
         throw new Error("Nu există parametru pentru masă în URL.");
       }
       const docRef = doc(db, "sessions", tableId);
-      try {
-        const snap = await getDoc(docRef);
-        if (snap.exists()) {
-          const data = snap.data();
-          console.log("[DEBUG] sessions/", tableId, "exista deja:", data);
-          if (data.sessionCode && data.status === "active") {
-            console.log("[DEBUG] Returnez sessionCode existent:", data.sessionCode);
-            return data.sessionCode;
-          } else {
-            const newSessionCode = generateSessionCode();
-            await setDoc(docRef, { sessionCode: newSessionCode, status: "active" }, { merge: true });
-            console.log("[DEBUG] Actualizat sessionDoc ->", tableId, "cu cod:", newSessionCode);
-            return newSessionCode;
-          }
+      const snap = await getDoc(docRef);
+
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.sessionCode && data.status) {
+          // Există deja un cod de sesiune
+          return data.sessionCode;
         } else {
           const newSessionCode = generateSessionCode();
-          await setDoc(docRef, { sessionCode: newSessionCode, status: "active" });
-          console.log("[DEBUG] Creat sessionDoc ->", tableId, "cu cod:", newSessionCode);
+          await setDoc(docRef, { sessionCode: newSessionCode, status: "occupied" }, { merge: true });
           return newSessionCode;
         }
-      } catch (error) {
-        console.error(`Eroare la obținerea/crearea session code pentru ${tableId}:`, error);
-        throw new Error("A apărut o eroare la obținerea/crearea session code-ului.");
+      } else {
+        const newSessionCode = generateSessionCode();
+        await setDoc(docRef, { sessionCode: newSessionCode, status: "occupied" });
+        return newSessionCode;
       }
     }
 
@@ -586,7 +574,6 @@
               image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp"
             }
           ],
-          /* Produsele pe categorii */
           products: {
             brunch: [
               {
@@ -602,13 +589,6 @@
                 price: 30,
                 image: "https://i.giphy.com/X3E37CTy55jNK.webp",
                 ingredients: ["Ouă", "Hollandaise", "Șuncă"]
-              },
-              {
-                title: "Clătite",
-                description: "Clătite, sirop de arțar, fructe proaspete.",
-                price: 20,
-                image: "https://i.giphy.com/5zu5JovduWFBS.webp",
-                ingredients: ["Făină", "Ouă", "Sirop de arțar", "Fructe"]
               }
             ],
             soups: [
@@ -625,13 +605,6 @@
                 price: 15,
                 image: "https://www.lalena.ro/images/uploaded/600x_Supa-crema-de-rosii-108.jpg",
                 ingredients: ["Roșii", "Crutoane", "Busuioc"]
-              },
-              {
-                title: "Ciorbă de legume",
-                description: "Legume proaspete, zeamă de lămâie.",
-                price: 12,
-                image: "https://www.prestij.ro/uploads/produse/1440/94--ciorba-taraneasca-de-legume.jpg",
-                ingredients: ["Morcovi", "Cartofi", "Ceapă", "Apio"]
               }
             ],
             pasta: [
@@ -648,13 +621,6 @@
                 price: 25,
                 image: "https://i.giphy.com/f0N7csaAc6t60OmXkm.webp",
                 ingredients: ["Penne", "Roșii", "Usturoi", "Ardei iute"]
-              },
-              {
-                title: "Tagliatelle Alfredo",
-                description: "Tagliatelle, sos Alfredo, pui.",
-                price: 30,
-                image: "https://i.giphy.com/xOML6s8aBmAtlLwujM.webp",
-                ingredients: ["Tagliatelle", "Pui", "Parmezan", "Smântână"]
               }
             ],
             main: [
@@ -664,20 +630,6 @@
                 price: 45,
                 image: "https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp",
                 ingredients: ["Porc", "Cartofi", "Mozzarella", "Bacon"]
-              },
-              {
-                title: "Tomahawk porc",
-                description: "Carne de porc, cartofi, sos brun.",
-                price: 41,
-                image: "https://i.giphy.com/KDskfOILt91T2.webp",
-                ingredients: ["Tomahawk", "Cartofi", "Sos brun"]
-              },
-              {
-                title: "Ceafă sfărâmată",
-                description: "Ceafă, piure de cartofi, ardei copți.",
-                price: 36,
-                image: "https://i.giphy.com/l378puWI9Fpi4OApO.webp",
-                ingredients: ["Ceafă porc", "Piure", "Ardei copți"]
               }
             ],
             desserts: [
@@ -687,20 +639,6 @@
                 price: 20,
                 image: "https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp",
                 ingredients: ["Cafea", "Mascarpone", "Pișcoturi"]
-              },
-              {
-                title: "Pavlova",
-                description: "Bezea, frișcă, fructe de pădure.",
-                price: 18,
-                image: "https://i.giphy.com/iiwu9bTOZ1HiM.webp",
-                ingredients: ["Bezea", "Frișcă", "Fructe de pădure"]
-              },
-              {
-                title: "Cheesecake",
-                description: "Cheesecake cu dulceață de căpșuni.",
-                price: 22,
-                image: "https://i.giphy.com/Xi2UAW7kTQvHa.webp",
-                ingredients: ["Brânză", "Biscuiți", "Căpșuni"]
               }
             ],
             drinks: [
@@ -710,20 +648,6 @@
                 price: 28,
                 image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp",
                 ingredients: ["Rom", "Fructe", "Gheață"]
-              },
-              {
-                title: "Ciocolată caldă",
-                description: "Cremă fierbinte de ciocolată cu topping de frișcă.",
-                price: 15,
-                image: "https://i.giphy.com/hPFKu8dKRRNgQ.webp",
-                ingredients: ["Ciocolată", "Lapte", "Frișcă"]
-              },
-              {
-                title: "Bere",
-                description: "Bere artizanală rece și spumoasă.",
-                price: 10,
-                image: "https://i.giphy.com/RkhJPJQJ2GPn02GMy6.webp",
-                ingredients: ["Malț", "Hamei", "Apă"]
               }
             ]
           },
@@ -732,7 +656,6 @@
         };
       },
       computed: {
-        // Produsele afișate la căutare
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
@@ -750,7 +673,6 @@
           }
           return results;
         },
-        // Total coș
         total() {
           return this.orders
             .reduce((sum, o) => sum + (o.price * o.quantity), 0)
@@ -773,13 +695,11 @@
           this.currentProducts = this.products[categoryName] || [];
           this.view = "produse";
           this.searchQuery = "";
-          this.$nextTick(() => window.scrollTo(0, 0));
         },
         backToCategories() {
           this.view = "categorii";
           this.currentProduct = null;
           this.searchQuery = "";
-          this.$nextTick(() => window.scrollTo(0, 0));
         },
         showProductDetails(product) {
           this.currentProduct = product;
@@ -796,7 +716,6 @@
             });
           }
           this.currentProduct = null;
-          // Animație mică de shake
           this.isShaking = true;
           setTimeout(() => {
             this.isShaking = false;
@@ -816,17 +735,16 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
-        // Trimite comanda în Firestore
         async checkout() {
           try {
             // userId unic
             const userId = localStorage.getItem("userId") || Date.now().toString();
             localStorage.setItem("userId", userId);
 
-            // Obținem (sau creăm) sessionCode
+            // (1) Obținem (sau creăm) sessionCode și setăm masa "occupied"
             this.sessionCode = await getOrCreateSessionCode(this.tableId);
 
-            // NU se adaugă puncte aici, ci la finalizarea mesei de către ospătar
+            // (2) Creăm comanda în Firestore (status="closed" de această dată)
             const orderData = {
               userId,
               tableId: this.tableId,
@@ -834,31 +752,44 @@
               clientNumber: this.clientNumber,
               items: this.orders,
               total: parseFloat(this.total),
-              status: "open",
+              status: "closed", // direct closed pt client
               timestamp: serverTimestamp()
             };
-
-            console.log("[DEBUG] Adăugăm comanda ->", orderData);
             await addDoc(collection(db, "orders"), orderData);
 
-            // Golește coșul
+            // (3) Adăugăm puncte clientului ACUM (5% din total)
+            const points = parseFloat(this.total) * 0.05;
+            if (this.clientNumber > 0) {
+              const clientDocRef = doc(db, "clients", this.clientNumber.toString());
+              const snap = await getDoc(clientDocRef);
+              if (snap.exists()) {
+                const oldPoints = snap.data().points || 0;
+                const newPoints = oldPoints + points;
+                await updateDoc(clientDocRef, { points: newPoints });
+                this.clientPoints = newPoints; // actualizăm local
+              } else {
+                await setDoc(clientDocRef, { points: points });
+                this.clientPoints = points;
+              }
+            }
+
+            // (4) Golește coșul
             this.orders = [];
             this.isOrderOpen = false;
 
-            // Redirecționare confirm
-            const urlParams = new URLSearchParams(window.location.search);
-            const masaParam = urlParams.get("masa");
-            const baseUrl = window.location.origin;
-            const confirmURL = `${baseUrl}/confirm.html?sessionCode=${this.sessionCode}&masa=${masaParam || ""}`;
-            console.log("[DEBUG] Redirect la", confirmURL);
-            window.location.href = confirmURL;
+            // (5) Reîncarcă secțiunea "puncte"
+            this.activeTab = "puncte";
+
+            // (6) Salvează local myOrders
+            await this.fetchOrders();
+
+            alert("Comanda a fost finalizată! Masa este acum ocupată.");
+
           } catch (err) {
-            console.error("Eroare la salvarea comenzii:", err);
+            console.error("Eroare la finalizarea comenzii:", err);
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
-
-        // Ia comenzile existente pt clientNumber (myOrders)
         async fetchOrders() {
           try {
             if (this.clientNumber === 0) {
@@ -873,13 +804,10 @@
               data.orderId = docSnap.id;
               this.myOrders.push(data);
             });
-            console.log("[DEBUG] myOrders pentru clientNumber=", this.clientNumber, this.myOrders);
           } catch (e) {
             console.error("Eroare la preluarea comenzilor:", e);
           }
         },
-
-        // Afișăm punctele clientului din colecția "clients/{clientNumber}"
         async loadClientPoints() {
           if (!this.clientNumber) return;
           try {
@@ -891,8 +819,6 @@
             } else {
               this.clientPoints = 0;
             }
-            localStorage.setItem("clientPoints", this.clientPoints);
-            console.log("[DEBUG] loadClientPoints ->", this.clientPoints);
           } catch (e) {
             console.error("Eroare la încărcarea punctelor:", e);
           }
@@ -902,13 +828,11 @@
         // 1. Parametru "masa" din URL
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
-        // IMPORTANT: Folosim același tipar la ID-ul mesei, ex: "Masa4", "Masa10" etc.
         if (masaParam) {
           this.tableId = "Masa" + masaParam;  // ex: "?masa=4" => "Masa4"
         } else {
           this.tableId = "Masa1";
         }
-        console.log("[DEBUG] mount index.html -> tableId=", this.tableId);
 
         // 2. clientNumber din localStorage (dacă există)
         const storedNumber = localStorage.getItem("clientNumber");
@@ -924,30 +848,19 @@
           localStorage.setItem("clientNumber", randomNum);
           this.isFirstOrder = false;
         }
-        console.log("[DEBUG] clientNumber=", this.clientNumber);
 
         // 3. Încărcăm punctele din Firestore
         await this.loadClientPoints();
 
         // 4. Încărcăm comenzile aferente clientului
         await this.fetchOrders();
-
-        // 5. Fallback la localStorage
-        const storedPoints = localStorage.getItem("clientPoints");
-        if (storedPoints) {
-          if (this.clientPoints === 0) {
-            this.clientPoints = parseFloat(storedPoints);
-          }
-        }
       },
       watch: {
-        // Când utilizatorul deschide tab-ul "puncte", re-încarcă punctele din Firestore
         activeTab(newVal) {
           if (newVal === 'puncte') {
             this.loadClientPoints();
           }
         },
-        // Salvăm local
         clientPoints(newVal) {
           localStorage.setItem("clientPoints", newVal);
         },
@@ -959,7 +872,6 @@
         }
       }
     });
-
     app.mount("#app");
   </script>
 </body>
