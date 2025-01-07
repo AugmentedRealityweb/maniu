@@ -103,7 +103,13 @@
     }
     .scratches {
       background-color: #000;
-      background-image: repeating-linear-gradient(45deg, rgba(231,140,0,0.15), rgba(231,140,0,0.15) 2px, transparent 2px, transparent 20px);
+      background-image: repeating-linear-gradient(
+        45deg,
+        rgba(231,140,0,0.15),
+        rgba(231,140,0,0.15) 2px,
+        transparent 2px,
+        transparent 20px
+      );
     }
     .sidebar {
       border-right: 2px solid #e78c00;
@@ -886,10 +892,11 @@
         // 1. Parametru "masa" din URL
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
+        // IMPORTANT: Folosim același tipar la ID-ul mesei, ex: "Masa4", "Masa10" etc.
         if (masaParam) {
-          this.tableId = `Masa numărul ${masaParam}`;
+          this.tableId = "Masa" + masaParam;  // <-- Fără "numărul "
         } else {
-          this.tableId = "Masa numărul 1";
+          this.tableId = "Masa1";
         }
 
         // 2. clientNumber din localStorage (dacă există)
@@ -900,7 +907,7 @@
             this.isFirstOrder = false;
           }
         } else {
-          // Generăm un clientNumber random
+          // Generăm un clientNumber random (5 cifre)
           const randomNum = Math.floor(Math.random() * 90000) + 10000;
           this.clientNumber = randomNum;
           localStorage.setItem("clientNumber", randomNum);
