@@ -264,7 +264,11 @@
             <h2 class="text-xl font-semibold mb-4 text-center">
               Rezultate pentru: "{{ searchQuery }}"
             </h2>
-            <div v-if="displayedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div 
+              v-if="displayedProducts.length > 0" 
+              class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" 
+              style="max-height: 400px; overflow-y: auto;"
+            >
               <div 
                 v-for="product in displayedProducts" 
                 :key="product.title" 
@@ -284,11 +288,15 @@
               </p>
             </div>
           </div>
+
           <!-- Afișarea categoriilor sau produselor, dacă nu se caută nimic -->
           <div v-else>
             <div v-if="view === 'categorii'">
               <h2 class="text-xl font-semibold mb-4 text-center">Alege Categoria</h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div 
+                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" 
+                style="max-height: 400px; overflow-y: auto;"
+              >
                 <div 
                   v-for="category in categories" 
                   :key="category.name" 
@@ -309,7 +317,10 @@
               <h2 class="text-xl font-semibold mb-4 text-center">
                 Produse ({{ currentProducts.length }})
               </h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div 
+                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" 
+                style="max-height: 400px; overflow-y: auto;"
+              >
                 <div 
                   v-for="product in currentProducts" 
                   :key="product.title" 
@@ -455,6 +466,10 @@
                   <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
                   <span class="text-gray-400">x{{ order.quantity }}</span>
                   <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
+                  <!-- Buton de ștergere produs -->
+                  <button class="btn-incdec" @click="removeItem(index)">
+                    <span class="material-icons">delete</span>
+                  </button>
                 </div>
               </div>
               <div>
@@ -812,6 +827,10 @@
             this.orders[index].quantity--;
           }
         },
+        // Metoda pentru eliminarea unui produs din coș
+        removeItem(index) {
+          this.orders.splice(index, 1);
+        },
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
@@ -824,12 +843,16 @@
             // Obține sau generează codul sesiunii pentru masă
             this.sessionCode = await getOrCreateSessionCode(this.tableId);
 
-            // Calcul puncte de fidelitate
-            let pointsToAdd = 0;
-            for (const item of this.orders) {
-              pointsToAdd += item.price * item.quantity * 0.05;
-            }
-            this.clientPoints += pointsToAdd;
+            // ----------------------------------------------------------------------------
+            // Punctele de fidelitate NU mai sunt adăugate aici, ci doar după ce ospătarul
+            // finalizează masa (în waiter.html sau alt flux), deci comentăm codul existent:
+            //
+            // let pointsToAdd = 0;
+            // for (const item of this.orders) {
+            //   pointsToAdd += item.price * item.quantity * 0.05;
+            // }
+            // this.clientPoints += pointsToAdd;
+            // ----------------------------------------------------------------------------
 
             // Creează datele comenzii
             const orderData = {
