@@ -496,15 +496,18 @@
           let pointsToAdd=0;
           for(const item of this.orders){pointsToAdd+=(item.price*item.quantity*0.05);}
           this.clientPoints+=pointsToAdd;
-          const orderData={
-            tableId:this.tableId,
-            sessionCode:this.sessionCode,
-            clientNumber:this.clientNumber,
-            items:this.orders,
-            total:parseFloat(this.total),
-            status:"open",
-            timestamp:serverTimestamp()
-          };
+          onst userId = localStorage.getItem("userId") || Date.now().toString();
+localStorage.setItem("userId", userId);
+          const orderData = {
+  userId, // Adaugă identificatorul utilizatorului
+  tableId: this.tableId,
+  sessionCode: this.sessionCode,
+  clientNumber: this.clientNumber,
+  items: this.orders,
+  total: parseFloat(this.total),
+  status: "open",
+  timestamp: serverTimestamp(),
+};
           try{
             await addDoc(collection(db,"orders"),orderData);
             this.orders=[];
