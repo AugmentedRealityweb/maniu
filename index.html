@@ -294,10 +294,10 @@
           <!-- Afișarea categoriilor sau produselor, dacă nu se caută nimic -->
           <div v-else>
             <div v-if="view === 'categorii'">
-              <h2 class="text-xl font-semibold mb-4 text-center">Alege Categoria</h2>
-              <div 
-                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" 
-                style="max-height: 400px; overflow-y: auto;"
+             <h2 class="text-xl font-semibold mb-4 text-center">Alege Categoria</h2>
+<div 
+  class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-full"
+  style="overflow-y: auto;"
               >
                 <div 
                   v-for="category in categories" 
