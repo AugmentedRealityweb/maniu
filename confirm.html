@@ -86,13 +86,12 @@
       collection, 
       query, 
       where, 
-      orderBy, 
+      orderBy,
       getDocs
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
     /*
-      Configurația Firebase (înlocuiește cu valorile tale).
-      Asigură-te că e aceeași configurație ca în alte pagini.
+      Configurația Firebase (trebuie să fie identică cu ce ai în index.html)
     */
     const firebaseConfig = {
   apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
@@ -104,14 +103,13 @@
   measurementId: "G-F44TB27G17"
 };
 
-    // Inițializează Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
     // Citim din URL: sessionCode=? si masa=?
     const params = new URLSearchParams(window.location.search);
     const sessionCode = params.get("sessionCode");
-    const masaNumber  = params.get("masa"); // ex: 5
+    const masaNumber  = params.get("masa"); // ex: "5"
 
     // Elemente HTML
     const sessionCodeElem = document.getElementById("sessionCodeElem");
@@ -120,7 +118,7 @@
     const orderTotalElem  = document.getElementById("orderTotal");
     const backLinkElem    = document.getElementById("backLinkElem");
 
-    // 1) Setăm textul și stilul pentru codul sesiunii
+    // 1. Afișăm codul sesiunii
     if (sessionCode) {
       sessionCodeElem.textContent = "Codul Sesiunii: " + sessionCode;
       sessionSubText.textContent  = "Spune acest cod ospătarului";
@@ -129,26 +127,22 @@
       sessionSubText.textContent  = "";
     }
 
-    // 2) Link "Înapoi la Meniu" -> adaugă param. masa=? dacă există
+    // 2. Link "Înapoi la Meniu" -> adaugă param. ?masa=...
     let backLink = "https://meniu-test.vercel.app/";
     if (masaNumber) {
       backLink += `?masa=${masaNumber}`;
     }
     backLinkElem.href = backLink;
 
-    // 3) Preluăm comenzile ordonate crescător după "timestamp"
+    // 3. Preluăm comenzile ordonate crescător după "timestamp"
     async function fetchSessionOrders() {
-      if (!sessionCode) {
-        return;
-      }
+      if (!sessionCode) return;
       try {
-        // Colecția "orders" – Filtrăm doar doc-urile unde sessionCode==X
-        // Sortăm după "timestamp" ASC: comanda cea mai veche apare prima
         const cRef = collection(db, "orders");
         const qRef = query(
           cRef, 
           where("sessionCode", "==", sessionCode),
-          orderBy("timestamp", "asc") 
+          orderBy("timestamp", "asc") // sortare asc
         );
 
         const snap = await getDocs(qRef);
@@ -157,25 +151,23 @@
         let htmlRows = "";
         let orderIndex = 1;
 
-        // Parcurgem comenzile în ordinea timestamp ASC
+        // Parcurgem comenzile în ordinea timestamp asc
         snap.forEach(docSnap => {
           const data = docSnap.data();
           const items = data.items || [];
-          
-          // Calcul subtotal pentru comanda curentă
+
           let subTotal = 0;
           items.forEach(item => {
             subTotal += item.price * item.quantity;
           });
           totalAll += subTotal;
 
-          // Scriem un heading "Comanda #1", "Comanda #2" etc.
+          // Heading: "Comanda #1", "Comanda #2", ...
           htmlRows += `
             <h3 class="text-lg font-semibold mt-3 mb-2">Comanda #${orderIndex}</h3>
           `;
           orderIndex++;
 
-          // Listăm produsele din comanda curentă
           items.forEach(item => {
             const thisSum = item.price * item.quantity;
             htmlRows += `
@@ -186,20 +178,16 @@
             `;
           });
 
-          // Linie de separare
           htmlRows += `<hr class="border-gray-700 my-2"/>`;
         });
 
-        // Afișăm comenzile în container
         itemsListElem.innerHTML = htmlRows;
-        // Afișăm totalul cumulat
         orderTotalElem.textContent = totalAll.toFixed(2) + " Lei";
       } catch (err) {
         console.error("Eroare la fetchSessionOrders:", err);
       }
     }
 
-    // Apelăm funcția la încărcare
     fetchSessionOrders();
   </script>
 </body>
