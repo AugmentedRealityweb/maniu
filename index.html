@@ -103,13 +103,7 @@
     }
     .scratches {
       background-color: #000;
-      background-image: repeating-linear-gradient(
-        45deg,
-        rgba(231,140,0,0.15),
-        rgba(231,140,0,0.15) 2px,
-        transparent 2px,
-        transparent 20px
-      );
+      background-image: repeating-linear-gradient(45deg, rgba(231,140,0,0.15), rgba(231,140,0,0.15) 2px, transparent 2px, transparent 20px);
     }
     .sidebar {
       border-right: 2px solid #e78c00;
@@ -127,8 +121,8 @@
       border: 2px solid #e78c00;
       border-radius: 0.5rem;
       padding: 1rem;
-      height: calc(100vh - 4rem);
-      overflow-y: auto;
+      height: calc(100vh - 4rem); /* Ajustează după layout */
+  overflow-y: auto;
     }
     .card-container {
       position: relative;
@@ -195,7 +189,6 @@
 </head>
 <body>
   <div id="app" class="h-screen flex overflow-hidden">
-    <!-- SIDEBAR (desktop) -->
     <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
       <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">Meniu Restaurant</div>
       <nav class="flex flex-col space-y-2">
@@ -211,10 +204,9 @@
       </nav>
     </aside>
 
-    <!-- CONTINUT PRINCIPAL -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-2">
       <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
-        <!-- Buton și titlu (mobile) -->
+        <!-- Butonul și titlul doar pentru mobile -->
         <div class="flex items-center justify-between mb-4 md:hidden">
           <div class="handwriting-title text-2xl font-bold fade-in-left">Meniu Restaurant</div>
           <button 
@@ -225,7 +217,7 @@
           </button>
         </div>
 
-        <!-- Sidebar mobil (afișat condiționat) -->
+        <!-- Sidebar pe mobile (afișat condiționat) -->
         <transition name="slide-fade">
           <aside 
             v-if="isSidebarVisible" 
@@ -257,8 +249,7 @@
           </aside>
         </transition>
 
-        <!-- Conținut pe tab-uri -->
-        <!-- TAB: Meniu -->
+        <!-- Tabloul principal de conținut -->
         <section v-if="activeTab === 'meniu'">
           <!-- Căutare produse -->
           <div class="flex items-center gap-4 mb-4">
@@ -270,12 +261,16 @@
             />
           </div>
 
-          <!-- Rezultatele căutării -->
+          <!-- Rezultatele căutării, dacă există query -->
           <div v-if="searchQuery.trim()">
             <h2 class="text-xl font-semibold mb-4 text-center">
               Rezultate pentru: "{{ searchQuery }}"
             </h2>
-            <div v-if="displayedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" style="overflow-y:auto;">
+            <div 
+              v-if="displayedProducts.length > 0" 
+  class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-full"
+  style="overflow-y: auto; overflow-x: hidden;"
+            >
               <div 
                 v-for="product in displayedProducts" 
                 :key="product.title" 
@@ -295,11 +290,15 @@
               </p>
             </div>
           </div>
-          <!-- Afișarea categoriilor / produselor -->
+
+          <!-- Afișarea categoriilor sau produselor, dacă nu se caută nimic -->
           <div v-else>
             <div v-if="view === 'categorii'">
-              <h2 class="text-xl font-semibold mb-4 text-center">Alege Categoria</h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" style="overflow-y: auto;">
+             <h2 class="text-xl font-semibold mb-4 text-center">Alege Categoria</h2>
+<div 
+  class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-full"
+  style="overflow-y: auto; overflow-x: hidden;"
+              >
                 <div 
                   v-for="category in categories" 
                   :key="category.name" 
@@ -320,7 +319,10 @@
               <h2 class="text-xl font-semibold mb-4 text-center">
                 Produse ({{ currentProducts.length }})
               </h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" style="overflow-y:auto;">
+              <div 
+                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-full"
+  style="overflow-y: auto; overflow-x: hidden;"
+              >
                 <div 
                   v-for="product in currentProducts" 
                   :key="product.title" 
@@ -337,18 +339,36 @@
             </div>
           </div>
 
-          <!-- Modal Detalii Produs -->
-          <div v-if="currentProduct" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <!-- Modalul de detalii al produsului curent -->
+          <div 
+            v-if="currentProduct" 
+            class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+          >
             <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
-              <button class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[#e78c00]" @click="currentProduct = null">
+              <button 
+                class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[#e78c00]" 
+                @click="currentProduct = null"
+              >
                 &times;
               </button>
-              <img :src="currentProduct.image" :alt="currentProduct.title" class="w-full h-64 object-cover mb-4 rounded-lg"/>
+              <img 
+                :src="currentProduct.image" 
+                :alt="currentProduct.title" 
+                class="w-full h-64 object-cover mb-4 rounded-lg"
+              />
               <h2 class="text-xl font-bold mb-2 handwriting-title">{{ currentProduct.title }}</h2>
-              <p class="text-[#f49032] font-bold text-lg mb-4">{{ currentProduct.price }} Lei</p>
-              <p class="text-gray-400 mb-4">{{ currentProduct.description }}</p>
+              <p class="text-[#f49032] font-bold text-lg mb-4">
+                {{ currentProduct.price }} Lei
+              </p>
+              <p class="text-gray-400 mb-4">
+                {{ currentProduct.description }}
+              </p>
               <ul class="text-gray-300 mb-4">
-                <li v-for="ingredient in currentProduct.ingredients" :key="ingredient" class="list-disc ml-5">
+                <li 
+                  v-for="ingredient in currentProduct.ingredients" 
+                  :key="ingredient" 
+                  class="list-disc ml-5"
+                >
                   {{ ingredient }}
                 </li>
               </ul>
@@ -359,7 +379,7 @@
           </div>
         </section>
 
-        <!-- TAB: Puncte -->
+        <!-- Tab-ul Puncte -->
         <section v-else-if="activeTab === 'puncte'">
           <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
           <div class="bg-black p-4 rounded border border-[#e78c00] shadow max-w-md scratches mx-auto">
@@ -382,7 +402,7 @@
           </div>
         </section>
 
-        <!-- TAB: Comenzile Tale -->
+        <!-- Tab-ul Comenzile Tale -->
         <section v-else-if="activeTab === 'comenzileTale'">
           <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
           <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
@@ -398,7 +418,10 @@
                 Comanda #{{ idx + 1 }}
               </h3>
               <ul class="list-disc list-inside text-gray-300">
-                <li v-for="(prod, pidx) in order.items" :key="pidx">
+                <li 
+                  v-for="(prod, pidx) in order.items" 
+                  :key="pidx"
+                >
                   {{ prod.name }} x {{ prod.quantity }} – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
                 </li>
               </ul>
@@ -413,7 +436,7 @@
         </section>
       </main>
 
-      <!-- Buton Coș (apare doar dacă ai produse) -->
+      <!-- Butonul pentru coșul de cumpărături (vizibil doar când există produse în coș) -->
       <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
         <button 
           @click="toggleOrderBar" 
@@ -425,11 +448,11 @@
         </button>
       </div>
 
-      <!-- Bara laterală de comenzi (coș) -->
+      <!-- Bara laterală de comenzi (coșul de cumpărături) -->
       <transition name="slide-cart">
         <aside 
           v-show="isOrderOpen && orders.length > 0" 
-          class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[#e78c00] p-4 overflow-y-auto scrollbar"
+          class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[#e78c00] p-4 overflow-y-auto scrollbar" 
           style="max-height: 100vh;"
         >
           <div class="flex flex-col">
@@ -445,7 +468,7 @@
                   <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
                   <span class="text-gray-400">x{{ order.quantity }}</span>
                   <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
-                  <!-- Buton stergere produs -->
+                  <!-- Buton de ștergere produs -->
                   <button class="btn-incdec" @click="removeItem(index)">
                     <span class="material-icons">delete</span>
                   </button>
@@ -501,18 +524,16 @@
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    // Funcție auxiliară
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
-    // Generează un sessionCode (4 cifre)
     function generateSessionCode() {
+      // Generează un număr aleator între 1000 și 9999
       const code = Math.floor(1000 + Math.random() * 9000).toString();
       return code;
     }
 
-    // Obține sau creează "sessions/tableId" => {sessionCode, status}
     async function getOrCreateSessionCode(tableId) {
       if (!tableId) {
         throw new Error("Nu există parametru pentru masă în URL.");
@@ -552,7 +573,7 @@
           currentProduct: null,
           searchQuery: "",
           clientNumber: 0,
-          clientPoints: 0,  // punctele actuale ale clientului, încărcate din Firestore
+          clientPoints: 0, // punctele din Firestore
           isFirstOrder: true,
           tableId: "",
           sessionCode: "",
@@ -727,7 +748,6 @@
         };
       },
       computed: {
-        // Produsele afișate la căutare
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
@@ -738,14 +758,16 @@
             for (const prod of this.products[catKey]) {
               const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
               const descNoDiac = removeDiacritics(prod.description.toLowerCase());
-              if (titleNoDiac.includes(q) || descNoDiac.includes(q)) {
+              if (
+                titleNoDiac.includes(q) ||
+                descNoDiac.includes(q)
+              ) {
                 results.push(prod);
               }
             }
           }
           return results;
         },
-        // Total coș
         total() {
           return this.orders
             .reduce((sum, o) => sum + (o.price * o.quantity), 0)
@@ -768,13 +790,17 @@
           this.currentProducts = this.products[categoryName] || [];
           this.view = "produse";
           this.searchQuery = "";
-          this.$nextTick(() => window.scrollTo(0, 0));
+          this.$nextTick(() => {
+            window.scrollTo(0, 0);
+          });
         },
         backToCategories() {
           this.view = "categorii";
           this.currentProduct = null;
           this.searchQuery = "";
-          this.$nextTick(() => window.scrollTo(0, 0));
+          this.$nextTick(() => {
+            window.scrollTo(0, 0);
+          });
         },
         showProductDetails(product) {
           this.currentProduct = product;
@@ -791,7 +817,6 @@
             });
           }
           this.currentProduct = null;
-          // Animație mică de shake
           this.isShaking = true;
           setTimeout(() => {
             this.isShaking = false;
@@ -805,25 +830,30 @@
             this.orders[index].quantity--;
           }
         },
+        // Metoda pentru eliminarea unui produs din coș
         removeItem(index) {
           this.orders.splice(index, 1);
         },
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
-        // Trimite comanda în Firestore
         async checkout() {
           try {
-            // userId unic
+            // Obține sau generează un userId unic pentru utilizator
             const userId = localStorage.getItem("userId") || Date.now().toString();
             localStorage.setItem("userId", userId);
 
-            // sessionCode
+            // Obține sau generează codul sesiunii pentru masă
             this.sessionCode = await getOrCreateSessionCode(this.tableId);
 
-            // NU se adaugă puncte aici, ci la finalizarea mesei de către ospătar
+            // =========================================
+            // Punctele de fidelitate NU mai sunt adăugate aici.
+            // Se adaugă doar după ce ospătarul finalizează masa (în waiter.html).
+            // =========================================
+
+            // Creează datele comenzii
             const orderData = {
-              userId,
+              userId, // Identificatorul unic al utilizatorului
               tableId: this.tableId,
               sessionCode: this.sessionCode,
               clientNumber: this.clientNumber,
@@ -833,13 +863,14 @@
               timestamp: serverTimestamp()
             };
 
+            // Adaugă comanda în Firestore
             await addDoc(collection(db, "orders"), orderData);
 
-            // Golește coșul
+            // Resetează coșul de cumpărături și închide bara de comenzi
             this.orders = [];
             this.isOrderOpen = false;
 
-            // Redirecționare confirm
+            // Redirecționează către pagina confirm.html cu parametrii necesari
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
@@ -850,14 +881,17 @@
           }
         },
 
-        // Ia comenzile existente pt clientNumber (myOrders)
         async fetchOrders() {
           try {
             if (this.clientNumber === 0) {
               this.myOrders = [];
               return;
             }
-            const qRef = query(collection(db, "orders"), where("clientNumber", "==", this.clientNumber));
+            // Găsește toate comenzile (indiferent de status) pentru clientNumber
+            const qRef = query(
+              collection(db, "orders"),
+              where("clientNumber", "==", this.clientNumber)
+            );
             const snap = await getDocs(qRef);
             this.myOrders = [];
             snap.forEach(docSnap => {
@@ -870,7 +904,8 @@
           }
         },
 
-        // Afișăm punctele clientului din colecția "clients/{clientNumber}"
+        // Metodă pentru a încărca punctele din Firestore (colecția "clients"),
+        // folosind clientNumber.
         async loadClientPoints() {
           if (!this.clientNumber) return;
           try {
@@ -880,8 +915,10 @@
               const data = snap.data();
               this.clientPoints = data.points || 0;
             } else {
+              // Dacă nu există, setăm local 0 (probabil nu are încă puncte).
               this.clientPoints = 0;
             }
+            // Salvăm și în localStorage, dacă dorim
             localStorage.setItem("clientPoints", this.clientPoints);
           } catch (e) {
             console.error("Eroare la încărcarea punctelor:", e);
@@ -889,17 +926,16 @@
         }
       },
       async mounted() {
-        // 1. Parametru "masa" din URL
+        // 1. Obținem parametrii din URL pentru masă
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
-        // IMPORTANT: Folosim același tipar la ID-ul mesei, ex: "Masa4", "Masa10" etc.
         if (masaParam) {
-          this.tableId = "Masa" + masaParam;  // <-- Fără "numărul "
+          this.tableId = `Masa numărul ${masaParam}`;
         } else {
-          this.tableId = "Masa1";
+          this.tableId = "Masa numărul 1";
         }
 
-        // 2. clientNumber din localStorage (dacă există)
+        // 2. Verificăm dacă avem deja un clientNumber în localStorage
         const storedNumber = localStorage.getItem("clientNumber");
         if (storedNumber) {
           this.clientNumber = parseInt(storedNumber);
@@ -907,45 +943,44 @@
             this.isFirstOrder = false;
           }
         } else {
-          // Generăm un clientNumber random (5 cifre)
+          // dacă nu, generăm unul random
           const randomNum = Math.floor(Math.random() * 90000) + 10000;
           this.clientNumber = randomNum;
           localStorage.setItem("clientNumber", randomNum);
           this.isFirstOrder = false;
         }
 
-        // 3. Încărcăm punctele din Firestore
+        // 3. Încercăm să încărcăm punctele (din Firestore)
         await this.loadClientPoints();
 
-        // 4. Încărcăm comenzile aferente clientului
+        // 4. Încărcăm comenzile (din Firestore) asociate clientului curent
         await this.fetchOrders();
 
-        // 5. Fallback la localStorage
+        // 5. Dacă avem deja ceva în localStorage la "clientPoints", îl punem doar ca fallback
         const storedPoints = localStorage.getItem("clientPoints");
         if (storedPoints) {
+          // dacă datele din Firestore erau 0, putem păstra localStorage ca fallback
           if (this.clientPoints === 0) {
             this.clientPoints = parseFloat(storedPoints);
           }
         }
       },
       watch: {
-        // Când utilizatorul deschide tab-ul "puncte", re-încarcă punctele din Firestore
-        activeTab(newVal) {
-          if (newVal === 'puncte') {
-            this.loadClientPoints();
-          }
-        },
-        // Salvăm local
-        clientPoints(newVal) {
-          localStorage.setItem("clientPoints", newVal);
-        },
-        clientNumber(newVal) {
-          localStorage.setItem("clientNumber", newVal);
-        },
-        myOrders(newVal) {
-          localStorage.setItem("myOrders", JSON.stringify(newVal));
-        }
-      }
+  activeTab(newVal) {
+    if (newVal === 'puncte') {
+      this.loadClientPoints(); 
+    }
+  },
+  clientPoints(newVal) {
+    localStorage.setItem("clientPoints", newVal);
+  },
+  clientNumber(newVal) {
+    localStorage.setItem("clientNumber", newVal);
+  },
+  myOrders(newVal) {
+    localStorage.setItem("myOrders", JSON.stringify(newVal));
+  }
+}
     });
 
     app.mount("#app");
