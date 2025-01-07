@@ -365,6 +365,7 @@
   const code = Math.floor(1000 + Math.random() * 9000).toString(); // Generează un număr aleator între 1000 și 9999
   return code;
 }
+
     async function getOrCreateSessionCode(tableId){
       if(!tableId){throw new Error("Nu există parametru pentru masă în URL.");}
       const docRef=doc(db,"sessions",tableId);
@@ -384,7 +385,7 @@
           return newSessionCode;
         }
       }catch(error){
-        console.error(`Eroare la obținerea/crearea session code pentru ${tableId}:`,error);
+        console.error(Eroare la obținerea/crearea session code pentru ${tableId}:,error);
         throw new Error("A apărut o eroare la obținerea/crearea session code-ului.");
       }
     }
@@ -488,39 +489,63 @@
           this.currentProduct=null;this.isShaking=true;
           setTimeout(()=>{this.isShaking=false;},500);
         },
-        incrementQuantity(index){this.orders[index].quantity++;},
-        decrementQuantity(index){if(this.orders[index].quantity>1){this.orders[index].quantity--;}},
-        toggleOrderBar(){this.isOrderOpen=!this.isOrderOpen;},
-        async checkout(){
-          this.sessionCode=await getOrCreateSessionCode(this.tableId);
-          let pointsToAdd=0;
-          for(const item of this.orders){pointsToAdd+=(item.price*item.quantity*0.05);}
-          this.clientPoints+=pointsToAdd;
-          onst userId = localStorage.getItem("userId") || Date.now().toString();
-localStorage.setItem("userId", userId);
-          const orderData = {
-  userId, // Adaugă identificatorul utilizatorului
-  tableId: this.tableId,
-  sessionCode: this.sessionCode,
-  clientNumber: this.clientNumber,
-  items: this.orders,
-  total: parseFloat(this.total),
-  status: "open",
-  timestamp: serverTimestamp(),
-};
-          try{
-            await addDoc(collection(db,"orders"),orderData);
-            this.orders=[];
-            this.isOrderOpen=false;
-            const urlParams=new URLSearchParams(window.location.search);
-            const masaParam=urlParams.get("masa");
-            const baseUrl=window.location.origin;
-            window.location.href=`${baseUrl}/confirm.html?sessionCode=${this.sessionCode}&masa=${masaParam||""}`;
-          }catch(err){
-            console.error("Eroare la salvarea comenzii:",err);
+        methods: {
+    incrementQuantity(index) {
+        this.orders[index].quantity++;
+    },
+    decrementQuantity(index) {
+        if (this.orders[index].quantity > 1) {
+            this.orders[index].quantity--;
+        }
+    },
+    toggleOrderBar() {
+        this.isOrderOpen = !this.isOrderOpen;
+    },
+    async checkout() {
+        try {
+            // Obține sau generează un userId unic pentru utilizator
+            const userId = localStorage.getItem("userId") || Date.now().toString();
+            localStorage.setItem("userId", userId);
+
+            // Obține sau generează codul sesiunii pentru masă
+            this.sessionCode = await getOrCreateSessionCode(this.tableId);
+
+            // Calcul puncte de fidelitate
+            let pointsToAdd = 0;
+            for (const item of this.orders) {
+                pointsToAdd += item.price * item.quantity * 0.05;
+            }
+            this.clientPoints += pointsToAdd;
+
+            // Creează datele comenzii
+            const orderData = {
+                userId, // Identificatorul unic al utilizatorului
+                tableId: this.tableId,
+                sessionCode: this.sessionCode,
+                clientNumber: this.clientNumber,
+                items: this.orders,
+                total: parseFloat(this.total),
+                status: "open",
+                timestamp: serverTimestamp(),
+            };
+
+            // Adaugă comanda în Firestore
+            await addDoc(collection(db, "orders"), orderData);
+
+            // Resetează coșul de cumpărături și închide bara de comenzi
+            this.orders = [];
+            this.isOrderOpen = false;
+
+            // Redirecționează către pagina confirm.html cu parametrii necesari
+            const urlParams = new URLSearchParams(window.location.search);
+            const masaParam = urlParams.get("masa");
+            const baseUrl = window.location.origin;
+            window.location.href = `${baseUrl}/confirm.html?sessionCode=${this.sessionCode}&masa=${masaParam || ""}`;
+        } catch (err) {
+            console.error("Eroare la salvarea comenzii:", err);
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
-          }
-        },
+        }
+    },
         async fetchOrders(){
           try{
             if(this.clientNumber===0){this.myOrders=[];return;}
@@ -538,7 +563,7 @@ localStorage.setItem("userId", userId);
       mounted(){
         const urlParams=new URLSearchParams(window.location.search);
         const masaParam=urlParams.get("masa");
-        if(masaParam){this.tableId=`Masa numărul ${masaParam}`;}
+        if(masaParam){this.tableId=Masa numărul ${masaParam};}
         else{this.tableId="Masa numărul 1";}
         const storedNumber=localStorage.getItem("clientNumber");
         if(storedNumber){this.clientNumber=parseInt(storedNumber);if(this.clientNumber>0){this.isFirstOrder=false;}}
