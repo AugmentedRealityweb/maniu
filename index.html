@@ -267,7 +267,7 @@
             <div 
               v-if="displayedProducts.length > 0" 
               class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" 
-              style="max-height: 400px; overflow-y: auto;"
+              style="max-height: 700px; overflow-y: auto;"
             >
               <div 
                 v-for="product in displayedProducts" 
@@ -500,6 +500,7 @@
       doc,
       getDoc,
       setDoc,
+      updateDoc,
       collection,
       addDoc,
       getDocs,
@@ -570,7 +571,7 @@
           currentProduct: null,
           searchQuery: "",
           clientNumber: 0,
-          clientPoints: 0,
+          clientPoints: 0, // punctele din Firestore
           isFirstOrder: true,
           tableId: "",
           sessionCode: "",
@@ -843,16 +844,10 @@
             // Obține sau generează codul sesiunii pentru masă
             this.sessionCode = await getOrCreateSessionCode(this.tableId);
 
-            // ----------------------------------------------------------------------------
-            // Punctele de fidelitate NU mai sunt adăugate aici, ci doar după ce ospătarul
-            // finalizează masa (în waiter.html sau alt flux), deci comentăm codul existent:
-            //
-            // let pointsToAdd = 0;
-            // for (const item of this.orders) {
-            //   pointsToAdd += item.price * item.quantity * 0.05;
-            // }
-            // this.clientPoints += pointsToAdd;
-            // ----------------------------------------------------------------------------
+            // =========================================
+            // Punctele de fidelitate NU mai sunt adăugate aici.
+            // Se adaugă doar după ce ospătarul finalizează masa (în waiter.html).
+            // =========================================
 
             // Creează datele comenzii
             const orderData = {
@@ -883,12 +878,14 @@
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
+
         async fetchOrders() {
           try {
             if (this.clientNumber === 0) {
               this.myOrders = [];
               return;
             }
+            // Găsește toate comenzile (indiferent de status) pentru clientNumber
             const qRef = query(
               collection(db, "orders"),
               where("clientNumber", "==", this.clientNumber)
@@ -903,9 +900,31 @@
           } catch (e) {
             console.error("Eroare la preluarea comenzilor:", e);
           }
+        },
+
+        // Metodă pentru a încărca punctele din Firestore (colecția "clients"),
+        // folosind clientNumber.
+        async loadClientPoints() {
+          if (!this.clientNumber) return;
+          try {
+            const docRef = doc(db, "clients", this.clientNumber.toString());
+            const snap = await getDoc(docRef);
+            if (snap.exists()) {
+              const data = snap.data();
+              this.clientPoints = data.points || 0;
+            } else {
+              // Dacă nu există, setăm local 0 (probabil nu are încă puncte).
+              this.clientPoints = 0;
+            }
+            // Salvăm și în localStorage, dacă dorim
+            localStorage.setItem("clientPoints", this.clientPoints);
+          } catch (e) {
+            console.error("Eroare la încărcarea punctelor:", e);
+          }
         }
       },
-      mounted() {
+      async mounted() {
+        // 1. Obținem parametrii din URL pentru masă
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
         if (masaParam) {
@@ -914,6 +933,7 @@
           this.tableId = "Masa numărul 1";
         }
 
+        // 2. Verificăm dacă avem deja un clientNumber în localStorage
         const storedNumber = localStorage.getItem("clientNumber");
         if (storedNumber) {
           this.clientNumber = parseInt(storedNumber);
@@ -921,26 +941,31 @@
             this.isFirstOrder = false;
           }
         } else {
+          // dacă nu, generăm unul random
           const randomNum = Math.floor(Math.random() * 90000) + 10000;
           this.clientNumber = randomNum;
           localStorage.setItem("clientNumber", randomNum);
           this.isFirstOrder = false;
         }
 
+        // 3. Încercăm să încărcăm punctele (din Firestore)
+        await this.loadClientPoints();
+
+        // 4. Încărcăm comenzile (din Firestore) asociate clientului curent
+        await this.fetchOrders();
+
+        // 5. Dacă avem deja ceva în localStorage la "clientPoints", îl punem doar ca fallback
         const storedPoints = localStorage.getItem("clientPoints");
         if (storedPoints) {
-          this.clientPoints = parseFloat(storedPoints);
+          // dacă datele din Firestore erau 0, putem păstra localStorage ca fallback
+          if (this.clientPoints === 0) {
+            this.clientPoints = parseFloat(storedPoints);
+          }
         }
-
-        const storedMyOrders = localStorage.getItem("myOrders");
-        if (storedMyOrders) {
-          this.myOrders = JSON.parse(storedMyOrders);
-        }
-
-        this.fetchOrders();
       },
       watch: {
         clientPoints(newVal) {
+          // Actualizăm localStorage la fiecare modificare
           localStorage.setItem("clientPoints", newVal);
         },
         clientNumber(newVal) {
