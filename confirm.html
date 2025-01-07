@@ -163,22 +163,14 @@
           totalAll += subTotal;
 
           // Heading: "Comanda #1", "Comanda #2", ...
-          htmlRows += `
-            <h3 class="text-lg font-semibold mt-3 mb-2">Comanda #${orderIndex}</h3>
-          `;
-          orderIndex++;
-
-          items.forEach(item => {
-            const thisSum = item.price * item.quantity;
-            htmlRows += `
-              <div class="product-row">
-                <span class="product-name">${item.name} x ${item.quantity}</span>
-                <span class="price">${thisSum.toFixed(2)} Lei</span>
-              </div>
-            `;
-          });
-
-          htmlRows += `<hr class="border-gray-700 my-2"/>`;
+          htmlRows += `<h3 class="text-lg font-semibold mt-3 mb-2">Comanda #${orderIndex}</h3>`;
+htmlRows += `
+  <div class="product-row">
+    <span class="product-name">${item.name} x ${item.quantity}</span>
+    <span class="price">${thisSum.toFixed(2)} Lei</span>
+  </div>
+`;
+htmlRows += `<hr class="border-gray-700 my-2"/>`;
         });
 
         itemsListElem.innerHTML = htmlRows;
