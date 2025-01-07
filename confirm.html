@@ -36,6 +36,29 @@
     .product-name {
       margin-right: 1rem;
     }
+    .pulse {
+      color: #f49032;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+    .subtitle {
+      text-align: center;
+      color: #f3f3f3;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
   </style>
 </head>
 <body>
@@ -44,7 +67,8 @@
 
     <div class="bg-gray-800 p-4 rounded shadow">
       <!-- Afișăm sessionCode -->
-      <h2 id="sessionCodeElem" class="text-xl font-semibold mb-2"></h2>
+      <h2 id="sessionCodeElem" class="pulse"></h2>
+      <p id="subtitleElem" class="subtitle">Spune acest cod ospătarului</p>
       
       <!-- Lista de produse -->
       <div id="itemsList" class="mb-4"></div>
@@ -73,10 +97,6 @@
       getDocs 
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    /*
-      Configurația Firebase (înlocuiește cu datele tale).
-      Asigură-te că e identică cu ce ai în index.html
-    */
     const firebaseConfig = {
       apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -90,25 +110,21 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Citim din URL sessionCode=? și masa=?
     const params = new URLSearchParams(window.location.search);
     const sessionCode = params.get("sessionCode");
-    const masaNumber  = params.get("masa"); // ex: "5"
+    const masaNumber  = params.get("masa");
 
-    // Elemente HTML
     const sessionCodeElem = document.getElementById("sessionCodeElem");
     const itemsListElem   = document.getElementById("itemsList");
     const orderTotalElem  = document.getElementById("orderTotal");
     const backLinkElem    = document.getElementById("backLinkElem");
 
-    // Afișăm codul sesiunii
     if (sessionCode) {
       sessionCodeElem.textContent = "Codul Sesiunii: " + sessionCode;
     } else {
       sessionCodeElem.textContent = "Nu există niciun cod de sesiune!";
     }
 
-    // Link "Înapoi la Meniu" -> adaugă parametru ?masa=
     let backLink = "https://meniu-test.vercel.app/";
     if (masaNumber) {
       backLink += `?masa=${masaNumber}`;
@@ -116,47 +132,47 @@
     backLinkElem.href = backLink;
 
     const userId = localStorage.getItem("userId");
-    // Preluăm toate comenzile din Firestore care au sessionCode = X
+
     async function fetchSessionOrders() {
-  if (!sessionCode || !userId) return;
+      if (!sessionCode || !userId) return;
 
-  try {
-    const cRef = collection(db, "orders");
-    const qRef = query(
-      cRef,
-      where("sessionCode", "==", sessionCode),
-      where("userId", "==", userId) // Filtrăm comenzile doar pentru utilizatorul curent
-    );
+      try {
+        const cRef = collection(db, "orders");
+        const qRef = query(
+          cRef,
+          where("sessionCode", "==", sessionCode),
+          where("userId", "==", userId)
+        );
 
-    const snap = await getDocs(qRef);
+        const snap = await getDocs(qRef);
 
-    let totalAll = 0;
-    let htmlRows = "";
-    snap.forEach((docSnap) => {
-      const data = docSnap.data();
-      const items = data.items || [];
+        let totalAll = 0;
+        let htmlRows = "";
+        snap.forEach((docSnap) => {
+          const data = docSnap.data();
+          const items = data.items || [];
 
-      items.forEach((item) => {
-        const thisSum = item.price * item.quantity;
-        totalAll += thisSum;
+          items.forEach((item) => {
+            const thisSum = item.price * item.quantity;
+            totalAll += thisSum;
 
-        htmlRows += `
-          <div class="product-row">
-            <span class="product-name">${item.name} x ${item.quantity}</span>
-            <span class="price">${thisSum.toFixed(2)} Lei</span>
-          </div>
-        `;
-      });
+            htmlRows += `
+              <div class="product-row">
+                <span class="product-name">${item.name} x ${item.quantity}</span>
+                <span class="price">${thisSum.toFixed(2)} Lei</span>
+              </div>
+            `;
+          });
 
-      htmlRows += `<hr class="border-gray-700 my-2"/>`;
-    });
+          htmlRows += `<hr class="border-gray-700 my-2"/>`;
+        });
 
-    itemsListElem.innerHTML = htmlRows;
-    orderTotalElem.textContent = totalAll.toFixed(2) + " Lei";
-  } catch (err) {
-    console.error("Eroare la fetchSessionOrders:", err);
-  }
-}
+        itemsListElem.innerHTML = htmlRows;
+        orderTotalElem.textContent = totalAll.toFixed(2) + " Lei";
+      } catch (err) {
+        console.error("Eroare la fetchSessionOrders:", err);
+      }
+    }
 
     fetchSessionOrders();
   </script>
