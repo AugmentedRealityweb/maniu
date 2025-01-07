@@ -71,6 +71,9 @@
         </div>
       </div>
     </div>
+    <div v-else class="text-gray-400 mb-4">
+      Nu există mese deschise (status="active").
+    </div>
 
     <hr class="my-4 border-gray-700"/>
 
@@ -181,6 +184,7 @@
         // 1) Preia mesele deschise (sessions cu status="active")
         async fetchOpenTables() {
           try {
+            console.log("[DEBUG] fetchOpenTables()...");
             const cRef = collection(db, "sessions");
             const qRef = query(cRef, where("status", "==", "active"));
             const snap = await getDocs(qRef);
@@ -188,11 +192,13 @@
             this.openTables = [];
             snap.forEach(docSnap => {
               const data = docSnap.data();
+              console.log("[DEBUG] sessions doc:", docSnap.id, data);
               this.openTables.push({
                 tableId: docSnap.id,        // ex: "Masa4"
                 sessionCode: data.sessionCode
               });
             });
+            console.log("[DEBUG] openTables =>", this.openTables);
           } catch (e) {
             console.error("Eroare la fetchOpenTables:", e);
             alert("Eroare la încărcarea meselor active!");
@@ -201,35 +207,42 @@
 
         // 2) Caută manual un "sessions/tableId"
         async findSession(tableId) {
-          if (!tableId.trim()) {
-            alert("Te rog introdu un ID masă valid! (ex: Masa4)");
-            return;
+          try {
+            if (!tableId.trim()) {
+              alert("Te rog introdu un ID masă valid! (ex: Masa4)");
+              return;
+            }
+            console.log("[DEBUG] findSession ->", tableId.trim());
+            const docRef_ = doc(db, "sessions", tableId.trim());
+            const snap = await getDoc(docRef_);
+            if (!snap.exists()) {
+              alert("Nu există nicio sesiune pt această masă!");
+              this.currentTableId = "";
+              this.currentSessionCode = "";
+              this.orders = [];
+              return;
+            }
+            const data = snap.data();
+            console.log("[DEBUG] findSession docData:", data);
+            if (data.status === "closed" || !data.sessionCode) {
+              alert("Sesiunea pentru această masă este deja închisă sau nu există!");
+              this.currentTableId = "";
+              this.currentSessionCode = "";
+              this.orders = [];
+              return;
+            }
+            this.currentTableId = tableId.trim();
+            this.currentSessionCode = data.sessionCode;
+            // Preluăm comenzile "open" aferente
+            await this.loadOrdersBySession(this.currentSessionCode);
+          } catch (err) {
+            console.error("[DEBUG] Eroare findSession:", err);
           }
-          const docRef_ = doc(db, "sessions", tableId.trim());
-          const snap = await getDoc(docRef_);
-          if (!snap.exists()) {
-            alert("Nu există nicio sesiune pt această masă!");
-            this.currentTableId = "";
-            this.currentSessionCode = "";
-            this.orders = [];
-            return;
-          }
-          const data = snap.data();
-          if (data.status === "closed" || !data.sessionCode) {
-            alert("Sesiunea pentru această masă este deja închisă sau nu există!");
-            this.currentTableId = "";
-            this.currentSessionCode = "";
-            this.orders = [];
-            return;
-          }
-          this.currentTableId = tableId.trim();
-          this.currentSessionCode = data.sessionCode;
-          // Preluăm comenzile "open" aferente
-          await this.loadOrdersBySession(this.currentSessionCode);
         },
 
         // 3) Afișează comenzile când dai "Vezi Comenzi"
         async showOrders(tableId, sessionCode) {
+          console.log("[DEBUG] showOrders ->", tableId, sessionCode);
           this.currentTableId = tableId;
           this.currentSessionCode = sessionCode;
           await this.loadOrdersBySession(sessionCode);
@@ -239,6 +252,7 @@
         async loadOrdersBySession(sCode) {
           this.orders = [];
           try {
+            console.log("[DEBUG] loadOrdersBySession ->", sCode);
             const cRef = collection(db, "orders");
             const qRef = query(cRef, where("sessionCode", "==", sCode), where("status", "==", "open"));
             const snap = await getDocs(qRef);
@@ -246,8 +260,10 @@
             snap.forEach(docSnap => {
               const data = docSnap.data();
               data.docId = docSnap.id;
+              console.log("[DEBUG] order found ->", docSnap.id, data);
               this.orders.push(data);
             });
+            console.log("[DEBUG] orders =>", this.orders);
           } catch (e) {
             console.error("Eroare la loadOrdersBySession:", e);
             alert("Eroare la încărcarea comenzilor!");
@@ -262,6 +278,7 @@
             return;
           }
           try {
+            console.log("[DEBUG] finalizeTable ->", tableId);
             const sCode = this.currentSessionCode;
             if (!sCode) {
               alert("Nu există un sessionCode pt masa curentă!");
@@ -277,12 +294,14 @@
             for (const docSnap of snap.docs) {
               const ordData = docSnap.data();
               const ordId = docSnap.id;
+              console.log("[DEBUG] finalize -> inchidem comanda", ordId, ordData);
               
               // ---- Acordare puncte de fidelitate ----
               // Suma e ordData.total, deci 5% din total => points
               const points = ordData.total * 0.05;
               const clientNr = ordData.clientNumber; 
               if (clientNr) {
+                console.log("[DEBUG] Acordare puncte -> clientNr=", clientNr, "puncte=", points);
                 // Documentul "clients/clientNr"
                 const clientDocRef = doc(db, "clients", clientNr.toString());
                 const clientSnap = await getDoc(clientDocRef);
@@ -291,9 +310,11 @@
                   const oldPoints = clientSnap.data().points || 0;
                   const newPoints = oldPoints + points;
                   await updateDoc(clientDocRef, { points: newPoints });
+                  console.log("[DEBUG] updateDoc -> noul total de puncte=", newPoints);
                 } else {
                   // Creăm document cu puncte = points
                   await setDoc(clientDocRef, { points: points });
+                  console.log("[DEBUG] setDoc -> client nou, puncte=", points);
                 }
               }
               // -------------------------------------
@@ -301,11 +322,13 @@
               // Comanda devine "closed"
               const ordRef = doc(db, "orders", ordId);
               await updateDoc(ordRef, { status: "closed" });
+              console.log("[DEBUG] comanda inchisa ->", ordId);
             }
 
-            // 5b) Masa devine "closed"
+            // Masa devine "closed"
             const docRef_ = doc(db, "sessions", tableId);
             await updateDoc(docRef_, { sessionCode: null, status: "closed" });
+            console.log("[DEBUG] masa inchisa ->", tableId);
 
             alert(`Masa ${tableId} a fost închisă și punctele de fidelitate au fost acordate!`);
 
