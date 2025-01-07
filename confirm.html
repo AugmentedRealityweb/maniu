@@ -119,22 +119,19 @@
     const orderTotalElem  = document.getElementById("orderTotal");
     const backLinkElem    = document.getElementById("backLinkElem");
 
-    console.log("[DEBUG] confirm.html param sessionCode=", sessionCode, "masa=", masaNumber);
-
     if (sessionCode) {
       sessionCodeElem.textContent = "Codul Sesiunii: " + sessionCode;
     } else {
       sessionCodeElem.textContent = "Nu există niciun cod de sesiune!";
     }
 
-    let backLink = window.location.origin;
+    let backLink = "https://meniu-test.vercel.app/";
     if (masaNumber) {
-      backLink += `/?masa=${masaNumber}`;
+      backLink += `?masa=${masaNumber}`;
     }
     backLinkElem.href = backLink;
 
     const userId = localStorage.getItem("userId");
-    console.log("[DEBUG] confirm.html local userId=", userId);
 
     async function fetchSessionOrders() {
       if (!sessionCode || !userId) return;
@@ -148,13 +145,11 @@
         );
 
         const snap = await getDocs(qRef);
-        console.log("[DEBUG] confirm.html snap.size=", snap.size);
 
         let totalAll = 0;
         let htmlRows = "";
         snap.forEach((docSnap) => {
           const data = docSnap.data();
-          console.log("[DEBUG] confirm.html orderDoc:", docSnap.id, data);
           const items = data.items || [];
 
           items.forEach((item) => {
@@ -169,7 +164,6 @@
             `;
           });
 
-          // Linie despărțitoare între comenzi (dacă userId-ul a plasat mai multe)
           htmlRows += `<hr class="border-gray-700 my-2"/>`;
         });
 
