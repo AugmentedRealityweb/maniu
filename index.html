@@ -1,351 +1,232 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Meniu Restaurant - Pagina Principală</title>
-
   <!-- Vue 3 (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
-
   <!-- TailwindCSS (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
-
   <!-- Google Material Icons (opțional) -->
-  <link
-    href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    rel="stylesheet"
-  />
-
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
   <!-- Font “scris de mână” (Dancing Script) -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap"
-    rel="stylesheet"
-  />
-
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet"/>
   <style>
-    /* Font principal + handwriting */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-
     body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #000000 0%, #e78c00 100%);
-      color: #fff;
-      margin: 0;
-      min-height: 100vh;
+      font-family:'Inter',sans-serif;
+      background:linear-gradient(135deg,#000000 0%,#e78c00 100%);
+      color:#fff;
+      margin:0;
+      min-height:100vh;
     }
-
     .scrollbar {
-      scrollbar-width: thin;
-      scrollbar-color: #e78c00 #000;
+      scrollbar-width:thin;
+      scrollbar-color:#e78c00 #000;
     }
     .scrollbar::-webkit-scrollbar {
-      width: 6px;
+      width:6px;
     }
     .scrollbar::-webkit-scrollbar-thumb {
-      background-color: #e78c00;
-      border-radius: 6px;
+      background-color:#e78c00;
+      border-radius:6px;
     }
     .scrollbar::-webkit-scrollbar-track {
-      background-color: #000000;
+      background-color:#000000;
     }
-
-    /* Butoane portocalii + Glow la hover */
     .btn-orange {
-      background: linear-gradient(to right, #f49032, #d35400);
-      color: #fff;
-      font-weight: bold;
-      border: none;
-      padding: 0.5rem 1.2rem;
-      border-radius: 0.75rem;
-      font-size: 0.875rem;
-      transition: box-shadow 0.3s ease, transform 0.3s ease;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
+      background:linear-gradient(to right,#f49032,#d35400);
+      color:#fff;
+      font-weight:bold;
+      border:none;
+      padding:0.5rem 1.2rem;
+      border-radius:0.75rem;
+      font-size:0.875rem;
+      transition:box-shadow 0.3s ease,transform 0.3s ease;
+      box-shadow:0 4px 6px rgba(0,0,0,0.1);
+      cursor:pointer;
     }
     .btn-orange:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 8px #f49032, 0 0 20px #d35400;
+      transform:scale(1.05);
+      box-shadow:0 0 8px #f49032,0 0 20px #d35400;
     }
-
-    /* Butoane +/- pentru cantitate */
     .btn-incdec {
-      background: linear-gradient(to right, #f49032, #d35400);
-      color: #fff;
-      font-weight: bold;
-      border: none !important;
-      width: 2rem;
-      height: 2rem;
-      border-radius: 9999px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.2s ease;
+      background:linear-gradient(to right,#f49032,#d35400);
+      color:#fff;
+      font-weight:bold;
+      border:none !important;
+      width:2rem;
+      height:2rem;
+      border-radius:9999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:background-color 0.2s ease,transform 0.2s ease;
     }
     .btn-incdec:hover {
-      transform: scale(1.1);
+      transform:scale(1.1);
     }
-
-    /* Animație shake pentru coș */
     @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-5px); }
-      40%, 80% { transform: translateX(5px); }
+      0%,100%{transform:translateX(0);}
+      20%,60%{transform:translateX(-5px);}
+      40%,80%{transform:translateX(5px);}
     }
     .animate-shake {
-      animation: shake 0.5s;
+      animation:shake 0.5s;
     }
-
-    /* Slide-cart (tranziție mai lentă) */
-    .slide-cart-enter-active, .slide-cart-leave-active {
-      transition: max-height 0.5s ease, opacity 0.5s ease;
-      overflow: hidden;
+    .slide-cart-enter-active,
+    .slide-cart-leave-active {
+      transition:max-height 0.5s ease,opacity 0.5s ease;
+      overflow:hidden;
     }
-    .slide-cart-enter-from, .slide-cart-leave-to {
-      max-height: 0;
-      opacity: 0;
+    .slide-cart-enter-from,
+    .slide-cart-leave-to {
+      max-height:0;
+      opacity:0;
     }
-
-    /* Slide-fade pentru sidebar mobil */
     .slide-fade-enter-active,
     .slide-fade-leave-active {
-      transition: all 0.3s ease;
+      transition:all 0.3s ease;
     }
     .slide-fade-enter,
     .slide-fade-leave-to {
-      transform: translateX(-50px);
-      opacity: 0;
+      transform:translateX(-50px);
+      opacity:0;
     }
-
-    /* Zgârieturi oranj mai vizibile */
     .scratches {
-      background-color: #000;
-      background-image: repeating-linear-gradient(
-        45deg,
-        rgba(231, 140, 0, 0.15),
-        rgba(231, 140, 0, 0.15) 2px,
-        transparent 2px,
-        transparent 20px
-      );
+      background-color:#000;
+      background-image:repeating-linear-gradient(45deg,rgba(231,140,0,0.15),rgba(231,140,0,0.15)2px,transparent 2px,transparent 20px);
     }
-
-    /* Sidebar (coloană stânga) */
     .sidebar {
-      border-right: 2px solid #e78c00;
-      box-shadow: 4px 0 8px rgba(0,0,0,0.3);
+      border-right:2px solid #e78c00;
+      box-shadow:4px 0 8px rgba(0,0,0,0.3);
     }
     .sidebar-btn {
-      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+      transition:background 0.2s ease,color 0.2s ease,transform 0.2s ease;
     }
     .sidebar-btn:hover {
-      background-color: #e78c00;
-      color: #000;
-      transform: scale(1.03);
+      background-color:#e78c00;
+      color:#000;
+      transform:scale(1.03);
     }
-
-    /* Container principal */
     .main-container {
-      border: 2px solid #e78c00;
-      border-radius: 0.5rem;
-      padding: 1rem;
+      border:2px solid #e78c00;
+      border-radius:0.5rem;
+      padding:1rem;
     }
-
-    /* Card container */
     .card-container {
-      position: relative;
-      overflow: hidden;
-      border-radius: 1rem;
-      border: 1px solid #e78c00;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      text-align: center;
+      position:relative;
+      overflow:hidden;
+      border-radius:1rem;
+      border:1px solid #e78c00;
+      transition:transform 0.2s ease,box-shadow 0.2s ease;
+      text-align:center;
     }
     .card-container:hover {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 12px 24px rgba(255, 140, 0, 0.3);
+      transform:translateY(-4px) scale(1.02);
+      box-shadow:0 12px 24px rgba(255,140,0,0.3);
     }
-
-    /* Imagine */
     .card-img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      border-top-left-radius: 1rem;
-      border-top-right-radius: 1rem;
+      width:100%;
+      height:200px;
+      object-fit:cover;
+      border-top-left-radius:1rem;
+      border-top-right-radius:1rem;
     }
-
-    /* Detalii card + handwriting + centrare */
     .card-details {
-      padding: 0.75rem;
-      text-align: center;
+      padding:0.75rem;
+      text-align:center;
     }
     .card-details h3 {
-      font-size: 1.1rem;
-      margin-bottom: 0.2rem;
-      font-family: 'Dancing Script', cursive;
+      font-size:1.1rem;
+      margin-bottom:0.2rem;
+      font-family:'Dancing Script',cursive;
     }
     .card-details p {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #f49032;
-      text-align: center;
+      font-size:1rem;
+      font-weight:600;
+      color:#f49032;
+      text-align:center;
     }
-
     @keyframes fadeInLeft {
-      0% {
-        transform: translateX(-50px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateX(0);
-        opacity: 1;
-      }
+      0%{transform:translateX(-50px);opacity:0;}
+      100%{transform:translateX(0);opacity:1;}
     }
     .fade-in-left {
-      animation: fadeInLeft 2s ease forwards;
+      animation:fadeInLeft 2s ease forwards;
     }
     .handwriting-title {
-      font-family: 'Dancing Script', cursive;
-      font-size: 2rem;
-      font-weight: 700;
-      text-align: center;
+      font-family:'Dancing Script',cursive;
+      font-size:2rem;
+      font-weight:700;
+      text-align:center;
     }
-
-    /* Centrăm textul în secțiuni – ex. “Alege Categoria” */
-    h2, h3, .text-center {
-      text-align: center;
-    }
-
-    /* Modal Detalii Produs */
     .modal-product {
-      background-color: #0d0d0d;
-      border: 2px solid #e78c00;
-      border-radius: 0.5rem;
-      position: relative;
-      max-height: 90vh;
-      overflow-y: auto;
+      background-color:#0d0d0d;
+      border:2px solid #e78c00;
+      border-radius:0.5rem;
+      position:relative;
+      max-height:90vh;
+      overflow-y:auto;
     }
   </style>
 </head>
 <body>
   <div id="app" class="h-screen flex overflow-hidden">
-    <!-- SIDEBAR -->
-    <aside
-      class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches"
-    >
-      <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">
-        Meniu Restaurant
-      </div>
+    <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
+      <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">Meniu Restaurant</div>
       <nav class="flex flex-col space-y-2">
-        <button
-          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
-          @click="activeTab = 'meniu'"
-        >
-          <span class="material-icons">restaurant_menu</span>
-          Meniu
+        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'">
+          <span class="material-icons">restaurant_menu</span>Meniu
         </button>
-        <button
-          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
-          @click="activeTab = 'puncte'"
-        >
-          <span class="material-icons">star</span>
-          Puncte
+        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='puncte'">
+          <span class="material-icons">star</span>Puncte
         </button>
-        <button
-          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
-          @click="activeTab = 'comenzileTale'"
-        >
-          <span class="material-icons">receipt</span>
-          Comenzile Tale
+        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale'">
+          <span class="material-icons">receipt</span>Comenzile Tale
         </button>
       </nav>
     </aside>
-
-    <!-- CONȚINUT PRINCIPAL -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-2">
-      <!-- Container principal -->
       <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
-        <!-- Buton meniu mobil (apare doar pe ecrane mici) -->
         <div class="flex items-center justify-between mb-4 md:hidden">
-          <div class="handwriting-title text-2xl font-bold fade-in-left">
-            Meniu Restaurant
-          </div>
-          <button
-            class="bg-black border-2 border-[#e78c00] hover:bg-[#e78c00] hover:text-black text-white p-2 rounded-full"
-            @click="isSidebarVisible = !isSidebarVisible"
-          >
+          <div class="handwriting-title text-2xl font-bold fade-in-left">Meniu Restaurant</div>
+          <button class="bg-black border-2 border-[#e78c00] hover:bg-[#e78c00] hover:text-black text-white p-2 rounded-full" @click="isSidebarVisible=!isSidebarVisible">
             <span class="material-icons">menu</span>
           </button>
         </div>
-
-        <!-- Sidebar mobil (slide-fade) -->
         <transition name="slide-fade">
-          <aside
-            v-if="isSidebarVisible"
-            class="absolute top-0 left-0 w-48 p-4 z-50 rounded-tr-lg rounded-br-lg sidebar scratches"
-          >
-            <button
-              class="text-white mb-2"
-              @click="isSidebarVisible = false"
-            >
+          <aside v-if="isSidebarVisible" class="absolute top-0 left-0 w-48 p-4 z-50 rounded-tr-lg rounded-br-lg sidebar scratches">
+            <button class="text-white mb-2" @click="isSidebarVisible=false">
               <span class="material-icons">close</span>
             </button>
             <nav class="flex flex-col space-y-2">
-              <button
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
-                @click="activeTab = 'meniu'; isSidebarVisible=false"
-              >
-                <span class="material-icons">restaurant_menu</span>
-                Meniu
+              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu';isSidebarVisible=false">
+                <span class="material-icons">restaurant_menu</span>Meniu
               </button>
-              <button
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
-                @click="activeTab = 'puncte'; isSidebarVisible=false"
-              >
-                <span class="material-icons">star</span>
-                Puncte
+              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='puncte';isSidebarVisible=false">
+                <span class="material-icons">star</span>Puncte
               </button>
-              <button
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
-                @click="activeTab = 'comenzileTale'; isSidebarVisible=false"
-              >
-                <span class="material-icons">receipt</span>
-                Comenzile Tale
+              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale';isSidebarVisible=false">
+                <span class="material-icons">receipt</span>Comenzile Tale
               </button>
             </nav>
           </aside>
         </transition>
-
-        <!-- TAB MENIU -->
-        <section v-if="activeTab === 'meniu'">
-          <!-- (Eliminat câmpul de introducere a ID-ului mesei) -->
-
-          <!-- Căutare -->
+        <section v-if="activeTab==='meniu'">
           <div class="flex items-center gap-4 mb-4">
-            <input
-              type="text"
-              placeholder="Caută produse..."
-              v-model="searchQuery"
-              class="bg-black text-gray-200 border border-[#e78c00] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[#e78c00] w-full md:w-1/2"
-            />
+            <input type="text" placeholder="Caută produse..." v-model="searchQuery" class="bg-black text-gray-200 border border-[#e78c00] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[#e78c00] w-full md:w-1/2"/>
           </div>
-
-          <!-- Rezultate căutare -->
           <div v-if="searchQuery.trim()">
-            <h2 class="text-xl font-semibold mb-4 text-center">
-              Rezultate pentru: "{{ searchQuery }}"
-            </h2>
-            <div v-if="displayedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              <div
-                v-for="product in displayedProducts"
-                :key="product.title"
-                class="card-container cursor-pointer"
-                @click="showProductDetails(product)"
-              >
+            <h2 class="text-xl font-semibold mb-4 text-center">Rezultate pentru: "{{searchQuery}}"</h2>
+            <div v-if="displayedProducts.length>0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div v-for="product in displayedProducts" :key="product.title" class="card-container cursor-pointer" @click="showProductDetails(product)">
                 <img :src="product.image" :alt="product.title" class="card-img"/>
                 <div class="card-details">
-                  <h3>{{ product.title }}</h3>
-                  <p>{{ product.price }} Lei</p>
+                  <h3>{{product.title}}</h3>
+                  <p>{{product.price}} Lei</p>
                 </div>
               </div>
             </div>
@@ -353,680 +234,342 @@
               <p class="text-center">Nu a fost găsit niciun produs care să corespundă căutării.</p>
             </div>
           </div>
-
-          <!-- CATEGORII / PRODUSE PE CATEGORIE -->
           <div v-else>
-            <!-- Lista de categorii -->
-            <div v-if="view === 'categorii'">
+            <div v-if="view==='categorii'">
               <h2 class="text-xl font-semibold mb-4 text-center">Alege Categoria</h2>
               <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                <div
-                  v-for="category in categories"
-                  :key="category.name"
-                  class="card-container cursor-pointer"
-                  @click="enterCategory(category.name)"
-                >
+                <div v-for="category in categories" :key="category.name" class="card-container cursor-pointer" @click="enterCategory(category.name)">
                   <img :src="category.image" :alt="category.name" class="card-img"/>
                   <div class="card-details">
-                    <h3>{{ renameCategory(category.name) }}</h3>
+                    <h3>{{renameCategory(category.name)}}</h3>
                   </div>
                 </div>
               </div>
             </div>
-
-            <!-- Lista de produse din categoria selectată -->
-            <div v-else-if="view === 'produse'">
-              <button class="btn-orange mb-4 rounded-full" @click="backToCategories">
-                Înapoi la Categorii
-              </button>
-              <h2 class="text-xl font-semibold mb-4 text-center">Produse ({{ currentProducts.length }})</h2>
+            <div v-else-if="view==='produse'">
+              <button class="btn-orange mb-4 rounded-full" @click="backToCategories">Înapoi la Categorii</button>
+              <h2 class="text-xl font-semibold mb-4 text-center">Produse ({{currentProducts.length}})</h2>
               <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                <div
-                  v-for="product in currentProducts"
-                  :key="product.title"
-                  class="card-container cursor-pointer"
-                  @click="showProductDetails(product)"
-                >
+                <div v-for="product in currentProducts" :key="product.title" class="card-container cursor-pointer" @click="showProductDetails(product)">
                   <img :src="product.image" :alt="product.title" class="card-img"/>
                   <div class="card-details">
-                    <h3>{{ product.title }}</h3>
-                    <p>{{ product.price }} Lei</p>
+                    <h3>{{product.title}}</h3>
+                    <p>{{product.price}} Lei</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-          <!-- MODAL Detalii Produs -->
-          <div
-            v-if="currentProduct"
-            class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
-          >
+          <div v-if="currentProduct" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
             <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
-              <button
-                class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[#e78c00]"
-                @click="currentProduct = null"
-              >
-                &times;
-              </button>
-              <img :src="currentProduct.image" :alt="currentProduct.title" class="w-full h-64 object-cover mb-4 rounded-lg" />
-              <h2 class="text-xl font-bold mb-2 handwriting-title">{{ currentProduct.title }}</h2>
-              <p class="text-[#f49032] font-bold text-lg mb-4">{{ currentProduct.price }} Lei</p>
-              <p class="text-gray-400 mb-4">{{ currentProduct.description }}</p>
+              <button class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[#e78c00]" @click="currentProduct=null">&times;</button>
+              <img :src="currentProduct.image" :alt="currentProduct.title" class="w-full h-64 object-cover mb-4 rounded-lg"/>
+              <h2 class="text-xl font-bold mb-2 handwriting-title">{{currentProduct.title}}</h2>
+              <p class="text-[#f49032] font-bold text-lg mb-4">{{currentProduct.price}} Lei</p>
+              <p class="text-gray-400 mb-4">{{currentProduct.description}}</p>
               <ul class="text-gray-300 mb-4">
-                <li
-                  v-for="ingredient in currentProduct.ingredients"
-                  :key="ingredient"
-                  class="list-disc ml-5"
-                >
-                  {{ ingredient }}
+                <li v-for="ingredient in currentProduct.ingredients" :key="ingredient" class="list-disc ml-5">
+                  {{ingredient}}
                 </li>
               </ul>
-              <button class="btn-orange rounded-full" @click="addToOrder(currentProduct)">
-                Adaugă în coș
-              </button>
+              <button class="btn-orange rounded-full" @click="addToOrder(currentProduct)">Adaugă în coș</button>
             </div>
           </div>
         </section>
-
-        <!-- TAB PUNCTE -->
-        <section v-else-if="activeTab === 'puncte'">
+        <section v-else-if="activeTab==='puncte'">
           <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
           <div class="bg-black p-4 rounded border border-[#e78c00] shadow max-w-md scratches mx-auto">
-            <div v-if="clientNumber === 0" class="mb-4">
-              <p class="text-gray-300 text-center">
-                Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
-              </p>
+            <div v-if="clientNumber===0" class="mb-4">
+              <p class="text-gray-300 text-center">Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!</p>
             </div>
             <div v-else>
               <p class="text-gray-300 mb-2 text-center">
-                Număr client: <span class="font-bold">#{{ clientNumber }}</span>
+                Număr client: <span class="font-bold">#{{clientNumber}}</span>
               </p>
             </div>
             <p class="text-gray-300 text-center">
-              Puncte acumulate:
-              <span class="font-bold text-[#f49032]">{{ clientPoints.toFixed(2) }}</span>
+              Puncte acumulate: <span class="font-bold text-[#f49032]">{{clientPoints.toFixed(2)}}</span>
             </p>
           </div>
         </section>
-
-        <!-- TAB COMENZILE TALE -->
-        <section v-else-if="activeTab === 'comenzileTale'">
+        <section v-else-if="activeTab==='comenzileTale'">
           <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
-          <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
-            Nu ai nicio comandă finalizată încă.
-          </div>
+          <div v-if="myOrders.length===0" class="text-gray-300 text-center">Nu ai nicio comandă finalizată încă.</div>
           <div v-else class="space-y-4">
-            <div
-              v-for="(order, idx) in myOrders"
-              :key="order.orderId"
-              class="bg-black p-4 rounded border border-[#e78c00] scratches"
-            >
-              <h3 class="text-lg font-semibold mb-2">
-                Comanda #{{ idx + 1 }}
-              </h3>
+            <div v-for="(order,idx) in myOrders" :key="order.orderId" class="bg-black p-4 rounded border border-[#e78c00] scratches">
+              <h3 class="text-lg font-semibold mb-2">Comanda #{{idx+1}}</h3>
               <ul class="list-disc list-inside text-gray-300">
-                <li
-                  v-for="(prod, pidx) in order.items"
-                  :key="pidx"
-                >
-                  {{ prod.name }} x {{ prod.quantity }}
-                  – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
+                <li v-for="(prod,pidx) in order.items" :key="pidx">
+                  {{prod.name}} x {{prod.quantity}} – {{(prod.price*prod.quantity).toFixed(2)}} Lei
                 </li>
               </ul>
-              <div class="mt-2 font-bold text-[#f49032]">
-                Total: {{ order.total }} Lei
-              </div>
-              <div class="text-sm text-gray-400">
-                ID comandă: {{ order.orderId }}
-              </div>
+              <div class="mt-2 font-bold text-[#f49032]">Total: {{order.total}} Lei</div>
+              <div class="text-sm text-gray-400">ID comandă: {{order.orderId}}</div>
             </div>
           </div>
         </section>
       </main>
-
-      <!-- Buton Coș (doar dacă există produse) -->
-      <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
-        <button
-          @click="toggleOrderBar"
-          class="btn-orange flex items-center relative rounded-full"
-          :class="{ 'animate-shake': isShaking }"
-        >
+      <div v-if="orders.length>0" class="fixed bottom-3 right-5 z-50">
+        <button @click="toggleOrderBar" class="btn-orange flex items-center relative rounded-full" :class="{'animate-shake':isShaking}">
           <span class="material-icons mr-2 text-white">shopping_cart</span>
-          <span class="text-white">Coș ({{ orders.length }})</span>
+          <span class="text-white">Coș ({{orders.length}})</span>
         </button>
       </div>
-
-      <!-- Bara COMANDA TA (slide-cart) -->
       <transition name="slide-cart">
-        <aside
-          v-show="isOrderOpen && orders.length > 0"
-          class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[#e78c00] p-4 overflow-y-auto scrollbar"
-          style="max-height:100vh;"
-        >
+        <aside v-show="isOrderOpen&&orders.length>0" class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[#e78c00] p-4 overflow-y-auto scrollbar" style="max-height:100vh;">
           <div class="flex flex-col">
             <h3 class="text-xl font-bold mb-4 text-center">Comanda Ta</h3>
-            <!-- Lista de produse din coș -->
-            <div
-              v-for="(order, index) in orders"
-              :key="index"
-              class="flex justify-between items-center bg-black border border-[#e78c00] p-4 rounded-lg mb-2 scratches"
-            >
+            <div v-for="(order,index) in orders" :key="index" class="flex justify-between items-center bg-black border border-[#e78c00] p-4 rounded-lg mb-2 scratches">
               <div class="flex flex-col">
-                <span class="font-bold">{{ order.name }}</span>
+                <span class="font-bold">{{order.name}}</span>
                 <div class="flex items-center gap-2 mt-1">
                   <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
-                  <span class="text-gray-400">x{{ order.quantity }}</span>
+                  <span class="text-gray-400">x{{order.quantity}}</span>
                   <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
                 </div>
               </div>
               <div>
-                <span class="text-[#f49032] font-bold">
-                  {{ (order.price * order.quantity).toFixed(2) }} Lei
-                </span>
+                <span class="text-[#f49032] font-bold">{{(order.price*order.quantity).toFixed(2)}} Lei</span>
               </div>
             </div>
-
-            <!-- Total + buton Finalizează Comanda dedesubt -->
             <div class="mt-4">
               <div class="flex justify-between items-center">
                 <span class="text-lg font-semibold">Total:</span>
-                <span class="text-[#f49032] text-xl font-bold">{{ total }}</span>
+                <span class="text-[#f49032] text-xl font-bold">{{total}}</span>
               </div>
-              <button class="btn-orange mt-4 rounded-full self-end" @click="checkout">
-                Finalizează Comanda
-              </button>
+              <button class="btn-orange mt-4 rounded-full self-end" @click="checkout">Finalizează Comanda</button>
             </div>
           </div>
         </aside>
       </transition>
     </div>
   </div>
-
-  <!-- Firebase + Vue Integration -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { 
-      getFirestore, 
-      doc, 
-      getDoc, 
-      setDoc, 
-      collection, 
-      addDoc, 
-      getDocs, 
-      query, 
-      where, 
-      serverTimestamp 
+    import {initializeApp} from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import {
+      getFirestore,doc,getDoc,setDoc,collection,addDoc,getDocs,query,where,serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-
-    /* Configurația Firebase (înlocuiește cu datele tale). */
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-      authDomain: "restaurantapp-d0256.firebaseapp.com",
-      projectId: "restaurantapp-d0256",
-      storageBucket: "restaurantapp-d0256.firebasestorage.app",
-      messagingSenderId: "275208346650",
-      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-      measurementId: "G-F44TB27G17"
-    };
-
-    const firebaseApp = initializeApp(firebaseConfig);
-    const db = getFirestore(firebaseApp);
-
-    // Funcție pt. a elimina diacritice (folosită la căutare)
-    function removeDiacritics(str) {
-      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    }
-
-    // Generăm un cod random ex. "X7VH5"
-    function generateSessionCode(length = 5) {
-      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-      let code = "";
-      for (let i = 0; i < length; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
+  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+  authDomain: "restaurantapp-d0256.firebaseapp.com",
+  projectId: "restaurantapp-d0256",
+  storageBucket: "restaurantapp-d0256.firebasestorage.app",
+  messagingSenderId: "275208346650",
+  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+  measurementId: "G-F44TB27G17"
+};
+    const firebaseApp=initializeApp(firebaseConfig);
+    const db=getFirestore(firebaseApp);
+    function removeDiacritics(str){return str.normalize("NFD").replace(/[\u0300-\u036f]/g,"");}
+    function generateSessionCode(length=5){
+      const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";let code="";
+      for(let i=0;i<length;i++){code+=chars.charAt(Math.floor(Math.random()*chars.length));}
       return code;
     }
-
-    // Obținem sau creăm un sessionCode la "sessions/tableId"
-    async function getOrCreateSessionCode(tableId) {
-      if (!tableId) {
-        throw new Error("Nu există parametru pentru masă în URL.");
-      }
-      const docRef = doc(db, "sessions", tableId);
-
-      try {
-        // Verificăm dacă documentul există deja în Firestore
-        const snap = await getDoc(docRef);
-
-        if (snap.exists()) {
-          const data = snap.data();
-
-          // Dacă există un sessionCode activ, îl folosim
-          if (data.sessionCode && data.status === "active") {
-            console.log(`Session code activ găsit pentru ${tableId}: ${data.sessionCode}`);
-            return data.sessionCode;
+    async function getOrCreateSessionCode(tableId){
+      if(!tableId){throw new Error("Nu există parametru pentru masă în URL.");}
+      const docRef=doc(db,"sessions",tableId);
+      try{
+        const snap=await getDoc(docRef);
+        if(snap.exists()){
+          const data=snap.data();
+          if(data.sessionCode&&data.status==="active"){return data.sessionCode;}
+          else{
+            const newSessionCode=generateSessionCode();
+            await setDoc(docRef,{sessionCode:newSessionCode,status:"active"},{merge:true});
+            return newSessionCode;
           }
-
-          // Dacă documentul există, dar sessionCode-ul nu este activ, generăm unul nou
-          const newSessionCode = generateSessionCode();
-          await setDoc(docRef, { sessionCode: newSessionCode, status: "active" }, { merge: true });
-          console.log(`Session code regenerat pentru ${tableId}: ${newSessionCode}`);
+        }else{
+          const newSessionCode=generateSessionCode();
+          await setDoc(docRef,{sessionCode:newSessionCode,status:"active"});
           return newSessionCode;
         }
-
-        // Dacă documentul nu există, creăm unul nou cu un sessionCode activ
-        const newSessionCode = generateSessionCode();
-        await setDoc(docRef, { sessionCode: newSessionCode, status: "active" });
-        console.log(`Session code nou creat pentru ${tableId}: ${newSessionCode}`);
-        return newSessionCode;
-
-      } catch (error) {
-        console.error(`Eroare la obținerea/crearea session code pentru ${tableId}:`, error);
+      }catch(error){
+        console.error(Eroare la obținerea/crearea session code pentru ${tableId}:,error);
         throw new Error("A apărut o eroare la obținerea/crearea session code-ului.");
       }
     }
-
-    const app = Vue.createApp({
-      data() {
-        return {
-          // Sidebar mobil
-          isSidebarVisible: false,
-
-          // Coș
-          isOrderOpen: false,
-          isShaking: false,
-
-          activeTab: 'meniu',
-          view: 'categorii',
-
-          currentProducts: [],
-          currentProduct: null,
-          searchQuery: '',
-
-          clientNumber: 0,
-          clientPoints: 0,
-          isFirstOrder: true,
-
-          // Masa + session code
-          tableId: '',
-          sessionCode: '',
-
-          categories: [
-            { name: 'brunch', image: 'https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp' },
-            { name: 'soups',  image: 'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg' },
-            { name: 'pasta',  image: 'https://i.giphy.com/dZRlFW1sbFEpG.webp' },
-            { name: 'main',   image: 'https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp' },
-            { name: 'desserts', image: 'https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp' },
-            { name: 'drinks',   image: 'https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp' },
+    const app=Vue.createApp({
+      data(){return{
+        isSidebarVisible:false,isOrderOpen:false,isShaking:false,
+        activeTab:"meniu",view:"categorii",
+        currentProducts:[],currentProduct:null,searchQuery:"",
+        clientNumber:0,clientPoints:0,isFirstOrder:true,
+        tableId:"",sessionCode:"",
+        categories:[
+          {name:"brunch",image:"https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp"},
+          {name:"soups",image:"https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg"},
+          {name:"pasta",image:"https://i.giphy.com/dZRlFW1sbFEpG.webp"},
+          {name:"main",image:"https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp"},
+          {name:"desserts",image:"https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp"},
+          {name:"drinks",image:"https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp"}
+        ],
+        products:{
+          brunch:[
+            {title:"Toast cu avocado",description:"Avocado, toast, ouă poșate, roșii cherry.",price:25,image:"https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp",ingredients:["Avocado","Toast","Ouă","Roșii cherry"]},
+            {title:"Ouă Benedict",description:"Ouă poșate, sos hollandaise, șuncă.",price:30,image:"https://i.giphy.com/X3E37CTy55jNK.webp",ingredients:["Ouă","Hollandaise","Șuncă"]},
+            {title:"Clătite",description:"Clătite, sirop de arțar, fructe proaspete.",price:20,image:"https://i.giphy.com/5zu5JovduWFBS.webp",ingredients:["Făină","Ouă","Sirop de arțar","Fructe"]}
           ],
-          products: {
-            brunch: [
-              {
-                title: 'Toast cu avocado',
-                description: 'Avocado, toast, ouă poșate, roșii cherry.',
-                price: 25,
-                image: 'https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp',
-                ingredients: ['Avocado', 'Toast', 'Ouă', 'Roșii cherry'],
-              },
-              {
-                title: 'Ouă Benedict',
-                description: 'Ouă poșate, sos hollandaise, șuncă.',
-                price: 30,
-                image: 'https://i.giphy.com/X3E37CTy55jNK.webp',
-                ingredients: ['Ouă', 'Hollandaise', 'Șuncă'],
-              },
-              {
-                title: 'Clătite',
-                description: 'Clătite, sirop de arțar, fructe proaspete.',
-                price: 20,
-                image: 'https://i.giphy.com/5zu5JovduWFBS.webp',
-                ingredients: ['Făină', 'Ouă', 'Sirop de arțar', 'Fructe'],
-              },
-            ],
-            soups: [
-              {
-                title: 'Ciorbă de burtă',
-                description: 'Tradițională, smântână, ardei iute.',
-                price: 18,
-                image: 'https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg',
-                ingredients: ['Burtă', 'Smântână', 'Ardei iute'],
-              },
-              {
-                title: 'Supă cremă de roșii',
-                description: 'Roșii proaspete, crutoane, busuioc.',
-                price: 15,
-                image: 'https://www.lalena.ro/images/uploaded/600x_Supa-crema-de-rosii-108.jpg',
-                ingredients: ['Roșii', 'Crutoane', 'Busuioc'],
-              },
-              {
-                title: 'Ciorbă de legume',
-                description: 'Legume proaspete, zeamă de lămâie.',
-                price: 12,
-                image: 'https://www.prestij.ro/uploads/produse/1440/94--ciorba-taraneasca-de-legume.jpg',
-                ingredients: ['Morcovi', 'Cartofi', 'Ceapă', 'Apio'],
-              },
-            ],
-            pasta: [
-              {
-                title: 'Spaghete Carbonara',
-                description: 'Spaghetti, bacon, parmezan, ouă.',
-                price: 28,
-                image: 'https://i.giphy.com/dZRlFW1sbFEpG.webp',
-                ingredients: ['Spaghetti', 'Bacon', 'Parmezan', 'Ouă'],
-              },
-              {
-                title: 'Penne Arrabbiata',
-                description: 'Penne, sos de roșii picant, usturoi.',
-                price: 25,
-                image: 'https://i.giphy.com/f0N7csaAc6t60OmXkm.webp',
-                ingredients: ['Penne', 'Roșii', 'Usturoi', 'Ardei iute'],
-              },
-              {
-                title: 'Tagliatelle Alfredo',
-                description: 'Tagliatelle, sos Alfredo, pui.',
-                price: 30,
-                image: 'https://i.giphy.com/xOML6s8aBmAtlLwujM.webp',
-                ingredients: ['Tagliatelle', 'Pui', 'Parmezan', 'Smântână'],
-              },
-            ],
-            main: [
-              {
-                title: 'Mușchiuleț de porc',
-                description: 'Mușchiuleț, cartofi copți, mozzarella, bacon.',
-                price: 45,
-                image: 'https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp',
-                ingredients: ['Porc', 'Cartofi', 'Mozzarella', 'Bacon'],
-              },
-              {
-                title: 'Tomahawk porc',
-                description: 'Carne de porc, cartofi, sos brun.',
-                price: 41,
-                image: 'https://i.giphy.com/KDskfOILt91T2.webp',
-                ingredients: ['Tomahawk', 'Cartofi', 'Sos brun'],
-              },
-              {
-                title: 'Ceafă sfărâmată',
-                description: 'Ceafă, piure de cartofi, ardei copți.',
-                price: 36,
-                image: 'https://i.giphy.com/l378puWI9Fpi4OApO.webp',
-                ingredients: ['Ceafă porc', 'Piure', 'Ardei copți'],
-              },
-            ],
-            desserts: [
-              {
-                title: 'Tiramisu',
-                description: 'Prăjitură italiană cu cafea, mascarpone.',
-                price: 20,
-                image: 'https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp',
-                ingredients: ['Cafea', 'Mascarpone', 'Pișcoturi'],
-              },
-              {
-                title: 'Pavlova',
-                description: 'Bezea, frișcă, fructe de pădure.',
-                price: 18,
-                image: 'https://i.giphy.com/iiwu9bTOZ1HiM.webp',
-                ingredients: ['Bezea', 'Frișcă', 'Fructe de pădure'],
-              },
-              {
-                title: 'Cheesecake',
-                description: 'Cheesecake cu dulceață de căpșuni.',
-                price: 22,
-                image: 'https://i.giphy.com/Xi2UAW7kTQvHa.webp',
-                ingredients: ['Brânză', 'Biscuiți', 'Căpșuni'],
-              },
-            ],
-            drinks: [
-              {
-                title: 'Cocktail',
-                description: 'Băutură răcoritoare cu fructe proaspete și alcool fin.',
-                price: 28,
-                image: 'https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp',
-                ingredients: ['Rom', 'Fructe', 'Gheață'],
-              },
-              {
-                title: 'Ciocolată caldă',
-                description: 'Cremă fierbinte de ciocolată cu topping de frișcă.',
-                price: 15,
-                image: 'https://i.giphy.com/hPFKu8dKRRNgQ.webp',
-                ingredients: ['Ciocolată', 'Lapte', 'Frișcă'],
-              },
-              {
-                title: 'Bere',
-                description: 'Bere artizanală rece și spumoasă.',
-                price: 10,
-                image: 'https://i.giphy.com/RkhJPJQJ2GPn02GMy6.webp',
-                ingredients: ['Malț', 'Hamei', 'Apă'],
-              },
-            ],
-          },
-          orders: [],
-          myOrders: [],
-        };
-      },
-      computed: {
-        displayedProducts() {
-          const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
-          if (!q) {
-            return this.view === 'produse' ? this.currentProducts : [];
-          }
-          const results = [];
-          for (const catKey in this.products) {
-            for (const prod of this.products[catKey]) {
-              const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
-              const descNoDiac  = removeDiacritics(prod.description.toLowerCase());
-              if (titleNoDiac.includes(q) || descNoDiac.includes(q)) {
-                results.push(prod);
-              }
+          soups:[
+            {title:"Ciorbă de burtă",description:"Tradițională, smântână, ardei iute.",price:18,image:"https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg",ingredients:["Burtă","Smântână","Ardei iute"]},
+            {title:"Supă cremă de roșii",description:"Roșii proaspete, crutoane, busuioc.",price:15,image:"https://www.lalena.ro/images/uploaded/600x_Supa-crema-de-rosii-108.jpg",ingredients:["Roșii","Crutoane","Busuioc"]},
+            {title:"Ciorbă de legume",description:"Legume proaspete, zeamă de lămâie.",price:12,image:"https://www.prestij.ro/uploads/produse/1440/94--ciorba-taraneasca-de-legume.jpg",ingredients:["Morcovi","Cartofi","Ceapă","Apio"]}
+          ],
+          pasta:[
+            {title:"Spaghete Carbonara",description:"Spaghetti,bacon,parmezan,ouă.",price:28,image:"https://i.giphy.com/dZRlFW1sbFEpG.webp",ingredients:["Spaghetti","Bacon","Parmezan","Ouă"]},
+            {title:"Penne Arrabbiata",description:"Penne, sos de roșii picant, usturoi.",price:25,image:"https://i.giphy.com/f0N7csaAc6t60OmXkm.webp",ingredients:["Penne","Roșii","Usturoi","Ardei iute"]},
+            {title:"Tagliatelle Alfredo",description:"Tagliatelle, sos Alfredo, pui.",price:30,image:"https://i.giphy.com/xOML6s8aBmAtlLwujM.webp",ingredients:["Tagliatelle","Pui","Parmezan","Smântână"]}
+          ],
+          main:[
+            {title:"Mușchiuleț de porc",description:"Mușchiuleț, cartofi copți, mozzarella, bacon.",price:45,image:"https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp",ingredients:["Porc","Cartofi","Mozzarella","Bacon"]},
+            {title:"Tomahawk porc",description:"Carne de porc, cartofi, sos brun.",price:41,image:"https://i.giphy.com/KDskfOILt91T2.webp",ingredients:["Tomahawk","Cartofi","Sos brun"]},
+            {title:"Ceafă sfărâmată",description:"Ceafă, piure de cartofi, ardei copți.",price:36,image:"https://i.giphy.com/l378puWI9Fpi4OApO.webp",ingredients:["Ceafă porc","Piure","Ardei copți"]}
+          ],
+          desserts:[
+            {title:"Tiramisu",description:"Prăjitură italiană cu cafea, mascarpone.",price:20,image:"https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp",ingredients:["Cafea","Mascarpone","Pișcoturi"]},
+            {title:"Pavlova",description:"Bezea, frișcă, fructe de pădure.",price:18,image:"https://i.giphy.com/iiwu9bTOZ1HiM.webp",ingredients:["Bezea","Frișcă","Fructe de pădure"]},
+            {title:"Cheesecake",description:"Cheesecake cu dulceață de căpșuni.",price:22,image:"https://i.giphy.com/Xi2UAW7kTQvHa.webp",ingredients:["Brânză","Biscuiți","Căpșuni"]}
+          ],
+          drinks:[
+            {title:"Cocktail",description:"Băutură răcoritoare cu fructe proaspete și alcool fin.",price:28,image:"https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp",ingredients:["Rom","Fructe","Gheață"]},
+            {title:"Ciocolată caldă",description:"Cremă fierbinte de ciocolată cu topping de frișcă.",price:15,image:"https://i.giphy.com/hPFKu8dKRRNgQ.webp",ingredients:["Ciocolată","Lapte","Frișcă"]},
+            {title:"Bere",description:"Bere artizanală rece și spumoasă.",price:10,image:"https://i.giphy.com/RkhJPJQJ2GPn02GMy6.webp",ingredients:["Malț","Hamei","Apă"]}
+          ]
+        },
+        orders:[],
+        myOrders:[]
+      }},
+      computed:{
+        displayedProducts(){
+          const q=removeDiacritics(this.searchQuery.toLowerCase().trim());
+          if(!q){return this.view==="produse"?this.currentProducts:[];}
+          const results=[];
+          for(const catKey in this.products){
+            for(const prod of this.products[catKey]){
+              const titleNoDiac=removeDiacritics(prod.title.toLowerCase());
+              const descNoDiac=removeDiacritics(prod.description.toLowerCase());
+              if(titleNoDiac.includes(q)||descNoDiac.includes(q)){results.push(prod);}
             }
           }
           return results;
         },
-        total() {
-          return this.orders
-            .reduce((sum, o) => sum + (o.price * o.quantity), 0)
-            .toFixed(2);
-        },
+        total(){
+          return this.orders.reduce((sum,o)=>sum+(o.price*o.quantity),0).toFixed(2);
+        }
       },
-      methods: {
-        renameCategory(cat) {
-          const dict = {
-            brunch: 'Mic Dejun',
-            soups: 'Supe',
-            pasta: 'Paste',
-            main: 'Fel Principal',
-            desserts: 'Deserturi',
-            drinks: 'Băuturi',
+      methods:{
+        renameCategory(cat){
+          const dict={
+            brunch:"Mic Dejun",
+            soups:"Supe",
+            pasta:"Paste",
+            main:"Fel Principal",
+            desserts:"Deserturi",
+            drinks:"Băuturi"
           };
-          return dict[cat] || cat;
+          return dict[cat]||cat;
         },
-        enterCategory(categoryName) {
-          this.currentProducts = this.products[categoryName] || [];
-          this.view = 'produse';
-          this.searchQuery = '';
-          this.$nextTick(() => {
-            window.scrollTo(0, 0);
-          });
+        enterCategory(categoryName){
+          this.currentProducts=this.products[categoryName]||[];
+          this.view="produse";
+          this.searchQuery="";
+          this.$nextTick(()=>{window.scrollTo(0,0);});
         },
-        backToCategories() {
-          this.view = 'categorii';
-          this.currentProduct = null;
-          this.searchQuery = '';
-          this.$nextTick(() => {
-            window.scrollTo(0, 0);
-          });
+        backToCategories(){
+          this.view="categorii";
+          this.currentProduct=null;
+          this.searchQuery="";
+          this.$nextTick(()=>{window.scrollTo(0,0);});
         },
-        showProductDetails(product) {
-          this.currentProduct = product;
+        showProductDetails(product){this.currentProduct=product;},
+        addToOrder(product){
+          const existing=this.orders.find(o=>o.name===product.title);
+          if(existing){existing.quantity++;}
+          else{this.orders.push({name:product.title,price:product.price,quantity:1});}
+          this.currentProduct=null;this.isShaking=true;
+          setTimeout(()=>{this.isShaking=false;},500);
         },
-        addToOrder(product) {
-          const existing = this.orders.find(o => o.name === product.title);
-          if (existing) {
-            existing.quantity++;
-          } else {
-            this.orders.push({ name: product.title, price: product.price, quantity: 1 });
-          }
-          this.currentProduct = null;
-          // Animație shake
-          this.isShaking = true;
-          setTimeout(() => {
-            this.isShaking = false;
-          }, 500);
-        },
-        incrementQuantity(index) {
-          this.orders[index].quantity++;
-        },
-        decrementQuantity(index) {
-          if (this.orders[index].quantity > 1) {
-            this.orders[index].quantity--;
-          }
-        },
-        toggleOrderBar() {
-          this.isOrderOpen = !this.isOrderOpen;
-        },
-
-        // Obține sau creează un sessionCode
-        async getOrCreateSessionCode(tableId) {
-          const docRef = doc(db, "sessions", tableId);
-          const snap = await getDoc(docRef);
-
-          let sessionCode = null;
-          if (snap.exists()) {
-            const data = snap.data();
-            // Dacă sessionCode există și e "active", folosim același
-            if (data.sessionCode && data.status === "active") {
-              sessionCode = data.sessionCode;
-            } else {
-              // generăm nou
-              sessionCode = generateSessionCode();
-              await setDoc(docRef, { sessionCode, status: "active" });
-            }
-          } else {
-            // creăm documentul
-            sessionCode = generateSessionCode();
-            await setDoc(docRef, { sessionCode, status: "active" });
-          }
-          return sessionCode;
-        },
-
-        // Finalizează Comanda
-        async checkout() {
-          // 1) Luăm/generăm sessionCode din Firestore (sessions/tableId)
-          this.sessionCode = await getOrCreateSessionCode(this.tableId);
-
-          // 2) Calculăm puncte (5% din total)
-          let pointsToAdd = 0;
-          for (const item of this.orders) {
-            pointsToAdd += (item.price * item.quantity * 0.05);
-          }
-          this.clientPoints += pointsToAdd;
-
-          // 3) Creăm obiectul comenzii
-          const orderData = {
-            tableId: this.tableId,
-            sessionCode: this.sessionCode,
-            clientNumber: this.clientNumber,
-            items: this.orders,
-            total: parseFloat(this.total),
-            status: "open",
-            timestamp: serverTimestamp(),
+        incrementQuantity(index){this.orders[index].quantity++;},
+        decrementQuantity(index){if(this.orders[index].quantity>1){this.orders[index].quantity--;}},
+        toggleOrderBar(){this.isOrderOpen=!this.isOrderOpen;},
+        async checkout(){
+          this.sessionCode=await getOrCreateSessionCode(this.tableId);
+          let pointsToAdd=0;
+          for(const item of this.orders){pointsToAdd+=(item.price*item.quantity*0.05);}
+          this.clientPoints+=pointsToAdd;
+          const orderData={
+            tableId:this.tableId,
+            sessionCode:this.sessionCode,
+            clientNumber:this.clientNumber,
+            items:this.orders,
+            total:parseFloat(this.total),
+            status:"open",
+            timestamp:serverTimestamp()
           };
-
-          try {
-            // 4) Salvăm comanda în Firestore
-            await addDoc(collection(db, "orders"), orderData);
-
-            // Golește coșul
-            this.orders = [];
-            this.isOrderOpen = false;
-
-            // 5) Redirecționează la confirm.html?sessionCode=...
-            const baseUrl = window.location.origin;
-            window.location.href = `${baseUrl}/confirm.html?sessionCode=${this.sessionCode}`;
-          } catch (err) {
-            console.error("Eroare la salvarea comenzii:", err);
-            console.log("Session code:", this.sessionCode);
+          try{
+            await addDoc(collection(db,"orders"),orderData);
+            this.orders=[];
+            this.isOrderOpen=false;
+            const urlParams=new URLSearchParams(window.location.search);
+            const masaParam=urlParams.get("masa");
+            const baseUrl=window.location.origin;
+            window.location.href=${baseUrl}/confirm.html?sessionCode=${this.sessionCode}&masa=${masaParam||""};
+          }catch(err){
+            console.error("Eroare la salvarea comenzii:",err);
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
-
-        // Preia comenzile deja plasate (pe baza clientNumber)
         async fetchOrders() {
-          try {
-            if (this.clientNumber === 0) {
-              this.myOrders = [];
-              return;
-            }
-            const qRef = query(
-              collection(db, "orders"),
-              where("clientNumber", "==", this.clientNumber)
-            );
-            const snap = await getDocs(qRef);
-            this.myOrders = [];
-            snap.forEach((docSnap) => {
-              const data = docSnap.data();
-              data.orderId = docSnap.id;
-              this.myOrders.push(data);
-            });
-          } catch (e) {
-            console.error("Eroare la preluarea comenzilor:", e);
-          }
-        },
+  try {
+    if (this.clientNumber === 0) {
+      this.myOrders = [];
+      return;
+    }
+    // Adăugăm sortarea descrescătoare după timestamp
+    const qRef = query(
+      collection(db, "orders"),
+      where("clientNumber", "==", this.clientNumber),
+      orderBy("timestamp", "desc") // Sortare descrescătoare
+    );
+
+    const snap = await getDocs(qRef);
+    this.myOrders = [];
+    snap.forEach((docSnap) => {
+      const data = docSnap.data();
+      data.orderId = docSnap.id;
+      this.myOrders.push(data);
+    });
+  } catch (e) {
+    console.error("Eroare la preluarea comenzilor:", e);
+  }
+}
       },
-      mounted() {
-        // Obținem parametru "masa" din URL:
-        const urlParams = new URLSearchParams(window.location.search);
-        const masaParam = urlParams.get('masa');
-        if (masaParam) {
-          this.tableId = `Masa numărul ${masaParam}`;
-        } else {
-          // fallback - dacă nu există parametru, default la "Masa numărul 1" (sau ce vrei tu)
-          this.tableId = 'Masa numărul 1';
+      mounted(){
+        const urlParams=new URLSearchParams(window.location.search);
+        const masaParam=urlParams.get("masa");
+        if(masaParam){this.tableId=Masa numărul ${masaParam};}
+        else{this.tableId="Masa numărul 1";}
+        const storedNumber=localStorage.getItem("clientNumber");
+        if(storedNumber){this.clientNumber=parseInt(storedNumber);if(this.clientNumber>0){this.isFirstOrder=false;}}
+        else{
+          const randomNum=Math.floor(Math.random()*90000)+10000;
+          this.clientNumber=randomNum;
+          localStorage.setItem("clientNumber",randomNum);
+          this.isFirstOrder=false;
         }
-
-        // CITIM clientNumber din localStorage
-        const storedNumber = localStorage.getItem('clientNumber');
-        if (storedNumber) {
-          this.clientNumber = parseInt(storedNumber);
-          if (this.clientNumber > 0) {
-            this.isFirstOrder = false;
-          }
-        } else {
-          const randomNum = Math.floor(Math.random() * 90000) + 10000;
-          this.clientNumber = randomNum;
-          localStorage.setItem('clientNumber', randomNum);
-          this.isFirstOrder = false;
-        }
-
-        // CITIM punctele stocate
-        const storedPoints = localStorage.getItem('clientPoints');
-        if (storedPoints) {
-          this.clientPoints = parseFloat(storedPoints);
-        }
-
-        // CITIM comenzile stocate local
-        const storedMyOrders = localStorage.getItem('myOrders');
-        if (storedMyOrders) {
-          this.myOrders = JSON.parse(storedMyOrders);
-        }
-
-        // Preluăm comenzile din Firestore (pentru clientNumber)
+        const storedPoints=localStorage.getItem("clientPoints");
+        if(storedPoints){this.clientPoints=parseFloat(storedPoints);}
+        const storedMyOrders=localStorage.getItem("myOrders");
+        if(storedMyOrders){this.myOrders=JSON.parse(storedMyOrders);}
         this.fetchOrders();
       },
-      watch: {
-        clientPoints(newVal) {
-          localStorage.setItem('clientPoints', newVal);
-        },
-        clientNumber(newVal) {
-          localStorage.setItem('clientNumber', newVal);
-        },
-        myOrders(newVal) {
-          localStorage.setItem('myOrders', JSON.stringify(newVal));
-        },
-      },
+      watch:{
+        clientPoints(newVal){localStorage.setItem("clientPoints",newVal);},
+        clientNumber(newVal){localStorage.setItem("clientNumber",newVal);},
+        myOrders(newVal){localStorage.setItem("myOrders",JSON.stringify(newVal));}
+      }
     });
-
-    app.mount('#app');
+    app.mount("#app");
   </script>
 </body>
 </html>
