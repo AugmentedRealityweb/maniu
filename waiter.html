@@ -164,10 +164,11 @@
           manualTableId: "",      // Căutare manuală
           currentTableId: "",     // Masa curentă
           currentSessionCode: "", // Codul sesiunii curente
-          orders: [],             // Comenzi open ale mesei curente
+          orders: [],             // Comenzi "open" ale mesei curente
         };
       },
       computed: {
+        // Calcul total masă (suma totală a tuturor comenzilor open pt acea masă)
         totalTable() {
           let sum = 0;
           for (const ord of this.orders) {
@@ -198,7 +199,7 @@
           }
         },
 
-        // 2) Găsește direct un document "sessions/tableId"
+        // 2) Caută manual un "sessions/tableId"
         async findSession(tableId) {
           if (!tableId.trim()) {
             alert("Te rog introdu un ID masă valid!");
@@ -223,7 +224,7 @@
           }
           this.currentTableId = tableId.trim();
           this.currentSessionCode = data.sessionCode;
-          // Preluăm comenzile open
+          // Preluăm comenzile "open" aferente
           await this.loadOrdersBySession(this.currentSessionCode);
         },
 
@@ -231,7 +232,6 @@
         async showOrders(tableId, sessionCode) {
           this.currentTableId = tableId;
           this.currentSessionCode = sessionCode;
-          // Încărcăm comenzile
           await this.loadOrdersBySession(sessionCode);
         },
 
@@ -254,37 +254,36 @@
           }
         },
 
-        // 5) Finalizează masa => setăm "sessions/tableId" => sessionCode=null, status="closed"
-        //    plus setăm pt "orders" => status="closed" unde sessionCode=sCode
-        //    + Acordăm puncte clientului.
+        // 5) Finalizează masa => set sessions/tableId => sessionCode:null, status="closed"
+        //    plus set orders => status="closed" unde sessionCode=sCode
+        //    + Acordăm puncte clientului (colecția "clients")
         async finalizeTable(tableId) {
           if (!confirm(`Ești sigur că vrei să finalizezi masa ${tableId}?`)) {
             return;
           }
           try {
-            // 5a) Luăm sessionCode curent => updatăm comenzile "open" => "closed"
             const sCode = this.currentSessionCode;
             if (!sCode) {
               alert("Nu există un sessionCode pt masa curentă!");
               return;
             }
 
-            // Găsim toate comenzile "open" cu sessionCode = sCode
+            // Găsim toate comenzile open cu sessionCode = sCode
             const ordersRef = collection(db, "orders");
             const openQuery = query(ordersRef, where("sessionCode", "==", sCode), where("status", "==", "open"));
             const snap = await getDocs(openQuery);
 
-            // Pentru fiecare comandă, o setăm pe "closed" și acordăm puncte
+            // Pentru fiecare comandă, setăm status="closed" și acordăm puncte
             for (const docSnap of snap.docs) {
               const ordData = docSnap.data();
               const ordId = docSnap.id;
               
               // ---- Acordare puncte de fidelitate ----
-              // Suma e ordData.total, deci punctele reprezintă 5% din total.
+              // Suma e ordData.total, deci 5% din total => points
               const points = ordData.total * 0.05;
               const clientNr = ordData.clientNumber; 
               if (clientNr) {
-                // Actualizăm / Creăm documentul clientului => "clients/clientNr"
+                // Documentul "clients/clientNr"
                 const clientDocRef = doc(db, "clients", clientNr.toString());
                 const clientSnap = await getDoc(clientDocRef);
                 if (clientSnap.exists()) {
@@ -293,28 +292,28 @@
                   const newPoints = oldPoints + points;
                   await updateDoc(clientDocRef, { points: newPoints });
                 } else {
-                  // Creăm document cu puncte
+                  // Creăm document cu puncte = points
                   await setDoc(clientDocRef, { points: points });
                 }
               }
-              // --------------------------------------
+              // -------------------------------------
 
-              // Setăm comanda la "closed"
+              // Comanda devine "closed"
               const ordRef = doc(db, "orders", ordId);
               await updateDoc(ordRef, { status: "closed" });
             }
 
-            // 5b) Setăm sessions/tableId => { sessionCode:null, status:"closed" }
+            // 5b) Masa devine "closed"
             const docRef_ = doc(db, "sessions", tableId);
             await updateDoc(docRef_, { sessionCode: null, status: "closed" });
 
             alert(`Masa ${tableId} a fost închisă și punctele de fidelitate au fost acordate!`);
-            // Resetare
+
+            // Resetare locală
             this.currentTableId = "";
             this.currentSessionCode = "";
             this.orders = [];
-            // Re-afișăm openTables
-            this.fetchOpenTables();
+            this.fetchOpenTables(); // Re-afișăm mesele open
           } catch (e) {
             console.error("Eroare la finalizeTable:", e);
             alert("Eroare la finalizarea mesei!");
@@ -322,7 +321,7 @@
         }
       },
       mounted() {
-        // Opțional: încărcăm direct openTables
+        // Opțional: încărcăm direct openTables la pornirea paginii
         this.fetchOpenTables();
       }
     });
