@@ -111,7 +111,7 @@
               v-for="(item, iidx) in ord.items"
               :key="iidx"
             >
-              {{ item.name }} x {{ item.quantity }} – {{ (item.price*item.quantity).toFixed(2) }} Lei
+              {{ item.name }} x {{ item.quantity }} – {{ (item.price * item.quantity).toFixed(2) }} Lei
             </li>
           </ul>
           <div class="font-bold mt-1 text-[#f49032]">
@@ -143,16 +143,16 @@
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
     import { createApp } from "https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js";
 
-    /* Configurarea Firebase (înlocuiește cu datele tale) */
+    /* Configurarea Firebase */
     const firebaseConfig = {
-  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-  authDomain: "restaurantapp-d0256.firebaseapp.com",
-  projectId: "restaurantapp-d0256",
-  storageBucket: "restaurantapp-d0256.firebasestorage.app",
-  messagingSenderId: "275208346650",
-  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-  measurementId: "G-F44TB27G17"
-};
+      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+      authDomain: "restaurantapp-d0256.firebaseapp.com",
+      projectId: "restaurantapp-d0256",
+      storageBucket: "restaurantapp-d0256.firebasestorage.app",
+      messagingSenderId: "275208346650",
+      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+      measurementId: "G-F44TB27G17"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -204,8 +204,8 @@
             alert("Te rog introdu un ID masă valid!");
             return;
           }
-          const docRef = doc(db, "sessions", tableId.trim());
-          const snap = await getDoc(docRef);
+          const docRef_ = doc(db, "sessions", tableId.trim());
+          const snap = await getDoc(docRef_);
           if (!snap.exists()) {
             alert("Nu există nicio sesiune pt această masă!");
             this.currentTableId = "";
@@ -256,30 +256,59 @@
 
         // 5) Finalizează masa => setăm "sessions/tableId" => sessionCode=null, status="closed"
         //    plus setăm pt "orders" => status="closed" unde sessionCode=sCode
+        //    + Acordăm puncte clientului.
         async finalizeTable(tableId) {
           if (!confirm(`Ești sigur că vrei să finalizezi masa ${tableId}?`)) {
             return;
           }
           try {
-            // 5a) Setăm sessions/tableId => { sessionCode:null, status:"closed" }
-            const docRef = doc(db, "sessions", tableId);
-            await updateDoc(docRef, { sessionCode: null, status: "closed" });
-
-            // 5b) Luăm sessionCode curent => setăm orders => status="closed"
+            // 5a) Luăm sessionCode curent => updatăm comenzile "open" => "closed"
             const sCode = this.currentSessionCode;
             if (!sCode) {
               alert("Nu există un sessionCode pt masa curentă!");
-            } else {
-              // Toate comenzile open cu sessionCode => setăm status="closed"
-              const cRef = collection(db, "orders");
-              const qRef = query(cRef, where("sessionCode", "==", sCode), where("status", "==", "open"));
-              const snap = await getDocs(qRef);
-              for (const docSnap of snap.docs) {
-                const ordRef = doc(db, "orders", docSnap.id);
-                await updateDoc(ordRef, { status: "closed" });
-              }
+              return;
             }
-            alert(`Masa ${tableId} a fost închisă!`);
+
+            // Găsim toate comenzile "open" cu sessionCode = sCode
+            const ordersRef = collection(db, "orders");
+            const openQuery = query(ordersRef, where("sessionCode", "==", sCode), where("status", "==", "open"));
+            const snap = await getDocs(openQuery);
+
+            // Pentru fiecare comandă, o setăm pe "closed" și acordăm puncte
+            for (const docSnap of snap.docs) {
+              const ordData = docSnap.data();
+              const ordId = docSnap.id;
+              
+              // ---- Acordare puncte de fidelitate ----
+              // Suma e ordData.total, deci punctele reprezintă 5% din total.
+              const points = ordData.total * 0.05;
+              const clientNr = ordData.clientNumber; 
+              if (clientNr) {
+                // Actualizăm / Creăm documentul clientului => "clients/clientNr"
+                const clientDocRef = doc(db, "clients", clientNr.toString());
+                const clientSnap = await getDoc(clientDocRef);
+                if (clientSnap.exists()) {
+                  // Creștem punctele existente
+                  const oldPoints = clientSnap.data().points || 0;
+                  const newPoints = oldPoints + points;
+                  await updateDoc(clientDocRef, { points: newPoints });
+                } else {
+                  // Creăm document cu puncte
+                  await setDoc(clientDocRef, { points: points });
+                }
+              }
+              // --------------------------------------
+
+              // Setăm comanda la "closed"
+              const ordRef = doc(db, "orders", ordId);
+              await updateDoc(ordRef, { status: "closed" });
+            }
+
+            // 5b) Setăm sessions/tableId => { sessionCode:null, status:"closed" }
+            const docRef_ = doc(db, "sessions", tableId);
+            await updateDoc(docRef_, { sessionCode: null, status: "closed" });
+
+            alert(`Masa ${tableId} a fost închisă și punctele de fidelitate au fost acordate!`);
             // Resetare
             this.currentTableId = "";
             this.currentSessionCode = "";
