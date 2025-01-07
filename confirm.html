@@ -78,14 +78,14 @@
       Asigură-te că e identică cu ce ai în index.html
     */
     const firebaseConfig = {
-  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-  authDomain: "restaurantapp-d0256.firebaseapp.com",
-  projectId: "restaurantapp-d0256",
-  storageBucket: "restaurantapp-d0256.firebasestorage.app",
-  messagingSenderId: "275208346650",
-  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-  measurementId: "G-F44TB27G17"
-};
+      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+      authDomain: "restaurantapp-d0256.firebaseapp.com",
+      projectId: "restaurantapp-d0256",
+      storageBucket: "restaurantapp-d0256.firebasestorage.app",
+      messagingSenderId: "275208346650",
+      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+      measurementId: "G-F44TB27G17"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -118,6 +118,7 @@
 
         let totalAll = 0;
         let htmlRows = "";
+        let orderIndex = 1;
 
         snap.forEach(docSnap => {
           const data = docSnap.data();
@@ -129,8 +130,9 @@
           });
           totalAll += subTotal;
 
-          // Afișăm un heading "Comanda: docSnap.id" (opțional)
-          htmlRows += `<h3 class="text-lg font-semibold mt-3 mb-2">Comanda #${docSnap.id}</h3>`;
+          // Afișăm un heading "Comanda #1", "Comanda #2", etc.
+          htmlRows += `<h3 class="text-lg font-semibold mt-3 mb-2">Comanda #${orderIndex}</h3>`;
+          orderIndex++;
 
           items.forEach(item => {
             const thisSum = item.price * item.quantity;
