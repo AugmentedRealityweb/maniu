@@ -119,6 +119,8 @@
     const orderTotalElem  = document.getElementById("orderTotal");
     const backLinkElem    = document.getElementById("backLinkElem");
 
+    console.log("[DEBUG] confirm.html param sessionCode=", sessionCode, "masa=", masaNumber);
+
     if (sessionCode) {
       sessionCodeElem.textContent = "Codul Sesiunii: " + sessionCode;
     } else {
@@ -126,13 +128,13 @@
     }
 
     let backLink = window.location.origin;
-    // Reconstruim link-ul către index, cu parametru masa
     if (masaNumber) {
       backLink += `/?masa=${masaNumber}`;
     }
     backLinkElem.href = backLink;
 
     const userId = localStorage.getItem("userId");
+    console.log("[DEBUG] confirm.html local userId=", userId);
 
     async function fetchSessionOrders() {
       if (!sessionCode || !userId) return;
@@ -146,11 +148,13 @@
         );
 
         const snap = await getDocs(qRef);
+        console.log("[DEBUG] confirm.html snap.size=", snap.size);
 
         let totalAll = 0;
         let htmlRows = "";
         snap.forEach((docSnap) => {
           const data = docSnap.data();
+          console.log("[DEBUG] confirm.html orderDoc:", docSnap.id, data);
           const items = data.items || [];
 
           items.forEach((item) => {
@@ -165,7 +169,7 @@
             `;
           });
 
-          // Linie despărțitoare între comenzile multiple
+          // Linie despărțitoare între comenzi (dacă userId-ul a plasat mai multe)
           htmlRows += `<hr class="border-gray-700 my-2"/>`;
         });
 
