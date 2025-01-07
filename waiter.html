@@ -76,11 +76,11 @@
 
     <!-- Introducere manuala a tableId (dacă vrei să cauți direct masa) -->
     <div class="mb-4">
-      <label class="block mb-2">Caută o masă (ex: Masa16):</label>
+      <label class="block mb-2">Caută o masă (ex: "Masa4"):</label>
       <input
         v-model="manualTableId"
         type="text"
-        placeholder="Masa16"
+        placeholder="Masa4"
         class="px-4 py-2 rounded text-black"
       />
       <button class="btn ml-2" @click="findSession(manualTableId)">Caută</button>
@@ -160,8 +160,8 @@
     const waiterApp = createApp({
       data() {
         return {
-          openTables: [],         // ex. [{tableId:"Masa16", sessionCode:"X7VH5"}, ...]
-          manualTableId: "",      // Căutare manuală
+          openTables: [],         // ex. [{tableId:"Masa4", sessionCode:"1234"}, ...]
+          manualTableId: "",      // Căutare manuală (ex: "Masa4")
           currentTableId: "",     // Masa curentă
           currentSessionCode: "", // Codul sesiunii curente
           orders: [],             // Comenzi "open" ale mesei curente
@@ -189,7 +189,7 @@
             snap.forEach(docSnap => {
               const data = docSnap.data();
               this.openTables.push({
-                tableId: docSnap.id,
+                tableId: docSnap.id,        // ex: "Masa4"
                 sessionCode: data.sessionCode
               });
             });
@@ -202,7 +202,7 @@
         // 2) Caută manual un "sessions/tableId"
         async findSession(tableId) {
           if (!tableId.trim()) {
-            alert("Te rog introdu un ID masă valid!");
+            alert("Te rog introdu un ID masă valid! (ex: Masa4)");
             return;
           }
           const docRef_ = doc(db, "sessions", tableId.trim());
@@ -313,7 +313,8 @@
             this.currentTableId = "";
             this.currentSessionCode = "";
             this.orders = [];
-            this.fetchOpenTables(); // Re-afișăm mesele open
+            // Re-afișăm mesele open
+            this.fetchOpenTables();
           } catch (e) {
             console.error("Eroare la finalizeTable:", e);
             alert("Eroare la finalizarea mesei!");
