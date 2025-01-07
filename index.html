@@ -519,30 +519,19 @@
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
-        async fetchOrders() {
-  try {
-    if (this.clientNumber === 0) {
-      this.myOrders = [];
-      return;
-    }
-    // Adăugăm sortarea descrescătoare după timestamp
-    const qRef = query(
-      collection(db, "orders"),
-      where("clientNumber", "==", this.clientNumber),
-      orderBy("timestamp", "desc") // Sortare descrescătoare
-    );
-
-    const snap = await getDocs(qRef);
-    this.myOrders = [];
-    snap.forEach((docSnap) => {
-      const data = docSnap.data();
-      data.orderId = docSnap.id;
-      this.myOrders.push(data);
-    });
-  } catch (e) {
-    console.error("Eroare la preluarea comenzilor:", e);
-  }
-}
+        async fetchOrders(){
+          try{
+            if(this.clientNumber===0){this.myOrders=[];return;}
+            const qRef=query(collection(db,"orders"),where("clientNumber","==",this.clientNumber));
+            const snap=await getDocs(qRef);
+            this.myOrders=[];
+            snap.forEach(docSnap=>{
+              const data=docSnap.data();data.orderId=docSnap.id;this.myOrders.push(data);
+            });
+          }catch(e){
+            console.error("Eroare la preluarea comenzilor:",e);
+          }
+        }
       },
       mounted(){
         const urlParams=new URLSearchParams(window.location.search);
