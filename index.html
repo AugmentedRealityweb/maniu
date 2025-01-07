@@ -361,11 +361,10 @@
     const firebaseApp=initializeApp(firebaseConfig);
     const db=getFirestore(firebaseApp);
     function removeDiacritics(str){return str.normalize("NFD").replace(/[\u0300-\u036f]/g,"");}
-    function generateSessionCode(length=5){
-      const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";let code="";
-      for(let i=0;i<length;i++){code+=chars.charAt(Math.floor(Math.random()*chars.length));}
-      return code;
-    }
+    function generateSessionCode() {
+  const code = Math.floor(1000 + Math.random() * 9000).toString(); // Generează un număr aleator între 1000 și 9999
+  return code;
+}
     async function getOrCreateSessionCode(tableId){
       if(!tableId){throw new Error("Nu există parametru pentru masă în URL.");}
       const docRef=doc(db,"sessions",tableId);
