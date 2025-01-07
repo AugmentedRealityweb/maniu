@@ -125,9 +125,10 @@
       sessionCodeElem.textContent = "Nu există niciun cod de sesiune!";
     }
 
-    let backLink = "https://meniu-test.vercel.app/";
+    let backLink = window.location.origin;
+    // Reconstruim link-ul către index, cu parametru masa
     if (masaNumber) {
-      backLink += `?masa=${masaNumber}`;
+      backLink += `/?masa=${masaNumber}`;
     }
     backLinkElem.href = backLink;
 
@@ -164,6 +165,7 @@
             `;
           });
 
+          // Linie despărțitoare între comenzile multiple
           htmlRows += `<hr class="border-gray-700 my-2"/>`;
         });
 
