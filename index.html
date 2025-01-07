@@ -320,8 +320,8 @@
                 Produse ({{ currentProducts.length }})
               </h2>
               <div 
-                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" 
-                style="max-height: 400px; overflow-y: auto;"
+                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-full"
+  style="overflow-y: auto; overflow-x: hidden;"
               >
                 <div 
                   v-for="product in currentProducts" 
