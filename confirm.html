@@ -43,7 +43,7 @@
     <h1 class="text-2xl font-bold text-center mb-6">Comanda Ta</h1>
 
     <div class="bg-gray-800 p-4 rounded shadow">
-      <!-- Afișăm sessionCode, ex: "Cod Sesiune: X7VH5" -->
+      <!-- Afișăm sessionCode -->
       <h2 id="sessionCodeElem" class="text-xl font-semibold mb-2"></h2>
       
       <!-- Lista de produse -->
@@ -99,7 +99,7 @@
     const itemsListElem   = document.getElementById("itemsList");
     const orderTotalElem  = document.getElementById("orderTotal");
 
-    // Afișăm codul
+    // Afișăm codul sesiunii
     if (sessionCode) {
       sessionCodeElem.textContent = "Codul Sesiunii: " + sessionCode;
     } else {
@@ -131,19 +131,19 @@
           totalAll += subTotal;
 
           // Afișăm un heading "Comanda #1", "Comanda #2", etc.
-          htmlRows += <h3 class="text-lg font-semibold mt-3 mb-2">Comanda #${orderIndex}</h3>;
+          htmlRows += `<h3 class="text-lg font-semibold mt-3 mb-2">Comanda #${orderIndex}</h3>`;
           orderIndex++;
 
           items.forEach(item => {
             const thisSum = item.price * item.quantity;
-            htmlRows += 
+            htmlRows += `
               <div class="product-row">
                 <span class="product-name">${item.name} x ${item.quantity}</span>
                 <span class="price">${thisSum.toFixed(2)} Lei</span>
               </div>
-            ;
+            `;
           });
-          htmlRows += <hr class="border-gray-700 my-2"/>;
+          htmlRows += `<hr class="border-gray-700 my-2"/>`;
         });
 
         itemsListElem.innerHTML = htmlRows;
