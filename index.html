@@ -276,12 +276,13 @@
               Rezultate pentru: "{{ searchQuery }}"
             </h2>
             <div v-if="displayedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              <div 
-                v-for="product in displayedProducts" 
-                :key="product.title" 
-                class="card-container cursor-pointer"
-                v-scroll-fade-up <!-- DIRECTIVA AICI -->
-                @click="showProductDetails(product)"
+              <div
+  v-for="product in displayedProducts"
+  :key="product.title"
+  class="card-container cursor-pointer"
+  v-scroll-fade-up
+  <!-- DIRECTIVA AICI -->
+  @click="showProductDetails(product)"
               >
                 <img :src="product.image" :alt="product.title" class="card-img"/>
                 <div class="card-details">
