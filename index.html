@@ -183,6 +183,41 @@
       max-height: 90vh;
       overflow-y: auto;
     }
+
+    /* STIL PENTRU TABUL SOCIAL */
+    .table-zone {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 1rem;
+      justify-items: center;
+      margin-top: 2rem;
+    }
+    .table-circle {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      background: #f49032;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: bold;
+    }
+    .table-message {
+      position: absolute;
+      top: -30px; /* Deasupra cercului */
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      color: #fff;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.85rem;
+      max-width: 100px;
+      text-align: center;
+      z-index: 10;
+    }
   </style>
 </head>
 <body>
@@ -199,7 +234,7 @@
         <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale'">
           <span class="material-icons">receipt</span>Comenzile Tale
         </button>
-        <!-- TAB NOU: Social -->
+        <!-- TAB SOCIAL -->
         <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='social'">
           <span class="material-icons">group</span>Social
         </button>
@@ -247,7 +282,7 @@
               >
                 <span class="material-icons">receipt</span>Comenzile Tale
               </button>
-              <!-- TAB NOU: Social (mobil) -->
+              <!-- TAB SOCIAL (mobil) -->
               <button 
                 class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
                 @click="activeTab='social'; isSidebarVisible=false"
@@ -258,8 +293,7 @@
           </aside>
         </transition>
 
-        <!-- Tabloul principal de conținut -->
-        <!-- TAB: Meniu -->
+        <!-- TAB MENIU -->
         <section v-if="activeTab === 'meniu'">
           <!-- Căutare produse -->
           <div class="flex items-center gap-4 mb-4">
@@ -271,7 +305,7 @@
             />
           </div>
 
-          <!-- Rezultatele căutării, dacă există query -->
+          <!-- Rezultatele căutării -->
           <div v-if="searchQuery.trim()">
             <h2 class="text-xl font-semibold mb-4 text-center">
               Rezultate pentru: "{{ searchQuery }}"
@@ -296,7 +330,7 @@
               </p>
             </div>
           </div>
-          <!-- Afișarea categoriilor sau produselor, dacă nu se caută nimic -->
+          <!-- Afișare categorii / produse -->
           <div v-else>
             <div v-if="view === 'categorii'">
               <h2 class="text-xl font-semibold mb-4 text-center">Alege Categoria</h2>
@@ -338,7 +372,7 @@
             </div>
           </div>
 
-          <!-- Modalul de detalii al produsului curent -->
+          <!-- Modal detalii produs -->
           <div 
             v-if="currentProduct" 
             class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
@@ -378,7 +412,7 @@
           </div>
         </section>
 
-        <!-- TAB: Puncte -->
+        <!-- TAB Puncte -->
         <section v-else-if="activeTab === 'puncte'">
           <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
           <div class="bg-black p-4 rounded border border-[#e78c00] shadow max-w-md scratches mx-auto">
@@ -401,7 +435,7 @@
           </div>
         </section>
 
-        <!-- TAB: Comenzile Tale -->
+        <!-- TAB Comenzile Tale -->
         <section v-else-if="activeTab === 'comenzileTale'">
           <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
           <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
@@ -427,7 +461,7 @@
               <div class="mt-2 font-bold text-[#f49032]">
                 Total: {{ order.total }} Lei
               </div>
-              <!-- Afisăm și codul sesiunii aici -->
+              <!-- ID-ul comenzii & codul sesiunii -->
               <div class="text-sm text-gray-400">
                 ID comandă: {{ order.orderId }} | Cod sesiune: {{ order.sessionCode }}
               </div>
@@ -435,35 +469,75 @@
           </div>
         </section>
 
-        <!-- TAB: Social (NOU) -->
+        <!-- TAB Social -->
         <section v-else-if="activeTab === 'social'">
-          <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
-          <div class="mx-auto max-w-xl">
-            <!-- Afișare mesaje existente -->
+          <!-- Verifică dacă avem username -->
+          <div v-if="!usernameSet" class="text-center">
+            <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
+            <p class="mb-4 text-gray-300 max-w-md mx-auto">
+              Bun venit în zona de socializare! <br />
+              Te rugăm să îți introduci numele înainte de a putea vedea conversația sau a trimite mesaje.
+            </p>
+            <div class="flex flex-col items-center max-w-sm mx-auto">
+              <input 
+                type="text" 
+                v-model="usernameInput" 
+                placeholder="Introduceți numele..." 
+                class="bg-black text-gray-200 border border-[#e78c00] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[#e78c00] w-full mb-4"
+              />
+              <button class="btn-orange rounded-full" @click="setUsername">
+                Continuă
+              </button>
+            </div>
+          </div>
+          <div v-else>
+            <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
+            <!-- Chat global -->
             <div class="mb-4 bg-black border border-[#e78c00] p-4 rounded scratches max-h-60 overflow-y-auto">
               <div 
-                v-for="(message, index) in messages" 
-                :key="index" 
+                v-for="message in chatMessages" 
+                :key="message.id"
                 class="mb-2"
               >
                 <span class="font-bold text-[#f49032]">{{ message.name }}</span>:
                 <span class="text-gray-300 ml-1">{{ message.text }}</span>
               </div>
             </div>
-            <!-- Adăugare mesaj nou -->
-            <div class="flex gap-2">
+            <!-- Formular mesaj nou -->
+            <div class="flex gap-2 max-w-xl mx-auto">
               <input 
                 v-model="newMessage" 
                 class="bg-black text-gray-200 border border-[#e78c00] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[#e78c00] flex-1" 
                 placeholder="Scrie un mesaj..." 
               />
-              <button class="btn-orange rounded-full" @click="postMessage">Trimite</button>
+              <button class="btn-orange rounded-full" @click="postMessage">
+                Trimite
+              </button>
+            </div>
+
+            <!-- Zona cu 12 mese (cercuri) -->
+            <div class="table-zone">
+              <div 
+                v-for="tableNum in 12" 
+                :key="tableNum" 
+                class="table-circle"
+              >
+                <!-- Afișăm numărul mesei -->
+                Masa {{ tableNum }}
+                <!-- Afișăm ultimul mesaj, dacă există, deasupra mesei -->
+                <div 
+                  v-if="lastMessageForTable(tableNum)" 
+                  class="table-message"
+                >
+                  {{ lastMessageForTable(tableNum).text }}
+                </div>
+              </div>
             </div>
           </div>
         </section>
       </main>
 
-      <!-- Butonul pentru coșul de cumpărături (vizibil doar când există produse în coș) -->
+      <!-- Buton Coș (dacă avem produse) -->
       <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
         <button 
           @click="toggleOrderBar" 
@@ -475,14 +549,13 @@
         </button>
       </div>
 
-      <!-- Bara laterală de comenzi (coșul de cumpărături) -->
+      <!-- Bara laterală coș -->
       <transition name="slide-cart">
         <aside 
           v-show="isOrderOpen && orders.length > 0" 
           class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[#e78c00] p-4 overflow-y-auto scrollbar" 
           style="max-height: 100vh;"
         >
-          <!-- Aici am adăugat butonul "X" în partea dreaptă, pentru a închide (minimiza) coșul -->
           <div class="relative flex flex-col">
             <button 
               class="absolute top-2 right-2 text-gray-300 text-2xl hover:text-[#e78c00]" 
@@ -502,7 +575,7 @@
                   <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
                   <span class="text-gray-400">x{{ order.quantity }}</span>
                   <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
-                  <!-- NOU: Buton pentru ștergere produs -->
+                  <!-- Ștergere produs -->
                   <button 
                     class="bg-red-600 hover:bg-red-800 text-white px-2 py-1 rounded-full" 
                     @click="removeItem(index)"
@@ -544,11 +617,13 @@
       getDocs,
       query,
       where,
-      serverTimestamp
+      serverTimestamp,
+      onSnapshot,
+      orderBy
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2GUW2wM5dxghoVt2bv0-6ZyWqQ",
+      apiKey: "AIzaSy...",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
       projectId: "restaurantapp-d0256",
       storageBucket: "restaurantapp-d0256.firebasestorage.app",
@@ -613,12 +688,15 @@
           isFirstOrder: true,
           tableId: "",
           sessionCode: "",
-          // Mesaje pentru tab-ul Social
-          messages: [
-            { name: "Client #1", text: "Salutare tuturor! Poftă bună! \u{1F60B}" },
-            { name: "Client #2", text: "Bună! Cine mai vrea să comandăm un desert împreună?" }
-          ],
+          orders: [],
+          myOrders: [],
+
+          /* SOCIAL */
+          usernameInput: "",
+          usernameSet: false,  // devine true după ce utilizatorul își setează numele
           newMessage: "",
+          chatMessages: [],    // toate mesajele încărcate din Firestore
+
           categories: [
             {
               name: "brunch",
@@ -784,9 +862,7 @@
                 ingredients: ["Malț", "Hamei", "Apă"]
               }
             ]
-          },
-          orders: [],
-          myOrders: []
+          }
         };
       },
       computed: {
@@ -864,7 +940,6 @@
             this.isShaking = false;
           }, 500);
         },
-        // NOU: Funcție de ștergere din coș
         removeItem(index) {
           this.orders.splice(index, 1);
         },
@@ -897,9 +972,9 @@
 
             // Creează datele comenzii
             const orderData = {
-              userId, // Identificatorul unic al utilizatorului
+              userId,
               tableId: this.tableId,
-              sessionCode: this.sessionCode, // Session code
+              sessionCode: this.sessionCode,
               clientNumber: this.clientNumber,
               items: this.orders,
               total: parseFloat(this.total),
@@ -907,14 +982,14 @@
               timestamp: serverTimestamp()
             };
 
-            // Adaugă comanda în Firestore
+            // Salvează comanda în Firestore
             await addDoc(collection(db, "orders"), orderData);
 
-            // Resetează coșul de cumpărături și închide bara de comenzi
+            // Resetează coșul și închide
             this.orders = [];
             this.isOrderOpen = false;
 
-            // Redirecționează către pagina confirm.html cu parametrii necesari
+            // Redirecționează către confirm.html
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
@@ -939,22 +1014,65 @@
             snap.forEach(docSnap => {
               const data = docSnap.data();
               data.orderId = docSnap.id;
-              // Observă că docSnap conține sessionCode; îl afișăm în "Comenzile Tale"
               this.myOrders.push(data);
             });
           } catch (e) {
             console.error("Eroare la preluarea comenzilor:", e);
           }
         },
-        // Metodă simplă pentru a posta un mesaj în tab-ul Social
-        postMessage() {
-          if (this.newMessage.trim() === "") return;
-          // Generăm un userId simplu, dacă nu există deja
-          const userId = localStorage.getItem("userId") || `Anonim_${Date.now()}`;
-          localStorage.setItem("userId", userId);
 
-          this.messages.push({ name: userId, text: this.newMessage });
-          this.newMessage = "";
+        /* ---- Funcții pentru Social ---- */
+        setUsername() {
+          if (!this.usernameInput.trim()) return;
+          // Salvăm user-ul local, astfel încât să nu trebuiască reintrodus
+          localStorage.setItem("username", this.usernameInput.trim());
+          this.usernameSet = true;
+        },
+        async loadMessages() {
+          // Ascultăm în timp real colecția "chatMessages" ordonată după timestamp
+          const qRef = query(collection(db, "chatMessages"), orderBy("timestamp", "asc"));
+          onSnapshot(qRef, (snapshot) => {
+            const msgs = [];
+            snapshot.forEach((doc) => {
+              const data = doc.data();
+              msgs.push({
+                id: doc.id,
+                ...data
+              });
+            });
+            this.chatMessages = msgs;
+          });
+        },
+        async postMessage() {
+          if (!this.newMessage.trim()) return;
+
+          try {
+            // putem lua numele din localStorage
+            const userName = localStorage.getItem("username");
+            if (!userName) return;
+
+            const masaParam = new URLSearchParams(window.location.search).get("masa") || "0";
+            const tableNumber = parseInt(masaParam) || 0; 
+            // ex: dacă user-ul e la masa 5, să reținem și masa
+
+            const docData = {
+              name: userName,
+              text: this.newMessage.trim(),
+              tableNumber: tableNumber,
+              timestamp: serverTimestamp()
+            };
+            await addDoc(collection(db, "chatMessages"), docData);
+            this.newMessage = "";
+          } catch (err) {
+            console.error("Eroare la trimiterea mesajului:", err);
+          }
+        },
+        // Returnează ultimul mesaj de la o masă
+        lastMessageForTable(tableNum) {
+          // Filtrăm chatMessages pentru a găsi ultimul mesaj cu tableNumber = tableNum
+          const filtered = this.chatMessages.filter(m => m.tableNumber === tableNum);
+          if (filtered.length === 0) return null;
+          return filtered[filtered.length - 1];
         }
       },
       mounted() {
@@ -989,9 +1107,27 @@
           this.myOrders = JSON.parse(storedMyOrders);
         }
 
+        // Verificăm dacă user-ul și-a setat deja numele
+        const storedUsername = localStorage.getItem("username");
+        if (storedUsername) {
+          this.usernameSet = true;
+          this.usernameInput = storedUsername;
+        }
+
         this.fetchOrders();
+
+        // Dacă avem deja username, putem încărca mesajele
+        if (this.usernameSet) {
+          this.loadMessages();
+        }
       },
       watch: {
+        usernameSet(newVal) {
+          // De îndată ce se setează user-ul, încărcăm chat-ul
+          if (newVal) {
+            this.loadMessages();
+          }
+        },
         clientPoints(newVal) {
           localStorage.setItem("clientPoints", newVal);
         },
