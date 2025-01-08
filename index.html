@@ -103,7 +103,13 @@
     }
     .scratches {
       background-color: #000;
-      background-image: repeating-linear-gradient(45deg, rgba(231,140,0,0.15), rgba(231,140,0,0.15) 2px, transparent 2px, transparent 20px);
+      background-image: repeating-linear-gradient(
+        45deg,
+        rgba(231,140,0,0.15),
+        rgba(231,140,0,0.15) 2px,
+        transparent 2px,
+        transparent 20px
+      );
     }
     .sidebar {
       border-right: 2px solid #e78c00;
@@ -183,31 +189,31 @@
       max-height: 90vh;
       overflow-y: auto;
     }
-
-    /* NOU: CSS pentru efectul de scroll fade-up */
-    .scroll-fade-up {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: all 0.6s ease;
-    }
-    .scroll-fade-up.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
   </style>
 </head>
 <body>
   <div id="app" class="h-screen flex overflow-hidden">
     <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
-      <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">Meniu Restaurant</div>
+      <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">
+        Meniu Restaurant
+      </div>
       <nav class="flex flex-col space-y-2">
-        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'">
+        <button
+          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
+          @click="activeTab='meniu'"
+        >
           <span class="material-icons">restaurant_menu</span>Meniu
         </button>
-        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='puncte'">
+        <button
+          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
+          @click="activeTab='puncte'"
+        >
           <span class="material-icons">star</span>Puncte
         </button>
-        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale'">
+        <button
+          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
+          @click="activeTab='comenzileTale'"
+        >
           <span class="material-icons">receipt</span>Comenzile Tale
         </button>
       </nav>
@@ -217,9 +223,11 @@
       <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
         <!-- Butonul și titlul doar pentru mobile -->
         <div class="flex items-center justify-between mb-4 md:hidden">
-          <div class="handwriting-title text-2xl font-bold fade-in-left">Meniu Restaurant</div>
-          <button 
-            class="bg-black border-2 border-[#e78c00] hover:bg-[#e78c00] hover:text-black text-white p-2 rounded-full" 
+          <div class="handwriting-title text-2xl font-bold fade-in-left">
+            Meniu Restaurant
+          </div>
+          <button
+            class="bg-black border-2 border-[#e78c00] hover:bg-[#e78c00] hover:text-black text-white p-2 rounded-full"
             @click="isSidebarVisible = !isSidebarVisible"
           >
             <span class="material-icons">menu</span>
@@ -228,28 +236,28 @@
 
         <!-- Sidebar pe mobile (afișat condiționat) -->
         <transition name="slide-fade">
-          <aside 
-            v-if="isSidebarVisible" 
+          <aside
+            v-if="isSidebarVisible"
             class="absolute top-0 left-0 w-48 p-4 z-50 rounded-tr-lg rounded-br-lg sidebar scratches"
           >
             <button class="text-white mb-2" @click="isSidebarVisible = false">
               <span class="material-icons">close</span>
             </button>
             <nav class="flex flex-col space-y-2">
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+              <button
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
                 @click="activeTab='meniu'; isSidebarVisible=false"
               >
                 <span class="material-icons">restaurant_menu</span>Meniu
               </button>
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+              <button
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
                 @click="activeTab='puncte'; isSidebarVisible=false"
               >
                 <span class="material-icons">star</span>Puncte
               </button>
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+              <button
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
                 @click="activeTab='comenzileTale'; isSidebarVisible=false"
               >
                 <span class="material-icons">receipt</span>Comenzile Tale
@@ -262,10 +270,10 @@
         <section v-if="activeTab === 'meniu'">
           <!-- Căutare produse -->
           <div class="flex items-center gap-4 mb-4">
-            <input 
-              type="text" 
-              placeholder="Caută produse..." 
-              v-model="searchQuery" 
+            <input
+              type="text"
+              placeholder="Caută produse..."
+              v-model="searchQuery"
               class="bg-black text-gray-200 border border-[#e78c00] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[#e78c00] w-full md:w-1/2"
             />
           </div>
@@ -275,15 +283,17 @@
             <h2 class="text-xl font-semibold mb-4 text-center">
               Rezultate pentru: "{{ searchQuery }}"
             </h2>
-            <div v-if="displayedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div
+              v-if="displayedProducts.length > 0"
+              class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+            >
               <div
-  v-for="product in displayedProducts"
-  :key="product.title"
-  class="card-container cursor-pointer"
-  v-scroll-fade-up
-  @click="showProductDetails(product)"
+                v-for="product in displayedProducts"
+                :key="product.title"
+                class="card-container cursor-pointer"
+                @click="showProductDetails(product)"
               >
-                <img :src="product.image" :alt="product.title" class="card-img"/>
+                <img :src="product.image" :alt="product.title" class="card-img" />
                 <div class="card-details">
                   <h3>{{ product.title }}</h3>
                   <p>{{ product.price }} Lei</p>
@@ -299,16 +309,17 @@
           <!-- Afișarea categoriilor sau produselor, dacă nu se caută nimic -->
           <div v-else>
             <div v-if="view === 'categorii'">
-              <h2 class="text-xl font-semibold mb-4 text-center">Alege Categoria</h2>
+              <h2 class="text-xl font-semibold mb-4 text-center">
+                Alege Categoria
+              </h2>
               <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                <div 
-                  v-for="category in categories" 
-                  :key="category.name" 
+                <div
+                  v-for="category in categories"
+                  :key="category.name"
                   class="card-container cursor-pointer"
-                  v-scroll-fade-up
                   @click="enterCategory(category.name)"
                 >
-                  <img :src="category.image" :alt="category.name" class="card-img"/>
+                  <img :src="category.image" :alt="category.name" class="card-img" />
                   <div class="card-details">
                     <h3>{{ renameCategory(category.name) }}</h3>
                   </div>
@@ -316,21 +327,23 @@
               </div>
             </div>
             <div v-else-if="view === 'produse'">
-              <button class="btn-orange mb-4 rounded-full" @click="backToCategories">
+              <button
+                class="btn-orange mb-4 rounded-full"
+                @click="backToCategories"
+              >
                 Înapoi la Categorii
               </button>
               <h2 class="text-xl font-semibold mb-4 text-center">
                 Produse ({{ currentProducts.length }})
               </h2>
               <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                <div 
-                  v-for="product in currentProducts" 
-                  :key="product.title" 
+                <div
+                  v-for="product in currentProducts"
+                  :key="product.title"
                   class="card-container cursor-pointer"
-                  v-scroll-fade-up
                   @click="showProductDetails(product)"
                 >
-                  <img :src="product.image" :alt="product.title" class="card-img"/>
+                  <img :src="product.image" :alt="product.title" class="card-img" />
                   <div class="card-details">
                     <h3>{{ product.title }}</h3>
                     <p>{{ product.price }} Lei</p>
@@ -341,23 +354,25 @@
           </div>
 
           <!-- Modalul de detalii al produsului curent -->
-          <div 
-            v-if="currentProduct" 
+          <div
+            v-if="currentProduct"
             class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
           >
             <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
-              <button 
-                class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[#e78c00]" 
+              <button
+                class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[#e78c00]"
                 @click="currentProduct = null"
               >
                 &times;
               </button>
-              <img 
-                :src="currentProduct.image" 
-                :alt="currentProduct.title" 
+              <img
+                :src="currentProduct.image"
+                :alt="currentProduct.title"
                 class="w-full h-64 object-cover mb-4 rounded-lg"
               />
-              <h2 class="text-xl font-bold mb-2 handwriting-title">{{ currentProduct.title }}</h2>
+              <h2 class="text-xl font-bold mb-2 handwriting-title">
+                {{ currentProduct.title }}
+              </h2>
               <p class="text-[#f49032] font-bold text-lg mb-4">
                 {{ currentProduct.price }} Lei
               </p>
@@ -365,9 +380,9 @@
                 {{ currentProduct.description }}
               </p>
               <ul class="text-gray-300 mb-4">
-                <li 
-                  v-for="ingredient in currentProduct.ingredients" 
-                  :key="ingredient" 
+                <li
+                  v-for="ingredient in currentProduct.ingredients"
+                  :key="ingredient"
                   class="list-disc ml-5"
                 >
                   {{ ingredient }}
@@ -395,7 +410,7 @@
               </p>
             </div>
             <p class="text-gray-300 text-center">
-              Puncte acumulate: 
+              Puncte acumulate:
               <span class="font-bold text-[#f49032]">
                 {{ clientPoints.toFixed(2) }}
               </span>
@@ -410,26 +425,26 @@
             Nu ai nicio comandă finalizată încă.
           </div>
           <div v-else class="space-y-4">
-            <div 
-              v-for="(order, idx) in myOrders" 
-              :key="order.orderId" 
+            <div
+              v-for="(order, idx) in myOrders"
+              :key="order.orderId"
               class="bg-black p-4 rounded border border-[#e78c00] scratches"
             >
               <h3 class="text-lg font-semibold mb-2">
                 Comanda #{{ idx + 1 }}
               </h3>
               <ul class="list-disc list-inside text-gray-300">
-                <li 
-                  v-for="(prod, pidx) in order.items" 
+                <li
+                  v-for="(prod, pidx) in order.items"
                   :key="pidx"
                 >
-                  {{ prod.name }} x {{ prod.quantity }} – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
+                  {{ prod.name }} x {{ prod.quantity }} –
+                  {{ (prod.price * prod.quantity).toFixed(2) }} Lei
                 </li>
               </ul>
               <div class="mt-2 font-bold text-[#f49032]">
                 Total: {{ order.total }} Lei
               </div>
-              <!-- Afisăm și codul sesiunii aici -->
               <div class="text-sm text-gray-400">
                 ID comandă: {{ order.orderId }} | Cod sesiune: {{ order.sessionCode }}
               </div>
@@ -440,9 +455,9 @@
 
       <!-- Butonul pentru coșul de cumpărături (vizibil doar când există produse în coș) -->
       <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
-        <button 
-          @click="toggleOrderBar" 
-          class="btn-orange flex items-center relative rounded-full" 
+        <button
+          @click="toggleOrderBar"
+          class="btn-orange flex items-center relative rounded-full"
           :class="{'animate-shake': isShaking}"
         >
           <span class="material-icons mr-2 text-white">shopping_cart</span>
@@ -452,27 +467,30 @@
 
       <!-- Bara laterală de comenzi (coșul de cumpărături) -->
       <transition name="slide-cart">
-        <aside 
-          v-show="isOrderOpen && orders.length > 0" 
-          class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[#e78c00] p-4 overflow-y-auto scrollbar" 
+        <aside
+          v-show="isOrderOpen && orders.length > 0"
+          class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[#e78c00] p-4 overflow-y-auto scrollbar"
           style="max-height: 100vh;"
         >
           <div class="flex flex-col">
             <h3 class="text-xl font-bold mb-4 text-center">Comanda Ta</h3>
-            <div 
-              v-for="(order, index) in orders" 
-              :key="index" 
+            <div
+              v-for="(order, index) in orders"
+              :key="index"
               class="flex justify-between items-center bg-black border border-[#e78c00] p-4 rounded-lg mb-2 scratches"
             >
               <div class="flex flex-col">
                 <span class="font-bold">{{ order.name }}</span>
                 <div class="flex items-center gap-2 mt-1">
-                  <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
+                  <button class="btn-incdec" @click="decrementQuantity(index)">
+                    -
+                  </button>
                   <span class="text-gray-400">x{{ order.quantity }}</span>
-                  <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
-                  <!-- NOU: Buton pentru ștergere produs -->
-                  <button 
-                    class="bg-red-600 hover:bg-red-800 text-white px-2 py-1 rounded-full" 
+                  <button class="btn-incdec" @click="incrementQuantity(index)">
+                    +
+                  </button>
+                  <button
+                    class="bg-red-600 hover:bg-red-800 text-white px-2 py-1 rounded-full"
                     @click="removeItem(index)"
                   >
                     <span class="material-icons text-sm">delete</span>
@@ -515,27 +533,6 @@
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    /* 1. Definim directiva scroll-fade-up pentru IntersectionObserver */
-    const scrollFadeUpDirective = {
-      mounted(el) {
-        // Elementul este inițial ascuns (prin CSS .scroll-fade-up)
-        el.classList.add('scroll-fade-up');
-
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              // Adăugăm clasa "show" când intră în viewport
-              el.classList.add('show');
-              // Nu mai urmărim elementul după ce a apărut
-              observer.unobserve(el);
-            }
-          });
-        });
-
-        observer.observe(el);
-      }
-    };
-
     const firebaseConfig = {
       apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -554,6 +551,7 @@
     }
 
     function generateSessionCode() {
+      // Generează un număr aleator între 1000 și 9999
       const code = Math.floor(1000 + Math.random() * 9000).toString();
       return code;
     }
@@ -585,7 +583,6 @@
       }
     }
 
-    // 2. Creăm aplicația Vue
     const app = Vue.createApp({
       data() {
         return {
@@ -783,7 +780,10 @@
             for (const prod of this.products[catKey]) {
               const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
               const descNoDiac = removeDiacritics(prod.description.toLowerCase());
-              if (titleNoDiac.includes(q) || descNoDiac.includes(q)) {
+              if (
+                titleNoDiac.includes(q) ||
+                descNoDiac.includes(q)
+              ) {
                 results.push(prod);
               }
             }
@@ -860,17 +860,21 @@
         },
         async checkout() {
           try {
+            // Obține sau generează un userId unic pentru utilizator
             const userId = localStorage.getItem("userId") || Date.now().toString();
             localStorage.setItem("userId", userId);
 
+            // Obține sau generează codul sesiunii pentru masă
             this.sessionCode = await getOrCreateSessionCode(this.tableId);
 
+            // Calcul puncte de fidelitate
             let pointsToAdd = 0;
             for (const item of this.orders) {
               pointsToAdd += item.price * item.quantity * 0.05;
             }
             this.clientPoints += pointsToAdd;
 
+            // Creează datele comenzii
             const orderData = {
               userId,
               tableId: this.tableId,
@@ -882,11 +886,14 @@
               timestamp: serverTimestamp()
             };
 
+            // Adaugă comanda în Firestore
             await addDoc(collection(db, "orders"), orderData);
 
+            // Resetează coșul de cumpărături și închide bara de comenzi
             this.orders = [];
             this.isOrderOpen = false;
 
+            // Redirecționează către pagina confirm.html cu parametrii necesari
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
@@ -965,10 +972,7 @@
       }
     });
 
-    // 3. Înregistrăm directiva în aplicație
-    app.directive('scroll-fade-up', scrollFadeUpDirective);
-
-    // 4. Montăm aplicația
+    // Montăm aplicația (fără directiva scrollFadeUp, fiind eliminată)
     app.mount("#app");
   </script>
 </body>
