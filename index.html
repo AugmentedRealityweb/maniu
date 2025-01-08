@@ -199,6 +199,10 @@
         <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale'">
           <span class="material-icons">receipt</span>Comenzile Tale
         </button>
+        <!-- TAB NOU: Social -->
+        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='social'">
+          <span class="material-icons">group</span>Social
+        </button>
       </nav>
     </aside>
 
@@ -243,11 +247,19 @@
               >
                 <span class="material-icons">receipt</span>Comenzile Tale
               </button>
+              <!-- TAB NOU: Social (mobil) -->
+              <button 
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                @click="activeTab='social'; isSidebarVisible=false"
+              >
+                <span class="material-icons">group</span>Social
+              </button>
             </nav>
           </aside>
         </transition>
 
         <!-- Tabloul principal de conținut -->
+        <!-- TAB: Meniu -->
         <section v-if="activeTab === 'meniu'">
           <!-- Căutare produse -->
           <div class="flex items-center gap-4 mb-4">
@@ -366,7 +378,7 @@
           </div>
         </section>
 
-        <!-- Tab-ul Puncte -->
+        <!-- TAB: Puncte -->
         <section v-else-if="activeTab === 'puncte'">
           <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
           <div class="bg-black p-4 rounded border border-[#e78c00] shadow max-w-md scratches mx-auto">
@@ -389,7 +401,7 @@
           </div>
         </section>
 
-        <!-- Tab-ul Comenzile Tale -->
+        <!-- TAB: Comenzile Tale -->
         <section v-else-if="activeTab === 'comenzileTale'">
           <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
           <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
@@ -422,6 +434,33 @@
             </div>
           </div>
         </section>
+
+        <!-- TAB: Social (NOU) -->
+        <section v-else-if="activeTab === 'social'">
+          <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
+          <div class="mx-auto max-w-xl">
+            <!-- Afișare mesaje existente -->
+            <div class="mb-4 bg-black border border-[#e78c00] p-4 rounded scratches max-h-60 overflow-y-auto">
+              <div 
+                v-for="(message, index) in messages" 
+                :key="index" 
+                class="mb-2"
+              >
+                <span class="font-bold text-[#f49032]">{{ message.name }}</span>:
+                <span class="text-gray-300 ml-1">{{ message.text }}</span>
+              </div>
+            </div>
+            <!-- Adăugare mesaj nou -->
+            <div class="flex gap-2">
+              <input 
+                v-model="newMessage" 
+                class="bg-black text-gray-200 border border-[#e78c00] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[#e78c00] flex-1" 
+                placeholder="Scrie un mesaj..." 
+              />
+              <button class="btn-orange rounded-full" @click="postMessage">Trimite</button>
+            </div>
+          </div>
+        </section>
       </main>
 
       <!-- Butonul pentru coșul de cumpărături (vizibil doar când există produse în coș) -->
@@ -443,7 +482,14 @@
           class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[#e78c00] p-4 overflow-y-auto scrollbar" 
           style="max-height: 100vh;"
         >
-          <div class="flex flex-col">
+          <!-- Aici am adăugat butonul "X" în partea dreaptă, pentru a închide (minimiza) coșul -->
+          <div class="relative flex flex-col">
+            <button 
+              class="absolute top-2 right-2 text-gray-300 text-2xl hover:text-[#e78c00]" 
+              @click="toggleOrderBar"
+            >
+              &times;
+            </button>
             <h3 class="text-xl font-bold mb-4 text-center">Comanda Ta</h3>
             <div 
               v-for="(order, index) in orders" 
@@ -502,7 +548,7 @@
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+      apiKey: "AIzaSyBahkhy2GUW2wM5dxghoVt2bv0-6ZyWqQ",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
       projectId: "restaurantapp-d0256",
       storageBucket: "restaurantapp-d0256.firebasestorage.app",
@@ -567,6 +613,12 @@
           isFirstOrder: true,
           tableId: "",
           sessionCode: "",
+          // Mesaje pentru tab-ul Social
+          messages: [
+            { name: "Client #1", text: "Salutare tuturor! Poftă bună! \u{1F60B}" },
+            { name: "Client #2", text: "Bună! Cine mai vrea să comandăm un desert împreună?" }
+          ],
+          newMessage: "",
           categories: [
             {
               name: "brunch",
@@ -893,6 +945,16 @@
           } catch (e) {
             console.error("Eroare la preluarea comenzilor:", e);
           }
+        },
+        // Metodă simplă pentru a posta un mesaj în tab-ul Social
+        postMessage() {
+          if (this.newMessage.trim() === "") return;
+          // Generăm un userId simplu, dacă nu există deja
+          const userId = localStorage.getItem("userId") || `Anonim_${Date.now()}`;
+          localStorage.setItem("userId", userId);
+
+          this.messages.push({ name: userId, text: this.newMessage });
+          this.newMessage = "";
         }
       },
       mounted() {
