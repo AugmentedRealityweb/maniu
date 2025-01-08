@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Meniu Restaurant - Pagina Principală</title>
+  <title>Meniu Restaurant - Sticky Edition</title>
   <!-- Vue 3 (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
   <!-- TailwindCSS (CDN) -->
@@ -14,6 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet"/>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
     body {
       font-family: 'Inter', sans-serif;
       background: linear-gradient(135deg, #000000 0%, #e78c00 100%);
@@ -162,16 +163,6 @@
       color: #f49032;
       text-align: center;
     }
-    @keyframes fadeInLeft {
-      0% {
-        transform: translateX(-50px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
     .fade-in-left {
       animation: fadeInLeft 2s ease forwards;
     }
@@ -189,43 +180,54 @@
       max-height: 90vh;
       overflow-y: auto;
     }
+
+    /* NOU: container sticky cu 2 secțiuni (categorii sus, produse jos) */
+    .meniu-sticky-container {
+      position: relative;
+      height: 200vh; /* ajustabil, ex. 300vh dacă ai multe produse */
+    }
+    .meniu-sticky-section {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 100vh;
+      overflow-y: auto; /* dacă vrei scroll intern în secțiune */
+    }
+    /* Secțiunea produselor stă sub cea a categoriilor, dar iese la scroll */
+    .meniu-products-section {
+      position: absolute;
+      top: 100vh; /* începe după secțiunea categoriilor */
+      z-index: 1;
+    }
+    .meniu-categories-section {
+      z-index: 2;
+    }
   </style>
 </head>
 <body>
   <div id="app" class="h-screen flex overflow-hidden">
     <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
-      <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">
-        Meniu Restaurant
-      </div>
+      <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">Meniu Restaurant</div>
       <nav class="flex flex-col space-y-2">
-        <button
-          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
-          @click="activeTab='meniu'"
-        >
+        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'">
           <span class="material-icons">restaurant_menu</span>Meniu
         </button>
-        <button
-          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
-          @click="activeTab='puncte'"
-        >
+        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='puncte'">
           <span class="material-icons">star</span>Puncte
         </button>
-        <button
-          class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
-          @click="activeTab='comenzileTale'"
-        >
+        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale'">
           <span class="material-icons">receipt</span>Comenzile Tale
         </button>
       </nav>
     </aside>
 
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-2">
+      <!-- Conținutul principal -->
       <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
+
         <!-- Butonul și titlul doar pentru mobile -->
         <div class="flex items-center justify-between mb-4 md:hidden">
-          <div class="handwriting-title text-2xl font-bold fade-in-left">
-            Meniu Restaurant
-          </div>
+          <div class="handwriting-title text-2xl font-bold fade-in-left">Meniu Restaurant</div>
           <button
             class="bg-black border-2 border-[#e78c00] hover:bg-[#e78c00] hover:text-black text-white p-2 rounded-full"
             @click="isSidebarVisible = !isSidebarVisible"
@@ -234,7 +236,7 @@
           </button>
         </div>
 
-        <!-- Sidebar pe mobile (afișat condiționat) -->
+        <!-- Sidebar pe mobile -->
         <transition name="slide-fade">
           <aside
             v-if="isSidebarVisible"
@@ -244,31 +246,24 @@
               <span class="material-icons">close</span>
             </button>
             <nav class="flex flex-col space-y-2">
-              <button
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
-                @click="activeTab='meniu'; isSidebarVisible=false"
-              >
+              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
+                @click="activeTab='meniu'; isSidebarVisible=false">
                 <span class="material-icons">restaurant_menu</span>Meniu
               </button>
-              <button
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
-                @click="activeTab='puncte'; isSidebarVisible=false"
-              >
+              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
+                @click="activeTab='puncte'; isSidebarVisible=false">
                 <span class="material-icons">star</span>Puncte
               </button>
-              <button
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
-                @click="activeTab='comenzileTale'; isSidebarVisible=false"
-              >
+              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full"
+                @click="activeTab='comenzileTale'; isSidebarVisible=false">
                 <span class="material-icons">receipt</span>Comenzile Tale
               </button>
             </nav>
           </aside>
         </transition>
 
-        <!-- Tabloul principal de conținut -->
+        <!-- Tab MENIU (sticky design) -->
         <section v-if="activeTab === 'meniu'">
-          <!-- Căutare produse -->
           <div class="flex items-center gap-4 mb-4">
             <input
               type="text"
@@ -278,79 +273,44 @@
             />
           </div>
 
-          <!-- Rezultatele căutării, dacă există query -->
-          <div v-if="searchQuery.trim()">
-            <h2 class="text-xl font-semibold mb-4 text-center">
-              Rezultate pentru: "{{ searchQuery }}"
-            </h2>
-            <div
-              v-if="displayedProducts.length > 0"
-              class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
-            >
-              <div
-                v-for="product in displayedProducts"
-                :key="product.title"
-                class="card-container cursor-pointer"
-                @click="showProductDetails(product)"
-              >
-                <img :src="product.image" :alt="product.title" class="card-img" />
-                <div class="card-details">
-                  <h3>{{ product.title }}</h3>
-                  <p>{{ product.price }} Lei</p>
-                </div>
-              </div>
-            </div>
-            <div v-else>
-              <p class="text-center">
-                Nu a fost găsit niciun produs care să corespundă căutării.
-              </p>
-            </div>
-          </div>
-          <!-- Afișarea categoriilor sau produselor, dacă nu se caută nimic -->
-          <div v-else>
-            <div v-if="view === 'categorii'">
-              <h2 class="text-xl font-semibold mb-4 text-center">
-                Alege Categoria
-              </h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <!-- Container "sticky" cu 2 secțiuni (categorii & produse) -->
+          <div class="meniu-sticky-container">
+            <!-- Secțiunea de categorii (lipită sus) -->
+            <section class="meniu-sticky-section meniu-categories-section scratches">
+              <h2 class="text-xl font-semibold mb-4 text-center">Categorii</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-2">
                 <div
                   v-for="category in categories"
                   :key="category.name"
                   class="card-container cursor-pointer"
-                  @click="enterCategory(category.name)"
+                  @click="selectedCategory = category.name"
                 >
-                  <img :src="category.image" :alt="category.name" class="card-img" />
+                  <img :src="category.image" :alt="category.name" class="card-img"/>
                   <div class="card-details">
                     <h3>{{ renameCategory(category.name) }}</h3>
                   </div>
                 </div>
               </div>
-            </div>
-            <div v-else-if="view === 'produse'">
-              <button
-                class="btn-orange mb-4 rounded-full"
-                @click="backToCategories"
-              >
-                Înapoi la Categorii
-              </button>
-              <h2 class="text-xl font-semibold mb-4 text-center">
-                Produse ({{ currentProducts.length }})
-              </h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            </section>
+
+            <!-- Secțiunea de produse (dedesubt, dar iese la scroll) -->
+            <section class="meniu-sticky-section meniu-products-section scratches">
+              <h2 class="text-xl font-semibold mb-4 text-center">Produse</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-2">
                 <div
-                  v-for="product in currentProducts"
+                  v-for="product in filteredProducts"
                   :key="product.title"
                   class="card-container cursor-pointer"
                   @click="showProductDetails(product)"
                 >
-                  <img :src="product.image" :alt="product.title" class="card-img" />
+                  <img :src="product.image" :alt="product.title" class="card-img"/>
                   <div class="card-details">
                     <h3>{{ product.title }}</h3>
                     <p>{{ product.price }} Lei</p>
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
           </div>
 
           <!-- Modalul de detalii al produsului curent -->
@@ -370,9 +330,7 @@
                 :alt="currentProduct.title"
                 class="w-full h-64 object-cover mb-4 rounded-lg"
               />
-              <h2 class="text-xl font-bold mb-2 handwriting-title">
-                {{ currentProduct.title }}
-              </h2>
+              <h2 class="text-xl font-bold mb-2 handwriting-title">{{ currentProduct.title }}</h2>
               <p class="text-[#f49032] font-bold text-lg mb-4">
                 {{ currentProduct.price }} Lei
               </p>
@@ -395,7 +353,7 @@
           </div>
         </section>
 
-        <!-- Tab-ul Puncte -->
+        <!-- Tab PUNCTE -->
         <section v-else-if="activeTab === 'puncte'">
           <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
           <div class="bg-black p-4 rounded border border-[#e78c00] shadow max-w-md scratches mx-auto">
@@ -418,7 +376,7 @@
           </div>
         </section>
 
-        <!-- Tab-ul Comenzile Tale -->
+        <!-- Tab COMENZILE TALE -->
         <section v-else-if="activeTab === 'comenzileTale'">
           <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
           <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
@@ -430,16 +388,13 @@
               :key="order.orderId"
               class="bg-black p-4 rounded border border-[#e78c00] scratches"
             >
-              <h3 class="text-lg font-semibold mb-2">
-                Comanda #{{ idx + 1 }}
-              </h3>
+              <h3 class="text-lg font-semibold mb-2">Comanda #{{ idx + 1 }}</h3>
               <ul class="list-disc list-inside text-gray-300">
                 <li
                   v-for="(prod, pidx) in order.items"
                   :key="pidx"
                 >
-                  {{ prod.name }} x {{ prod.quantity }} –
-                  {{ (prod.price * prod.quantity).toFixed(2) }} Lei
+                  {{ prod.name }} x {{ prod.quantity }} – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
                 </li>
               </ul>
               <div class="mt-2 font-bold text-[#f49032]">
@@ -482,13 +437,9 @@
               <div class="flex flex-col">
                 <span class="font-bold">{{ order.name }}</span>
                 <div class="flex items-center gap-2 mt-1">
-                  <button class="btn-incdec" @click="decrementQuantity(index)">
-                    -
-                  </button>
+                  <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
                   <span class="text-gray-400">x{{ order.quantity }}</span>
-                  <button class="btn-incdec" @click="incrementQuantity(index)">
-                    +
-                  </button>
+                  <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
                   <button
                     class="bg-red-600 hover:bg-red-800 text-white px-2 py-1 rounded-full"
                     @click="removeItem(index)"
@@ -498,9 +449,7 @@
                 </div>
               </div>
               <div>
-                <span class="text-[#f49032] font-bold">
-                  {{ (order.price * order.quantity).toFixed(2) }} Lei
-                </span>
+                <span class="text-[#f49032] font-bold">{{ (order.price * order.quantity).toFixed(2) }} Lei</span>
               </div>
             </div>
             <div class="mt-4">
@@ -549,11 +498,9 @@
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
-
     function generateSessionCode() {
       // Generează un număr aleator între 1000 și 9999
-      const code = Math.floor(1000 + Math.random() * 9000).toString();
-      return code;
+      return Math.floor(1000 + Math.random() * 9000).toString();
     }
 
     async function getOrCreateSessionCode(tableId) {
@@ -590,15 +537,17 @@
           isOrderOpen: false,
           isShaking: false,
           activeTab: "meniu",
-          view: "categorii",
-          currentProducts: [],
-          currentProduct: null,
+          // Am scos "view=produse/categorii". Folosim sticky sections, cu un "selectedCategory".
+          selectedCategory: "",
           searchQuery: "",
+          currentProduct: null,
           clientNumber: 0,
           clientPoints: 0,
           isFirstOrder: true,
           tableId: "",
           sessionCode: "",
+          orders: [],
+          myOrders: [],
           categories: [
             {
               name: "brunch",
@@ -764,26 +713,25 @@
                 ingredients: ["Malț", "Hamei", "Apă"]
               }
             ]
-          },
-          orders: [],
-          myOrders: []
+          }
         };
       },
       computed: {
-        displayedProducts() {
+        // Filtrează produsele în funcție de "selectedCategory" și "searchQuery"
+        filteredProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
-          if (!q) {
-            return this.view === "produse" ? this.currentProducts : [];
-          }
+          // Dacă nu ai nicio categorie selectată, le afișăm pe toate?
+          // Sau afișăm doar o categorie? Aici optez să afișez doar cat. selectată,
+          // iar dacă selectedCategory e "", afișez TOT.
+          const categoriesToShow = this.selectedCategory ? [this.selectedCategory] : Object.keys(this.products);
+
           const results = [];
-          for (const catKey in this.products) {
-            for (const prod of this.products[catKey]) {
+          for (const cat of categoriesToShow) {
+            const prodsInCat = this.products[cat] || [];
+            for (const prod of prodsInCat) {
               const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
               const descNoDiac = removeDiacritics(prod.description.toLowerCase());
-              if (
-                titleNoDiac.includes(q) ||
-                descNoDiac.includes(q)
-              ) {
+              if (!q || titleNoDiac.includes(q) || descNoDiac.includes(q)) {
                 results.push(prod);
               }
             }
@@ -807,22 +755,6 @@
             drinks: "Băuturi"
           };
           return dict[cat] || cat;
-        },
-        enterCategory(categoryName) {
-          this.currentProducts = this.products[categoryName] || [];
-          this.view = "produse";
-          this.searchQuery = "";
-          this.$nextTick(() => {
-            window.scrollTo(0, 0);
-          });
-        },
-        backToCategories() {
-          this.view = "categorii";
-          this.currentProduct = null;
-          this.searchQuery = "";
-          this.$nextTick(() => {
-            window.scrollTo(0, 0);
-          });
         },
         showProductDetails(product) {
           this.currentProduct = product;
@@ -860,21 +792,17 @@
         },
         async checkout() {
           try {
-            // Obține sau generează un userId unic pentru utilizator
             const userId = localStorage.getItem("userId") || Date.now().toString();
             localStorage.setItem("userId", userId);
 
-            // Obține sau generează codul sesiunii pentru masă
             this.sessionCode = await getOrCreateSessionCode(this.tableId);
 
-            // Calcul puncte de fidelitate
             let pointsToAdd = 0;
             for (const item of this.orders) {
               pointsToAdd += item.price * item.quantity * 0.05;
             }
             this.clientPoints += pointsToAdd;
 
-            // Creează datele comenzii
             const orderData = {
               userId,
               tableId: this.tableId,
@@ -886,14 +814,11 @@
               timestamp: serverTimestamp()
             };
 
-            // Adaugă comanda în Firestore
             await addDoc(collection(db, "orders"), orderData);
 
-            // Resetează coșul de cumpărături și închide bara de comenzi
             this.orders = [];
             this.isOrderOpen = false;
 
-            // Redirecționează către pagina confirm.html cu parametrii necesari
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
@@ -972,7 +897,6 @@
       }
     });
 
-    // Montăm aplicația (fără directiva scrollFadeUp, fiind eliminată)
     app.mount("#app");
   </script>
 </body>
