@@ -183,6 +183,17 @@
       max-height: 90vh;
       overflow-y: auto;
     }
+
+    /* NOU: CSS pentru efectul de scroll fade-up */
+    .scroll-fade-up {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.6s ease;
+    }
+    .scroll-fade-up.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body>
@@ -268,7 +279,8 @@
               <div 
                 v-for="product in displayedProducts" 
                 :key="product.title" 
-                class="card-container cursor-pointer" 
+                class="card-container cursor-pointer"
+                v-scroll-fade-up <!-- DIRECTIVA AICI -->
                 @click="showProductDetails(product)"
               >
                 <img :src="product.image" :alt="product.title" class="card-img"/>
@@ -292,7 +304,8 @@
                 <div 
                   v-for="category in categories" 
                   :key="category.name" 
-                  class="card-container cursor-pointer" 
+                  class="card-container cursor-pointer"
+                  v-scroll-fade-up <!-- DIRECTIVA AICI -->
                   @click="enterCategory(category.name)"
                 >
                   <img :src="category.image" :alt="category.name" class="card-img"/>
@@ -313,7 +326,8 @@
                 <div 
                   v-for="product in currentProducts" 
                   :key="product.title" 
-                  class="card-container cursor-pointer" 
+                  class="card-container cursor-pointer"
+                  v-scroll-fade-up <!-- DIRECTIVA AICI -->
                   @click="showProductDetails(product)"
                 >
                   <img :src="product.image" :alt="product.title" class="card-img"/>
@@ -501,6 +515,27 @@
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
+    /* 1. Definim directiva scroll-fade-up pentru IntersectionObserver */
+    const scrollFadeUpDirective = {
+      mounted(el) {
+        // Elementul este inițial ascuns (prin CSS .scroll-fade-up)
+        el.classList.add('scroll-fade-up');
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              // Adăugăm clasa "show" când intră în viewport
+              el.classList.add('show');
+              // Nu mai urmărim elementul după ce a apărut
+              observer.unobserve(el);
+            }
+          });
+        });
+
+        observer.observe(el);
+      }
+    };
+
     const firebaseConfig = {
       apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -519,7 +554,6 @@
     }
 
     function generateSessionCode() {
-      // Generează un număr aleator între 1000 și 9999
       const code = Math.floor(1000 + Math.random() * 9000).toString();
       return code;
     }
@@ -551,6 +585,7 @@
       }
     }
 
+    // 2. Creăm aplicația Vue
     const app = Vue.createApp({
       data() {
         return {
@@ -748,10 +783,7 @@
             for (const prod of this.products[catKey]) {
               const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
               const descNoDiac = removeDiacritics(prod.description.toLowerCase());
-              if (
-                titleNoDiac.includes(q) ||
-                descNoDiac.includes(q)
-              ) {
+              if (titleNoDiac.includes(q) || descNoDiac.includes(q)) {
                 results.push(prod);
               }
             }
@@ -812,7 +844,6 @@
             this.isShaking = false;
           }, 500);
         },
-        // NOU: Funcție de ștergere din coș
         removeItem(index) {
           this.orders.splice(index, 1);
         },
@@ -829,25 +860,21 @@
         },
         async checkout() {
           try {
-            // Obține sau generează un userId unic pentru utilizator
             const userId = localStorage.getItem("userId") || Date.now().toString();
             localStorage.setItem("userId", userId);
 
-            // Obține sau generează codul sesiunii pentru masă
             this.sessionCode = await getOrCreateSessionCode(this.tableId);
 
-            // Calcul puncte de fidelitate
             let pointsToAdd = 0;
             for (const item of this.orders) {
               pointsToAdd += item.price * item.quantity * 0.05;
             }
             this.clientPoints += pointsToAdd;
 
-            // Creează datele comenzii
             const orderData = {
-              userId, // Identificatorul unic al utilizatorului
+              userId,
               tableId: this.tableId,
-              sessionCode: this.sessionCode, // Session code
+              sessionCode: this.sessionCode,
               clientNumber: this.clientNumber,
               items: this.orders,
               total: parseFloat(this.total),
@@ -855,14 +882,11 @@
               timestamp: serverTimestamp()
             };
 
-            // Adaugă comanda în Firestore
             await addDoc(collection(db, "orders"), orderData);
 
-            // Resetează coșul de cumpărături și închide bara de comenzi
             this.orders = [];
             this.isOrderOpen = false;
 
-            // Redirecționează către pagina confirm.html cu parametrii necesari
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
@@ -887,7 +911,6 @@
             snap.forEach(docSnap => {
               const data = docSnap.data();
               data.orderId = docSnap.id;
-              // Observă că docSnap conține sessionCode; îl afișăm în "Comenzile Tale"
               this.myOrders.push(data);
             });
           } catch (e) {
@@ -942,6 +965,10 @@
       }
     });
 
+    // 3. Înregistrăm directiva în aplicație
+    app.directive('scroll-fade-up', scrollFadeUpDirective);
+
+    // 4. Montăm aplicația
     app.mount("#app");
   </script>
 </body>
