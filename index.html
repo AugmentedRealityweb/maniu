@@ -229,6 +229,29 @@
     .table-circle[style*="background: #666"] {
       box-shadow: 0 0 0 4px #fc912d; /* Contur portocaliu */
     }
+
+    /* Buton "Sus" */
+    .back-to-top {
+      position: fixed;
+      bottom: 100px; /* un pic mai sus de butonul coșului */
+      right: 1rem;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background: linear-gradient(to right, #f49032, #d35400);
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .back-to-top:hover {
+      transform: scale(1.1);
+    }
   </style>
 </head>
 <body>
@@ -256,7 +279,7 @@
 
     <!-- CONȚINUT PRINCIPAL -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-2">
-      <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
+      <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches" @scroll.passive="handleScroll">
         <!-- BUTON + TITLU mobil -->
         <div class="flex items-center justify-between mb-4 md:hidden">
           <div class="handwriting-title text-2xl font-bold fade-in-left">
@@ -325,10 +348,23 @@
             <h2 class="text-xl font-semibold mb-4 text-center">
               Rezultate pentru: "{{ searchQuery }}"
             </h2>
+            <!-- Toggle grid / list button (vizibil și la căutare) -->
+            <div class="flex justify-center mb-4">
+              <button 
+                class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                @click="toggleLayout"
+              >
+                <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+              </button>
+            </div>
+
             <div 
               v-if="displayedProducts.length > 0" 
-              class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
-            >
+              :class="isGrid 
+                      ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' 
+                      : 'flex flex-col space-y-4'">
+              >
               <div 
                 v-for="product in displayedProducts" 
                 :key="product.title" 
@@ -354,7 +390,21 @@
               <h2 class="text-xl font-semibold mb-4 text-center">
                 Alege Categoria
               </h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <!-- Toggle grid / list button -->
+              <div class="flex justify-center mb-4">
+                <button 
+                  class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                  @click="toggleLayout"
+                >
+                  <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                  <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+                </button>
+              </div>
+              <div 
+                :class="isGrid 
+                        ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' 
+                        : 'flex flex-col space-y-4'">
+                >
                 <div 
                   v-for="category in categories" 
                   :key="category.name" 
@@ -369,13 +419,27 @@
               </div>
             </div>
             <div v-else-if="view === 'produse'">
-              <button class="btn-orange mb-4 rounded-full" @click="backToCategories">
-                Înapoi la Categorii
-              </button>
+              <div class="flex items-center justify-between mb-4">
+                <button class="btn-orange rounded-full" @click="backToCategories">
+                  Înapoi la Categorii
+                </button>
+                <!-- Toggle grid / list button -->
+                <button 
+                  class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                  @click="toggleLayout"
+                >
+                  <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                  <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+                </button>
+              </div>
               <h2 class="text-xl font-semibold mb-4 text-center">
                 Produse ({{ currentProducts.length }})
               </h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div 
+                :class="isGrid 
+                        ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' 
+                        : 'flex flex-col space-y-4'">
+              >
                 <div 
                   v-for="product in currentProducts" 
                   :key="product.title" 
@@ -621,6 +685,15 @@
     </div>
   </div>
 
+  <!-- Buton "Sus" (Back to top) -->
+  <div 
+    v-if="showBackToTop" 
+    class="back-to-top" 
+    @click="scrollTop"
+  >
+    <span class="material-icons">keyboard_arrow_up</span>
+  </div>
+
   <!-- SCRIPTUL PRINCIPAL -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
@@ -690,14 +763,23 @@
     const app = Vue.createApp({
       data() {
         return {
+          /* Interfață */
           isSidebarVisible: false,
           isOrderOpen: false,
           isShaking: false,
+          showBackToTop: false,
+          isGrid: true,
+
+          /* Pagini / tab-uri */
           activeTab: "meniu",
-          view: "categorii",
+          view: "categorii", // "categorii" sau "produse"
+
+          /* Produse */
           currentProducts: [],
           currentProduct: null,
           searchQuery: "",
+
+          /* Client / comenzi */
           clientNumber: 0,
           clientPoints: 0,
           isFirstOrder: true,
@@ -712,7 +794,7 @@
           newMessage: "",
           chatMessages: [],  // mesaje sub 10 min
 
-          // Stiluri
+          /* Stiluri personalizate */
           gradientStyle: "linear-gradient(to right, #f49032, #d35400)",
           greyStyle: "#666",
 
@@ -744,7 +826,7 @@
             },
             {
               name: "garnish",
-              image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp"
+              image: ""
             }
           ],
           products: {
@@ -1068,7 +1150,7 @@
                 title: "Piure de cartofi",
                 description: "200g. Cremă fină de cartofi, bătută cu lapte și unt.",
                 price: 10,
-                image: "https://i.giphy.com/l0MYu3mmRtjxX28tq.webp",
+                image: "",
                 ingredients: ["Cartofi", "Unt", "Lapte"]
               },
               {
@@ -1105,10 +1187,13 @@
       },
       computed: {
         displayedProducts() {
+          // Filtrare după query
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
+            // Dacă nu există query, afișăm doar produsele din categoria curentă (dacă e 'produse')
             return this.view === "produse" ? this.currentProducts : [];
           }
+          // Dacă există query, căutăm în tot "products"
           const results = [];
           for (const catKey in this.products) {
             for (const prod of this.products[catKey]) {
@@ -1131,6 +1216,20 @@
         }
       },
       methods: {
+        /* Scroll handle */
+        handleScroll() {
+          // Afișează butonul "Sus" dacă scrollY > 200
+          this.showBackToTop = (window.scrollY > 200);
+        },
+        scrollTop() {
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
+        },
+        toggleLayout() {
+          this.isGrid = !this.isGrid;
+        },
         renameCategory(cat) {
           const dict = {
             brunch: "Mic Dejun",
@@ -1147,13 +1246,14 @@
           this.currentProducts = this.products[categoryName] || [];
           this.view = "produse";
           this.searchQuery = "";
-          this.$nextTick(() => window.scrollTo(0, 0));
+          // scroll sus când intrăm într-o categorie
+          window.scrollTo(0, 0);
         },
         backToCategories() {
           this.view = "categorii";
           this.currentProduct = null;
           this.searchQuery = "";
-          this.$nextTick(() => window.scrollTo(0, 0));
+          window.scrollTo(0, 0);
         },
         showProductDetails(product) {
           this.currentProduct = product;
@@ -1347,6 +1447,13 @@
         if (this.usernameSet) {
           this.loadMessages();
         }
+
+        // Ascultă eveniment de scroll pe fereastră
+        window.addEventListener("scroll", this.handleScroll);
+      },
+      unmounted() {
+        // Curățăm event listener-ul
+        window.removeEventListener("scroll", this.handleScroll);
       },
       watch: {
         usernameSet(newVal) {
