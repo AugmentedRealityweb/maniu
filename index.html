@@ -1053,23 +1053,21 @@
         },
         /* Determină stilul mesei (gri+border vs. gradient fill) */
         tableStyle(tableNum) {
-          const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
-          // Dacă are mesaje, facem tot cercul gradient
-          if (hasMessages) {
-            return {
-              background: this.gradientStyle,
-              color: '#000',
-              border: '3px solid transparent'
-            };
-          }
-          // Dacă n-are mesaje, fill gri și border gradient
-          return {
-            background: this.greyStyle,
-            color: '#fff',
-            border: '3px solid transparent',
-            borderImage: this.gradientStyle + ' 1'
-          };
-        }
+  const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
+  if (hasMessages) {
+    return {
+      background: `linear-gradient(to right, #f49032, #d35400)`,
+      color: '#000',
+      border: 'none'
+    };
+  }
+  return {
+    background: this.greyStyle,
+    color: '#fff',
+    border: '3px solid transparent',
+    borderImage: this.gradientStyle + ' 1'
+  };
+}
       },
       mounted() {
         const urlParams = new URLSearchParams(window.location.search);
