@@ -198,7 +198,6 @@
       justify-items: center; /* Să fie centrate pe coloană */
     }
     .table-circle {
-  position: relative;
   width: 80px;
   height: 80px;
   border-radius: 50%;
@@ -207,21 +206,27 @@
   justify-content: center;
   text-align: center;
   font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+
+  /* Situația implicită: Gri */
+  background: #666; 
   color: #fff;
-  background: #666; /* Culoarea de fundal gri implicită */
-  overflow: hidden; /* Ascunde partea din pseudo-element care ar ieși în afara cercului */
+
+  /* Bordura rotundă cu gradient */
+  position: relative;
+  z-index: 0;
 }
 
 .table-circle::before {
   content: '';
   position: absolute;
-  top: -4px; /* Ajustează pentru a crea efectul de bordură */
-  left: -4px;
-  width: calc(100% + 8px); /* Adaugă grosimea bordurii */
-  height: calc(100% + 8px); /* Adaugă grosimea bordurii */
-  border-radius: 50%; /* Asigură-te că gradientul este rotund */
-  background: linear-gradient(to right, #f49032, #d35400); /* Gradient pentru bordură */
-  z-index: 0; /* Gradientul să fie sub cerc */
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  z-index: -1;
+  border-radius: 50%;
+  background: linear-gradient(to right, #f49032, #d35400);
 }
   </style>
 </head>
@@ -1063,26 +1068,20 @@
         /* Determină stilul mesei (gri+border vs. gradient fill) */
         tableStyle(tableNum) {
   const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
-  if (hasMessages) {
-    // Stil pentru mesele cu mesaje
-    return {
-      background: this.gradientStyle,
-      color: '#000',
-      border: '3px solid transparent',
-      borderRadius: '50%' // Asigurăm bordura rotundă
-    };
-  }
-  // Stil pentru mesele fără mesaje
-  return {
-    background: this.greyStyle,
-    color: '#fff',
-    borderWidth: '3px',
-    borderStyle: 'solid',
-    borderColor: 'transparent',
-    borderImageSource: this.gradientStyle, // Gradient pentru bordură
-    borderImageSlice: 1, // Asigură aplicarea gradientului
-    borderRadius: '50%' // Asigurăm bordura rotundă
+
+  // Stiluri de bază pentru cerc
+  const baseStyle = {
+    background: this.greyStyle, // Fundal gri implicit
+    color: '#fff', // Text alb implicit
   };
+
+  // Dacă cercul are mesaje, schimbăm fundalul în gradient
+  if (hasMessages) {
+    baseStyle.background = this.gradientStyle; // Gradient complet
+    baseStyle.color = '#000'; // Text negru pentru contrast
+  }
+
+  return baseStyle;
 }
       },
       mounted() {
