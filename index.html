@@ -634,14 +634,14 @@
 
     /* --- CONFIGUREAZĂ FIREBASE AICI --- */
     const firebaseConfig = {
-      apiKey: "AIzaSy...REPLACE",
-      authDomain: "exemplu.firebaseapp.com",
-      projectId: "exemplu",
-      storageBucket: "exemplu.appspot.com",
-      messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:abcd1234efgh5678",
-      measurementId: "G-XXXXXX"
-    };
+  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+  authDomain: "restaurantapp-d0256.firebaseapp.com",
+  projectId: "restaurantapp-d0256",
+  storageBucket: "restaurantapp-d0256.firebasestorage.app",
+  messagingSenderId: "275208346650",
+  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+  measurementId: "G-F44TB27G17"
+};
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
@@ -1060,15 +1060,16 @@
           }
         },
         /* Determină stilul mesei (gri+border vs. gradient fill) */
-        tableStyle(tableNum) {
-  const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
-  if (hasMessages) {
-    // Stil pentru mesele cu mesaje
-    return {
-      background: this.gradientStyle, // Gradient complet pe fundal
-      color: '#000',
-    };
-  }
+         tableStyle(tableNum) {
+          const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
+          // Dacă are mesaje, facem tot cercul gradient
+          if (hasMessages) {
+            return {
+              background: this.gradientStyle,
+              color: '#000',
+              border: '3px solid transparent'
+            };
+          }
   // Stil pentru mesele fără mesaje (bordură gradient rotundă)
   return {
     background: '#666', // Fundal gri
