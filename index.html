@@ -138,13 +138,23 @@
       transform: translateY(-4px) scale(1.02);
       box-shadow: 0 12px 24px rgba(255,140,0,0.3);
     }
-    .card-img {
+    /* For Grid layout: imagine pătrată (aspect ratio 1:1) */
+    .card-img-square {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+    }
+    /* Pentru modul listă: rămâne înălțime standard */
+    .card-img-rect {
       width: 100%;
       height: 200px;
       object-fit: cover;
       border-top-left-radius: 1rem;
       border-top-right-radius: 1rem;
     }
+
     .card-details {
       padding: 0.75rem;
       text-align: center;
@@ -255,7 +265,7 @@
   </style>
 </head>
 <body>
-  <div id="app" class="h-screen flex">
+  <div id="app" class="h-screen flex flex-col">
     <!-- SIDEBAR desktop -->
     <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
       <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">
@@ -277,13 +287,9 @@
       </nav>
     </aside>
 
-    <!-- CONȚINUT PRINCIPAL, devine propriul container scrollabil -->
-    <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
-      <main 
-        ref="mainScroller"
-        class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches"
-        @scroll.passive="handleScroll"
-      >
+    <!-- CONȚINUT PRINCIPAL, e scrollabil pe window, nu local -->
+    <div class="flex-1 flex flex-col p-2">
+      <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
         <!-- BUTON + TITLU mobil -->
         <div class="flex items-center justify-between mb-4 md:hidden">
           <div class="handwriting-title text-2xl font-bold fade-in-left">
@@ -362,20 +368,23 @@
                 <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
               </button>
             </div>
-            <!-- Afișare produse pe 3 coloane (grid) sau 1 coloană (list) -->
+            <!-- Afișare produse (grid col-3 sau listă) -->
             <div 
               v-if="displayedProducts.length > 0" 
-              :class="isGrid 
-                      ? 'grid grid-cols-3 gap-6' 
-                      : 'flex flex-col space-y-4'"
+              :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
             >
               <div 
                 v-for="product in displayedProducts" 
                 :key="product.title" 
-                class="card-container cursor-pointer" 
+                class="card-container cursor-pointer"
                 @click="showProductDetails(product)"
               >
-                <img :src="product.image" :alt="product.title" class="card-img"/>
+                <!-- În grid => imagine pătrată, în listă => imagine rectangulară -->
+                <img 
+                  :class="isGrid ? 'card-img-square' : 'card-img-rect'"
+                  :src="product.image" 
+                  :alt="product.title" 
+                />
                 <div class="card-details">
                   <h3>{{ product.title }}</h3>
                   <p>{{ product.price }} Lei</p>
@@ -404,19 +413,21 @@
                   <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
                 </button>
               </div>
-              <!-- Afișare categorii -->
+              <!-- Afișare categorii (grid col-3 sau listă) -->
               <div 
-                :class="isGrid 
-                        ? 'grid grid-cols-3 gap-6' 
-                        : 'flex flex-col space-y-4'"
+                :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
               >
                 <div 
                   v-for="category in categories" 
                   :key="category.name" 
-                  class="card-container cursor-pointer" 
+                  class="card-container cursor-pointer"
                   @click="enterCategory(category.name)"
                 >
-                  <img :src="category.image" :alt="category.name" class="card-img"/>
+                  <img 
+                    :class="isGrid ? 'card-img-square' : 'card-img-rect'"
+                    :src="category.image" 
+                    :alt="category.name" 
+                  />
                   <div class="card-details">
                     <h3>{{ renameCategory(category.name) }}</h3>
                   </div>
@@ -442,9 +453,7 @@
                 Produse ({{ currentProducts.length }})
               </h2>
               <div 
-                :class="isGrid 
-                        ? 'grid grid-cols-3 gap-6' 
-                        : 'flex flex-col space-y-4'"
+                :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
               >
                 <div 
                   v-for="product in currentProducts" 
@@ -452,7 +461,11 @@
                   class="card-container cursor-pointer" 
                   @click="showProductDetails(product)"
                 >
-                  <img :src="product.image" :alt="product.title" class="card-img"/>
+                  <img 
+                    :class="isGrid ? 'card-img-square' : 'card-img-rect'"
+                    :src="product.image" 
+                    :alt="product.title"
+                  />
                   <div class="card-details">
                     <h3>{{ product.title }}</h3>
                     <p>{{ product.price }} Lei</p>
@@ -555,7 +568,7 @@
                 Total: {{ order.total }} Lei
               </div>
               <div class="text-sm text-gray-400">
-                ID comandă: {{ order.orderId }} | Codul Comenzii: {{ order.sessionCode }}
+                ID comandă: {{ order.orderId }} | Cod Ospătar: {{ order.sessionCode }}
               </div>
             </div>
           </div>
@@ -836,6 +849,7 @@
             }
           ],
           products: {
+            /* ... aceleași date din codul anterior ... */
             brunch: [
               {
                 title: "Toast cu avocado",
@@ -1219,18 +1233,16 @@
         }
       },
       methods: {
-        /* Scroll handle */
-        handleScroll(e) {
-          // Ne uităm la scroll-ul din <main>
-          const scrolled = e.target.scrollTop;
-          this.showBackToTop = scrolled > 200;
+        /* Folosim scroll-ul ferestrei (window) */
+        handleWindowScroll() {
+          this.showBackToTop = (window.scrollY > 200);
         },
         scrollTop() {
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth", // Derulare lină
-  });
-},
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
+        },
         toggleLayout() {
           this.isGrid = !this.isGrid;
         },
@@ -1250,14 +1262,13 @@
           this.currentProducts = this.products[categoryName] || [];
           this.view = "produse";
           this.searchQuery = "";
-          // scroll sus când intrăm într-o categorie
-          this.$refs.mainScroller.scrollTo(0, 0);
+          window.scrollTo(0, 0);
         },
         backToCategories() {
           this.view = "categorii";
           this.currentProduct = null;
           this.searchQuery = "";
-          this.$refs.mainScroller.scrollTo(0, 0);
+          window.scrollTo(0, 0);
         },
         showProductDetails(product) {
           this.currentProduct = product;
@@ -1389,7 +1400,6 @@
             console.error("Eroare la trimiterea mesajului:", err);
           }
         },
-        /* Determină stilul mesei (gri+border vs. gradient fill) */
         tableStyle(tableNum) {
           const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
           if (hasMessages) {
@@ -1407,6 +1417,9 @@
         }
       },
       mounted() {
+        // Ascultă eveniment de scroll la fereastră
+        window.addEventListener("scroll", this.handleWindowScroll);
+
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
         if (masaParam) {
@@ -1451,6 +1464,10 @@
         if (this.usernameSet) {
           this.loadMessages();
         }
+      },
+      unmounted() {
+        // Curățăm event listener-ul
+        window.removeEventListener("scroll", this.handleWindowScroll);
       },
       watch: {
         usernameSet(newVal) {
