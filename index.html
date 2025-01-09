@@ -216,18 +216,19 @@
 .table-circle:before {
   content: "";
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
   border-radius: 50%;
-  background: linear-gradient(45deg, #f49032, #d35400);
+  background: transparent; /* Inițial transparent */
+  border: 2px solid #f49032; /* Bordura portocalie */
   z-index: -1;
   display: none; /* Ascuns implicit */
 }
 
-.table-circle[style*="background: #666"]::before {
-  display: block; /* Afișează bordura gradient doar pentru cercurile gri */
+.table-circle[style*="background: #666"]:before {
+  display: block; /* Afișează bordura portocalie */
 }
   </style>
 </head>
