@@ -1085,20 +1085,16 @@
           });
         },
         showTemporaryMessage(msgData) {
-  const tNum = msgData.tableNumber;
-  if (this.tableLastMessages[tNum]?.id === msgData.id) {
-    // Evită reapelarea dacă mesajul e deja afișat
-    return;
-  }
-
-  this.tableLastMessages[tNum] = msgData;
-
-  setTimeout(() => {
-    if (this.tableLastMessages[tNum]?.id === msgData.id) {
-      this.$set(this.tableLastMessages, tNum, null); // Șterge mesajul după 3 secunde
-    }
-  }, 3000);
-},
+          // Reținem textul în tableLastMessages[masa] și îl ștergem după 3s
+          const tNum = msgData.tableNumber;
+          this.tableLastMessages[tNum] = msgData;
+          setTimeout(() => {
+            // Verificăm dacă tot acest msgData e încă acolo
+            if (this.tableLastMessages[tNum] === msgData) {
+              this.tableLastMessages[tNum] = null;
+            }
+          }, 3000);
+        },
         async postMessage() {
           if (!this.newMessage.trim()) return;
           try {
