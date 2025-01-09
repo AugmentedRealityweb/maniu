@@ -198,22 +198,31 @@
       justify-items: center; /* Să fie centrate pe coloană */
     }
     .table-circle {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      font-weight: bold;
-      transition: background-color 0.3s ease, border 0.3s ease;
-      /* Situația implicită: Gri + border gradient */
-      background: #666; 
-      color: #fff;
-      border: 3px solid transparent;
-      /* Folosim un "border-image" gradient */
-      border-image: linear-gradient(to right, #f49032, #d35400) 1;
-    }
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: bold;
+  color: #fff;
+  background: #666; /* Culoarea de fundal gri implicită */
+  overflow: hidden; /* Ascunde partea din pseudo-element care ar ieși în afara cercului */
+}
+
+.table-circle::before {
+  content: '';
+  position: absolute;
+  top: -3px; /* Ajustează pentru grosimea bordurii */
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border-radius: 50%; /* Asigură-te că pseudo-elementul este rotund */
+  background: linear-gradient(to right, #f49032, #d35400);
+  z-index: -1; /* Asigură-te că gradientul este în spatele cercului gri */
+}
   </style>
 </head>
 <body>
