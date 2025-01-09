@@ -198,22 +198,30 @@
       justify-items: center; /* Să fie centrate pe coloană */
     }
     .table-circle {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      font-weight: bold;
-      transition: background-color 0.3s ease, border 0.3s ease;
-      /* Situația implicită: Gri + border gradient */
-      background: #666; 
-      color: #fff;
-      border: 3px solid transparent;
-      /* Folosim un "border-image" gradient */
-      border-image: linear-gradient(to right, #f49032, #d35400) 1;
-    }
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: bold;
+  color: #fff;
+  background: #666; /* Culoarea de fundal gri implicită */
+  overflow: hidden; /* Ascunde partea din pseudo-element care ar ieși în afara cercului */
+}
+    .table-circle::before {
+  content: '';
+  position: absolute;
+  top: -3px; /* Ajustează pentru grosimea bordurii */
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border-radius: 50%; /* Asigură-te că pseudo-elementul este rotund */
+  background: linear-gradient(to right, #f49032, #d35400);
+  z-index: -1; /* Asigură-te că gradientul este în spatele cercului gri */
+}
   </style>
 </head>
 <body>
@@ -626,14 +634,14 @@
 
     /* --- CONFIGUREAZĂ FIREBASE AICI --- */
     const firebaseConfig = {
-  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-  authDomain: "restaurantapp-d0256.firebaseapp.com",
-  projectId: "restaurantapp-d0256",
-  storageBucket: "restaurantapp-d0256.firebasestorage.app",
-  messagingSenderId: "275208346650",
-  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-  measurementId: "G-F44TB27G17"
-};
+      apiKey: "AIzaSy...REPLACE",
+      authDomain: "exemplu.firebaseapp.com",
+      projectId: "exemplu",
+      storageBucket: "exemplu.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abcd1234efgh5678",
+      measurementId: "G-XXXXXX"
+    };
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
@@ -667,7 +675,7 @@
           return newSessionCode;
         }
       } catch (error) {
-        console.error(`Eroare la obținerea/crearea session code pentru ${tableId}:`, error);
+        console.error(Eroare la obținerea/crearea session code pentru ${tableId}:, error);
         throw new Error("A apărut o eroare la obținerea/crearea session code-ului.");
       }
     }
@@ -983,7 +991,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
-            window.location.href = `${baseUrl}/confirm.html?sessionCode=${this.sessionCode}&masa=${masaParam || ""}`;
+            window.location.href = ${baseUrl}/confirm.html?sessionCode=${this.sessionCode}&masa=${masaParam || ""};
           } catch (err) {
             console.error("Eroare la salvarea comenzii:", err);
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
@@ -1055,17 +1063,16 @@
         tableStyle(tableNum) {
   const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
   if (hasMessages) {
+    // Stil pentru mesele cu mesaje
     return {
-      background: `linear-gradient(to right, #f49032, #d35400)`,
+      background: this.gradientStyle, // Gradient complet pe fundal
       color: '#000',
-      border: 'none'
     };
   }
+  // Stil pentru mesele fără mesaje (bordură gradient rotundă)
   return {
-    background: this.greyStyle,
+    background: '#666', // Fundal gri
     color: '#fff',
-    border: '3px solid transparent',
-    borderImage: this.gradientStyle + ' 1'
   };
 }
       },
@@ -1073,7 +1080,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
         if (masaParam) {
-          this.tableId = `Masa numărul ${masaParam}`;
+          this.tableId = Masa numărul ${masaParam};
         } else {
           this.tableId = "Masa numărul 1";
         }
