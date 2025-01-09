@@ -255,7 +255,7 @@
   </style>
 </head>
 <body>
-  <div id="app" class="h-screen flex overflow-hidden">
+  <div id="app" class="h-screen flex">
     <!-- SIDEBAR desktop -->
     <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
       <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">
@@ -277,9 +277,13 @@
       </nav>
     </aside>
 
-    <!-- CONȚINUT PRINCIPAL -->
-    <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-2">
-      <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches" @scroll.passive="handleScroll">
+    <!-- CONȚINUT PRINCIPAL, devine propriul container scrollabil -->
+    <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+      <main 
+        ref="mainScroller"
+        class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches"
+        @scroll.passive="handleScroll"
+      >
         <!-- BUTON + TITLU mobil -->
         <div class="flex items-center justify-between mb-4 md:hidden">
           <div class="handwriting-title text-2xl font-bold fade-in-left">
@@ -358,32 +362,33 @@
                 <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
               </button>
             </div>
-
-          <div 
-  v-if="displayedProducts.length > 0" 
-  :class="isGrid 
-          ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' 
-          : 'flex flex-col space-y-4'">
-  <div 
-    v-for="product in displayedProducts" 
-    :key="product.title" 
-    class="card-container cursor-pointer" 
-    @click="showProductDetails(product)"
-  >
-    <img :src="product.image" :alt="product.title" class="card-img"/>
-    <div class="card-details">
-      <h3>{{ product.title }}</h3>
-      <p>{{ product.price }} Lei</p>
-    </div>
-  </div>
-</div>
+            <!-- Afișare produse pe 3 coloane (grid) sau 1 coloană (list) -->
+            <div 
+              v-if="displayedProducts.length > 0" 
+              :class="isGrid 
+                      ? 'grid grid-cols-3 gap-6' 
+                      : 'flex flex-col space-y-4'"
+            >
+              <div 
+                v-for="product in displayedProducts" 
+                :key="product.title" 
+                class="card-container cursor-pointer" 
+                @click="showProductDetails(product)"
+              >
+                <img :src="product.image" :alt="product.title" class="card-img"/>
+                <div class="card-details">
+                  <h3>{{ product.title }}</h3>
+                  <p>{{ product.price }} Lei</p>
+                </div>
+              </div>
+            </div>
             <div v-else>
               <p class="text-center">
                 Nu a fost găsit niciun produs care să corespundă căutării.
               </p>
             </div>
           </div>
-          <!-- Categorii / Produse -->
+          <!-- Categorii / Produse (fără căutare) -->
           <div v-else>
             <div v-if="view === 'categorii'">
               <h2 class="text-xl font-semibold mb-4 text-center">
@@ -399,11 +404,12 @@
                   <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
                 </button>
               </div>
+              <!-- Afișare categorii -->
               <div 
                 :class="isGrid 
-                        ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' 
-                        : 'flex flex-col space-y-4'">
-                >
+                        ? 'grid grid-cols-3 gap-6' 
+                        : 'flex flex-col space-y-4'"
+              >
                 <div 
                   v-for="category in categories" 
                   :key="category.name" 
@@ -417,6 +423,7 @@
                 </div>
               </div>
             </div>
+            <!-- Afișare produse dintr-o categorie -->
             <div v-else-if="view === 'produse'">
               <div class="flex items-center justify-between mb-4">
                 <button class="btn-orange rounded-full" @click="backToCategories">
@@ -436,8 +443,8 @@
               </h2>
               <div 
                 :class="isGrid 
-                        ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' 
-                        : 'flex flex-col space-y-4'">
+                        ? 'grid grid-cols-3 gap-6' 
+                        : 'flex flex-col space-y-4'"
               >
                 <div 
                   v-for="product in currentProducts" 
@@ -548,7 +555,7 @@
                 Total: {{ order.total }} Lei
               </div>
               <div class="text-sm text-gray-400">
-                ID comandă: {{ order.orderId }} | Cod Ospătar: {{ order.sessionCode }}
+                ID comandă: {{ order.orderId }} | Codul Comenzii: {{ order.sessionCode }}
               </div>
             </div>
           </div>
@@ -713,14 +720,14 @@
 
     /* --- CONFIGUREAZĂ FIREBASE AICI --- */
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2GgUW2W5dxghoVt2bv0-6ZyWq",
-      authDomain: "restaurantapp-d0256.firebaseapp.com",
-      projectId: "restaurantapp-d0256",
-      storageBucket: "restaurantapp-d0256.firebasestorage.app",
-      messagingSenderId: "275208346650",
-      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-      measurementId: "G-F44TB27G17"
-    };
+  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+  authDomain: "restaurantapp-d0256.firebaseapp.com",
+  projectId: "restaurantapp-d0256",
+  storageBucket: "restaurantapp-d0256.firebasestorage.app",
+  messagingSenderId: "275208346650",
+  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+  measurementId: "G-F44TB27G17"
+};
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
@@ -1198,10 +1205,7 @@
             for (const prod of this.products[catKey]) {
               const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
               const descNoDiac = removeDiacritics(prod.description.toLowerCase());
-              if (
-                titleNoDiac.includes(q) ||
-                descNoDiac.includes(q)
-              ) {
+              if (titleNoDiac.includes(q) || descNoDiac.includes(q)) {
                 results.push(prod);
               }
             }
@@ -1216,12 +1220,14 @@
       },
       methods: {
         /* Scroll handle */
-        handleScroll() {
-          // Afișează butonul "Sus" dacă scrollY > 200
-          this.showBackToTop = (window.scrollY > 200);
+        handleScroll(e) {
+          // Ne uităm la scroll-ul din <main>
+          const scrolled = e.target.scrollTop;
+          this.showBackToTop = scrolled > 200;
         },
         scrollTop() {
-          window.scrollTo({
+          // Derulăm <main> la 0
+          this.$refs.mainScroller.scrollTo({
             top: 0,
             behavior: "smooth"
           });
@@ -1246,13 +1252,13 @@
           this.view = "produse";
           this.searchQuery = "";
           // scroll sus când intrăm într-o categorie
-          window.scrollTo(0, 0);
+          this.$refs.mainScroller.scrollTo(0, 0);
         },
         backToCategories() {
           this.view = "categorii";
           this.currentProduct = null;
           this.searchQuery = "";
-          window.scrollTo(0, 0);
+          this.$refs.mainScroller.scrollTo(0, 0);
         },
         showProductDetails(product) {
           this.currentProduct = product;
@@ -1446,13 +1452,6 @@
         if (this.usernameSet) {
           this.loadMessages();
         }
-
-        // Ascultă eveniment de scroll pe fereastră
-        window.addEventListener("scroll", this.handleScroll);
-      },
-      unmounted() {
-        // Curățăm event listener-ul
-        window.removeEventListener("scroll", this.handleScroll);
       },
       watch: {
         usernameSet(newVal) {
