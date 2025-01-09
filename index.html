@@ -215,13 +215,13 @@
 .table-circle::before {
   content: '';
   position: absolute;
-  top: -3px; /* Ajustează pentru grosimea bordurii */
-  left: -3px;
-  right: -3px;
-  bottom: -3px;
-  border-radius: 50%; /* Asigură-te că pseudo-elementul este rotund */
-  background: linear-gradient(to right, #f49032, #d35400);
-  z-index: -1; /* Asigură-te că gradientul este în spatele cercului gri */
+  top: -4px; /* Ajustează pentru a crea efectul de bordură */
+  left: -4px;
+  width: calc(100% + 8px); /* Adaugă grosimea bordurii */
+  height: calc(100% + 8px); /* Adaugă grosimea bordurii */
+  border-radius: 50%; /* Asigură-te că gradientul este rotund */
+  background: linear-gradient(to right, #f49032, #d35400); /* Gradient pentru bordură */
+  z-index: 0; /* Gradientul să fie sub cerc */
 }
   </style>
 </head>
