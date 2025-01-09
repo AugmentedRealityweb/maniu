@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Meniu Restaurant - Pagina Principală</title>
   <!-- Vue 3 (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
@@ -35,6 +35,7 @@
     .scrollbar::-webkit-scrollbar-track {
       background-color: #000000;
     }
+
     .btn-orange {
       background: linear-gradient(to right, #f49032, #d35400);
       color: #fff;
@@ -68,20 +69,16 @@
     .btn-incdec:hover {
       transform: scale(1.1);
     }
+
     @keyframes shake {
-      0%, 100% {
-        transform: translateX(0);
-      }
-      20%, 60% {
-        transform: translateX(-5px);
-      }
-      40%, 80% {
-        transform: translateX(5px);
-      }
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
     }
     .animate-shake {
       animation: shake 0.5s;
     }
+
     .slide-cart-enter-active,
     .slide-cart-leave-active {
       transition: max-height 0.5s ease, opacity 0.5s ease;
@@ -101,9 +98,16 @@
       transform: translateX(-50px);
       opacity: 0;
     }
+
     .scratches {
       background-color: #000;
-      background-image: repeating-linear-gradient(45deg, rgba(231,140,0,0.15), rgba(231,140,0,0.15) 2px, transparent 2px, transparent 20px);
+      background-image: repeating-linear-gradient(
+        45deg,
+        rgba(231,140,0,0.15),
+        rgba(231,140,0,0.15) 2px,
+        transparent 2px,
+        transparent 20px
+      );
     }
     .sidebar {
       border-right: 2px solid #e78c00;
@@ -156,6 +160,7 @@
       color: #f49032;
       text-align: center;
     }
+
     @keyframes fadeInLeft {
       0% {
         transform: translateX(-50px);
@@ -184,48 +189,40 @@
       overflow-y: auto;
     }
 
-    /* AȘEZARE CIRCULARĂ A MESELOR */
+    /* TABELA - 12 mese, 4 pe rând */
     .table-zone {
-      position: relative;
-      width: 350px;   /* Dimensiune fixă a containerului */
-      height: 350px;
-      margin: 2rem auto; /* Centrează containerul pe orizontală */
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 1rem;
+      margin-top: 2rem;
+      justify-items: center; /* Să fie centrate pe coloană */
     }
     .table-circle {
-      position: absolute;
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
       font-weight: bold;
-      transition: background-color 0.3s ease;
-      /* Culoare de bază - Gri */
-      background: #777;
+      transition: background-color 0.3s ease, border 0.3s ease;
+      /* Situația implicită: Gri + border gradient */
+      background: #666; 
       color: #fff;
-    }
-    /* Mesajul de deasupra mesei (fără fundal, text alb + shadow) */
-    .table-message {
-      position: absolute;
-      top: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #fff;
-      text-shadow: 1px 1px 2px #000;
-      font-size: 0.85rem;
-      white-space: nowrap;
-      pointer-events: none; 
-      z-index: 2; 
+      border: 3px solid transparent;
+      /* Folosim un "border-image" gradient */
+      border-image: linear-gradient(to right, #f49032, #d35400) 1;
     }
   </style>
 </head>
 <body>
   <div id="app" class="h-screen flex overflow-hidden">
-    <!-- SIDEBAR pe desktop -->
+    <!-- SIDEBAR desktop -->
     <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
-      <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">Meniu Restaurant</div>
+      <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">
+        Meniu Restaurant
+      </div>
       <nav class="flex flex-col space-y-2">
         <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'">
           <span class="material-icons">restaurant_menu</span>Meniu
@@ -245,9 +242,11 @@
     <!-- CONȚINUT PRINCIPAL -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-2">
       <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
-        <!-- BUTON + TITLU pe mobile -->
+        <!-- BUTON + TITLU mobil -->
         <div class="flex items-center justify-between mb-4 md:hidden">
-          <div class="handwriting-title text-2xl font-bold fade-in-left">Meniu Restaurant</div>
+          <div class="handwriting-title text-2xl font-bold fade-in-left">
+            Meniu Restaurant
+          </div>
           <button 
             class="bg-black border-2 border-[#e78c00] hover:bg-[#e78c00] hover:text-black text-white p-2 rounded-full" 
             @click="isSidebarVisible = !isSidebarVisible"
@@ -256,7 +255,7 @@
           </button>
         </div>
 
-        <!-- SIDEBAR pe mobile (afișat condiționat) -->
+        <!-- SIDEBAR mobil (afișat condiționat) -->
         <transition name="slide-fade">
           <aside 
             v-if="isSidebarVisible" 
@@ -266,16 +265,28 @@
               <span class="material-icons">close</span>
             </button>
             <nav class="flex flex-col space-y-2">
-              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'; isSidebarVisible=false">
+              <button 
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                @click="activeTab='meniu'; isSidebarVisible=false"
+              >
                 <span class="material-icons">restaurant_menu</span>Meniu
               </button>
-              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='puncte'; isSidebarVisible=false">
+              <button 
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                @click="activeTab='puncte'; isSidebarVisible=false"
+              >
                 <span class="material-icons">star</span>Puncte
               </button>
-              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale'; isSidebarVisible=false">
+              <button 
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                @click="activeTab='comenzileTale'; isSidebarVisible=false"
+              >
                 <span class="material-icons">receipt</span>Comenzile Tale
               </button>
-              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='social'; isSidebarVisible=false">
+              <button 
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                @click="activeTab='social'; isSidebarVisible=false"
+              >
                 <span class="material-icons">group</span>Social
               </button>
             </nav>
@@ -294,12 +305,15 @@
             />
           </div>
 
-          <!-- Rezultatele căutării -->
+          <!-- Rezultate căutare -->
           <div v-if="searchQuery.trim()">
             <h2 class="text-xl font-semibold mb-4 text-center">
               Rezultate pentru: "{{ searchQuery }}"
             </h2>
-            <div v-if="displayedProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div 
+              v-if="displayedProducts.length > 0" 
+              class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+            >
               <div 
                 v-for="product in displayedProducts" 
                 :key="product.title" 
@@ -314,13 +328,17 @@
               </div>
             </div>
             <div v-else>
-              <p class="text-center">Nu a fost găsit niciun produs care să corespundă căutării.</p>
+              <p class="text-center">
+                Nu a fost găsit niciun produs care să corespundă căutării.
+              </p>
             </div>
           </div>
-          <!-- Afișarea categoriilor / produselor -->
+          <!-- Categorii / Produse -->
           <div v-else>
             <div v-if="view === 'categorii'">
-              <h2 class="text-xl font-semibold mb-4 text-center">Alege Categoria</h2>
+              <h2 class="text-xl font-semibold mb-4 text-center">
+                Alege Categoria
+              </h2>
               <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <div 
                   v-for="category in categories" 
@@ -359,7 +377,7 @@
             </div>
           </div>
 
-          <!-- Modal detalii produs -->
+          <!-- Modal produs -->
           <div 
             v-if="currentProduct" 
             class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
@@ -371,12 +389,20 @@
               >
                 &times;
               </button>
-              <img :src="currentProduct.image" :alt="currentProduct.title" class="w-full h-64 object-cover mb-4 rounded-lg"/>
-              <h2 class="text-xl font-bold mb-2 handwriting-title">{{ currentProduct.title }}</h2>
+              <img 
+                :src="currentProduct.image" 
+                :alt="currentProduct.title" 
+                class="w-full h-64 object-cover mb-4 rounded-lg"
+              />
+              <h2 class="text-xl font-bold mb-2 handwriting-title">
+                {{ currentProduct.title }}
+              </h2>
               <p class="text-[#f49032] font-bold text-lg mb-4">
                 {{ currentProduct.price }} Lei
               </p>
-              <p class="text-gray-400 mb-4">{{ currentProduct.description }}</p>
+              <p class="text-gray-400 mb-4">
+                {{ currentProduct.description }}
+              </p>
               <ul class="text-gray-300 mb-4">
                 <li 
                   v-for="ingredient in currentProduct.ingredients" 
@@ -404,11 +430,12 @@
             </div>
             <div v-else>
               <p class="text-gray-300 mb-2 text-center">
-                Număr client: <span class="font-bold">#{{ clientNumber }}</span>
+                Număr client: 
+                <span class="font-bold">#{{ clientNumber }}</span>
               </p>
             </div>
             <p class="text-gray-300 text-center">
-              Puncte acumulate:
+              Puncte acumulate: 
               <span class="font-bold text-[#f49032]">
                 {{ clientPoints.toFixed(2) }}
               </span>
@@ -496,30 +523,23 @@
               </button>
             </div>
 
-            <!-- Mese dispuse circular -->
+            <!-- 12 mese, 4 pe rând, checking mesaje -->
             <div class="table-zone">
               <div 
                 v-for="tableNum in 12" 
                 :key="tableNum" 
                 class="table-circle"
-                :style="[computeTableStyle(tableNum), tableColor(tableNum)]"
+                :style="tableStyle(tableNum)"
               >
-                <!-- Mesaj deasupra mesei (dispare după 3s) -->
-                <div 
-                  v-if="tableLastMessages[tableNum]" 
-                  class="table-message"
-                >
-                  {{ tableLastMessages[tableNum].text }}
-                </div>
-                <!-- Text în cerc -->
-                Masa {{ tableNum }}
+                <!-- Text central -->
+                Masa numărul {{ tableNum }}
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      <!-- Buton pentru Coș (dacă avem produse) -->
+      <!-- Buton Coș (dacă avem produse) -->
       <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
         <button 
           @click="toggleOrderBar" 
@@ -586,7 +606,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT VUE + FIREBASE -->
+  <!-- SCRIPTUL PRINCIPAL -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import {
@@ -604,7 +624,7 @@
       orderBy
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    /* --- CONFIG FIREBASE (înlocuiește cu datele tale) --- */
+    /* --- CONFIGUREAZĂ FIREBASE AICI --- */
     const firebaseConfig = {
   apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
   authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -675,14 +695,13 @@
           usernameInput: "",
           usernameSet: false,
           newMessage: "",
-          chatMessages: [],      // mesaje aduse din Firestore (<=10 min)
-          tableLastMessages: {}, // stocăm temporar msg la fiecare masă (dispare după 3 sec.)
+          chatMessages: [],  // mesaje sub 10 min
 
           // Stiluri
           gradientStyle: "linear-gradient(to right, #f49032, #d35400)",
-          greyStyle: "#777",
+          greyStyle: "#666",
 
-          /* -- Produse (demo) -- */
+          /* Date demo - categorii + produse */
           categories: [
             {
               name: "brunch",
@@ -862,7 +881,10 @@
             for (const prod of this.products[catKey]) {
               const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
               const descNoDiac = removeDiacritics(prod.description.toLowerCase());
-              if (titleNoDiac.includes(q) || descNoDiac.includes(q)) {
+              if (
+                titleNoDiac.includes(q) ||
+                descNoDiac.includes(q)
+              ) {
                 results.push(prod);
               }
             }
@@ -935,8 +957,8 @@
           try {
             const userId = localStorage.getItem("userId") || Date.now().toString();
             localStorage.setItem("userId", userId);
-            this.sessionCode = await getOrCreateSessionCode(this.tableId);
 
+            this.sessionCode = await getOrCreateSessionCode(this.tableId);
             let pointsToAdd = 0;
             for (const item of this.orders) {
               pointsToAdd += item.price * item.quantity * 0.05;
@@ -985,6 +1007,7 @@
             console.error("Eroare la preluarea comenzilor:", e);
           }
         },
+
         /* -- SOCIAL -- */
         setUsername() {
           if (!this.usernameInput.trim()) return;
@@ -997,8 +1020,6 @@
             const now = new Date();
             const TEN_MIN_MS = 10 * 60 * 1000;
             const finalMsgs = [];
-
-            // Reconstituim array-ul final, doar mesaje mai noi de 10 min
             snapshot.forEach(docItem => {
               const data = docItem.data();
               if (!data.timestamp) return;
@@ -1008,28 +1029,7 @@
               }
             });
             this.chatMessages = finalMsgs;
-
-            // Verificăm mesaje nou adăugate
-            snapshot.docChanges().forEach(change => {
-              if (change.type === "added") {
-                const data = change.doc.data();
-                if (!data.timestamp) return;
-                const docTime = data.timestamp.toDate();
-                if ((now - docTime) < TEN_MIN_MS) {
-                  this.showTemporaryMessage(data);
-                }
-              }
-            });
           });
-        },
-        showTemporaryMessage(msgData) {
-          const tNum = msgData.tableNumber;
-          this.tableLastMessages[tNum] = msgData;
-          setTimeout(() => {
-            if (this.tableLastMessages[tNum] === msgData) {
-              this.tableLastMessages[tNum] = null;
-            }
-          }, 3000);
         },
         async postMessage() {
           if (!this.newMessage.trim()) return;
@@ -1051,22 +1051,23 @@
             console.error("Eroare la trimiterea mesajului:", err);
           }
         },
-        computeTableStyle(tableNum) {
-          // Poziționează mesele pe un cerc
-          const angle = (tableNum - 1) * (360 / 12) * Math.PI / 180;
-          const radius = 120;
-          const center = 175; 
-          const x = center + radius * Math.cos(angle);
-          const y = center + radius * Math.sin(angle);
-          return {
-            transform: `translate(${x}px, ${y}px)`
-          };
-        },
-        tableColor(tableNum) {
+        /* Determină stilul mesei (gri+border vs. gradient fill) */
+        tableStyle(tableNum) {
           const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
+          // Dacă are mesaje, facem tot cercul gradient
+          if (hasMessages) {
+            return {
+              background: this.gradientStyle,
+              color: '#000',
+              border: '3px solid transparent'
+            };
+          }
+          // Dacă n-are mesaje, fill gri și border gradient
           return {
-            background: hasMessages ? this.gradientStyle : this.greyStyle,
-            color: hasMessages ? '#000' : '#fff'
+            background: this.greyStyle,
+            color: '#fff',
+            border: '3px solid transparent',
+            borderImage: this.gradientStyle + ' 1'
           };
         }
       },
@@ -1104,14 +1105,14 @@
 
         this.fetchOrders();
 
-        // Dacă username-ul e deja salvat, îl setăm direct
+        // Verificăm dacă avem deja username
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
           this.usernameSet = true;
           this.usernameInput = storedUsername;
         }
 
-        // Dacă avem deja username, încărcăm mesajele
+        // Dacă avem username, încărcăm direct mesajele
         if (this.usernameSet) {
           this.loadMessages();
         }
