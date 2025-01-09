@@ -198,35 +198,18 @@
       justify-items: center; /* Să fie centrate pe coloană */
     }
     .table-circle {
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-
-  /* Situația implicită: Gri */
-  background: #666; 
+  transition: background-color 0.3s ease;
+  background: #999085; /* Fundal gri */
   color: #fff;
-
-  /* Bordura rotundă cu gradient */
-  position: relative;
-  z-index: 0;
-}
-
-.table-circle::before {
-  content: '';
-  position: absolute;
-  top: -3px;
-  left: -3px;
-  right: -3px;
-  bottom: -3px;
-  z-index: -1;
-  border-radius: 50%;
-  background: linear-gradient(to right, #f49032, #d35400);
+  border: none; /* Elimină bordura complet */
 }
   </style>
 </head>
@@ -1068,20 +1051,16 @@
         /* Determină stilul mesei (gri+border vs. gradient fill) */
         tableStyle(tableNum) {
   const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
-
-  // Stiluri de bază pentru cerc
-  const baseStyle = {
-    background: this.greyStyle, // Fundal gri implicit
-    color: '#fff', // Text alb implicit
-  };
-
-  // Dacă cercul are mesaje, schimbăm fundalul în gradient
   if (hasMessages) {
-    baseStyle.background = this.gradientStyle; // Gradient complet
-    baseStyle.color = '#000'; // Text negru pentru contrast
+    return {
+      background: this.gradientStyle,
+      color: '#000'
+    };
   }
-
-  return baseStyle;
+  return {
+    background: this.greyStyle,
+    color: '#fff'
+  };
 }
       },
       mounted() {
