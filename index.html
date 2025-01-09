@@ -200,35 +200,34 @@
     .table-circle {
   width: 70px;
   height: 70px;
-  border-radius: 50%;
+  border-radius: 30%;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  background: #999085; /* Fundal gri implicit */
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  background: #999085; /* Fundal gri */
   color: #fff;
   position: relative;
   z-index: 1;
+  box-shadow: 0 0 0 4px transparent; /* Inițial fără contur */
 }
 
 .table-circle:before {
   content: "";
   position: absolute;
-  top: -6px;
-  left: -6px;
-  right: -6px;
-  bottom: -6px;
-  border-radius: 50%;
-  background: linear-gradient(45deg, #f49032, #d35400); /* Gradient pentru cerc */
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 30%;
   z-index: -1;
-  opacity: 0; /* Ascuns implicit */
-  transition: opacity 0.3s ease;
+  transition: box-shadow 0.3s ease;
 }
 
-.table-circle[style*="background: #666"]:before {
-  opacity: 1; /* Afișăm gradientul când fundalul este gri */
+.table-circle[style*="background: #666"] {
+  box-shadow: 0 0 0 4px #fc912d; /* Contur portocaliu */
 }
   </style>
 </head>
@@ -1073,12 +1072,14 @@
   if (hasMessages) {
     return {
       background: this.gradientStyle,
-      color: '#000'
+      color: '#000',
+      boxShadow: 'none'
     };
   }
   return {
     background: '#666', // Fundal gri
-    color: '#fff'
+    color: '#fff',
+    boxShadow: '0 0 0 4px #fc912d' // Contur portocaliu
   };
 }
       },
