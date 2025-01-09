@@ -206,10 +206,28 @@
   justify-content: center;
   text-align: center;
   font-weight: bold;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, border 0.3s ease;
   background: #999085; /* Fundal gri */
   color: #fff;
-  border: none; /* Elimină bordura complet */
+  position: relative;
+  z-index: 1;
+}
+
+.table-circle:before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #f49032, #d35400);
+  z-index: -1;
+  display: none; /* Ascuns implicit */
+}
+
+.table-circle[style*="background: #666"]::before {
+  display: block; /* Afișează bordura gradient doar pentru cercurile gri */
 }
   </style>
 </head>
@@ -529,7 +547,7 @@
                 :style="tableStyle(tableNum)"
               >
                 <!-- Text central -->
-                Masa numărul {{ tableNum }}
+                Masa {{ tableNum }}
               </div>
             </div>
           </div>
@@ -1058,7 +1076,7 @@
     };
   }
   return {
-    background: this.greyStyle,
+    background: '#666', // Fundal gri
     color: '#fff'
   };
 }
@@ -1067,9 +1085,9 @@
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
         if (masaParam) {
-          this.tableId = `Masa numărul ${masaParam}`;
+          this.tableId = `Masa ${masaParam}`;
         } else {
-          this.tableId = "Masa numărul 1";
+          this.tableId = "Masa 1";
         }
 
         const storedNumber = localStorage.getItem("clientNumber");
