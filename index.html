@@ -1226,12 +1226,11 @@
           this.showBackToTop = scrolled > 200;
         },
         scrollTop() {
-          // Derulăm <main> la 0
-          this.$refs.mainScroller.scrollTo({
-            top: 0,
-            behavior: "smooth"
-          });
-        },
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth", // Derulare lină
+  });
+},
         toggleLayout() {
           this.isGrid = !this.isGrid;
         },
