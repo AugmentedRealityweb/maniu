@@ -206,11 +206,12 @@
   justify-content: center;
   text-align: center;
   font-weight: bold;
-  transition: background-color 0.3s ease, border 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
   background: #999085; /* Fundal gri */
   color: #fff;
   position: relative;
   z-index: 1;
+  box-shadow: 0 0 0 4px transparent; /* Inițial fără contur */
 }
 
 .table-circle:before {
@@ -221,14 +222,12 @@
   right: -4px;
   bottom: -4px;
   border-radius: 50%;
-  background: transparent; /* Inițial transparent */
-  border: 2px solid #f49032; /* Bordura portocalie */
   z-index: -1;
-  display: none; /* Ascuns implicit */
+  transition: box-shadow 0.3s ease;
 }
 
-.table-circle[style*="background: #666"]:before {
-  display: block; /* Afișează bordura portocalie */
+.table-circle[style*="background: #666"] {
+  box-shadow: 0 0 0 4px #f49032; /* Contur portocaliu */
 }
   </style>
 </head>
@@ -1073,12 +1072,14 @@
   if (hasMessages) {
     return {
       background: this.gradientStyle,
-      color: '#000'
+      color: '#000',
+      boxShadow: 'none'
     };
   }
   return {
     background: '#666', // Fundal gri
-    color: '#fff'
+    color: '#fff',
+    boxShadow: '0 0 0 4px #f49032' // Contur portocaliu
   };
 }
       },
