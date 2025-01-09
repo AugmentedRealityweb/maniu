@@ -184,52 +184,46 @@
       overflow-y: auto;
     }
 
-    /* STIL PENTRU TABUL SOCIAL */
+    /* AȘEZARE CIRCULARĂ A MESELOR */
     .table-zone {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-gap: 1rem;
-      justify-items: center;
-      margin-top: 2rem;
+      position: relative;
+      width: 350px;   /* Dimensiune fixă a containerului */
+      height: 350px;
+      margin: 2rem auto; /* Centrează containerul pe orizontală */
     }
     .table-circle {
-      position: relative;
-      width: 70px;
-      height: 70px;
-      /* Gradient la fel ca butonul */
-      background: linear-gradient(to right, #f49032, #d35400);
+      position: absolute;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #000;
-      font-weight: bold;
       text-align: center;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+      /* Culoare de bază - Gri */
+      background: #777;
+      color: #fff;
     }
-    .table-circle .table-label {
-      display: flex;
-      flex-direction: column;
-      font-size: 0.8rem;
-      line-height: 1.1;
-    }
+    /* Mesajul de deasupra mesei (fără fundal, text alb + shadow) */
     .table-message {
       position: absolute;
-      top: -20px; /* un pic mai sus */
+      top: -20px;
       left: 50%;
       transform: translateX(-50%);
-      /* Fără background, doar text alb cu text-shadow */
       color: #fff;
       text-shadow: 1px 1px 2px #000;
       font-size: 0.85rem;
-      max-width: 110px;
-      text-align: center;
-      z-index: 10;
       white-space: nowrap;
+      pointer-events: none; 
+      z-index: 2; 
     }
   </style>
 </head>
 <body>
   <div id="app" class="h-screen flex overflow-hidden">
+    <!-- SIDEBAR pe desktop -->
     <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
       <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">Meniu Restaurant</div>
       <nav class="flex flex-col space-y-2">
@@ -242,16 +236,16 @@
         <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale'">
           <span class="material-icons">receipt</span>Comenzile Tale
         </button>
-        <!-- TAB SOCIAL -->
         <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='social'">
           <span class="material-icons">group</span>Social
         </button>
       </nav>
     </aside>
 
+    <!-- CONȚINUT PRINCIPAL -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-2">
       <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
-        <!-- Butonul și titlul doar pentru mobile -->
+        <!-- BUTON + TITLU pe mobile -->
         <div class="flex items-center justify-between mb-4 md:hidden">
           <div class="handwriting-title text-2xl font-bold fade-in-left">Meniu Restaurant</div>
           <button 
@@ -262,7 +256,7 @@
           </button>
         </div>
 
-        <!-- Sidebar pe mobile (afișat condiționat) -->
+        <!-- SIDEBAR pe mobile (afișat condiționat) -->
         <transition name="slide-fade">
           <aside 
             v-if="isSidebarVisible" 
@@ -272,36 +266,23 @@
               <span class="material-icons">close</span>
             </button>
             <nav class="flex flex-col space-y-2">
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                @click="activeTab='meniu'; isSidebarVisible=false"
-              >
+              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'; isSidebarVisible=false">
                 <span class="material-icons">restaurant_menu</span>Meniu
               </button>
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                @click="activeTab='puncte'; isSidebarVisible=false"
-              >
+              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='puncte'; isSidebarVisible=false">
                 <span class="material-icons">star</span>Puncte
               </button>
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                @click="activeTab='comenzileTale'; isSidebarVisible=false"
-              >
+              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale'; isSidebarVisible=false">
                 <span class="material-icons">receipt</span>Comenzile Tale
               </button>
-              <!-- TAB SOCIAL (mobil) -->
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                @click="activeTab='social'; isSidebarVisible=false"
-              >
+              <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='social'; isSidebarVisible=false">
                 <span class="material-icons">group</span>Social
               </button>
             </nav>
           </aside>
         </transition>
 
-        <!-- TAB MENIU -->
+        <!-- TAB: MENIU -->
         <section v-if="activeTab === 'meniu'">
           <!-- Căutare produse -->
           <div class="flex items-center gap-4 mb-4">
@@ -333,12 +314,10 @@
               </div>
             </div>
             <div v-else>
-              <p class="text-center">
-                Nu a fost găsit niciun produs care să corespundă căutării.
-              </p>
+              <p class="text-center">Nu a fost găsit niciun produs care să corespundă căutării.</p>
             </div>
           </div>
-          <!-- Afișare categorii / produse -->
+          <!-- Afișarea categoriilor / produselor -->
           <div v-else>
             <div v-if="view === 'categorii'">
               <h2 class="text-xl font-semibold mb-4 text-center">Alege Categoria</h2>
@@ -392,18 +371,12 @@
               >
                 &times;
               </button>
-              <img 
-                :src="currentProduct.image" 
-                :alt="currentProduct.title" 
-                class="w-full h-64 object-cover mb-4 rounded-lg"
-              />
+              <img :src="currentProduct.image" :alt="currentProduct.title" class="w-full h-64 object-cover mb-4 rounded-lg"/>
               <h2 class="text-xl font-bold mb-2 handwriting-title">{{ currentProduct.title }}</h2>
               <p class="text-[#f49032] font-bold text-lg mb-4">
                 {{ currentProduct.price }} Lei
               </p>
-              <p class="text-gray-400 mb-4">
-                {{ currentProduct.description }}
-              </p>
+              <p class="text-gray-400 mb-4">{{ currentProduct.description }}</p>
               <ul class="text-gray-300 mb-4">
                 <li 
                   v-for="ingredient in currentProduct.ingredients" 
@@ -420,7 +393,7 @@
           </div>
         </section>
 
-        <!-- TAB Puncte -->
+        <!-- TAB: Puncte -->
         <section v-else-if="activeTab === 'puncte'">
           <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
           <div class="bg-black p-4 rounded border border-[#e78c00] shadow max-w-md scratches mx-auto">
@@ -435,7 +408,7 @@
               </p>
             </div>
             <p class="text-gray-300 text-center">
-              Puncte acumulate: 
+              Puncte acumulate:
               <span class="font-bold text-[#f49032]">
                 {{ clientPoints.toFixed(2) }}
               </span>
@@ -443,7 +416,7 @@
           </div>
         </section>
 
-        <!-- TAB Comenzile Tale -->
+        <!-- TAB: Comenzile Tale -->
         <section v-else-if="activeTab === 'comenzileTale'">
           <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
           <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
@@ -469,7 +442,6 @@
               <div class="mt-2 font-bold text-[#f49032]">
                 Total: {{ order.total }} Lei
               </div>
-              <!-- ID-ul comenzii & codul sesiunii -->
               <div class="text-sm text-gray-400">
                 ID comandă: {{ order.orderId }} | Cod sesiune: {{ order.sessionCode }}
               </div>
@@ -477,13 +449,12 @@
           </div>
         </section>
 
-        <!-- TAB Social -->
+        <!-- TAB: Social -->
         <section v-else-if="activeTab === 'social'">
-          <!-- Verifică dacă avem username -->
           <div v-if="!usernameSet" class="text-center">
             <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
             <p class="mb-4 text-gray-300 max-w-md mx-auto">
-              Bun venit în zona de socializare! <br />
+              Bun venit în zona de socializare!  
               Te rugăm să îți introduci numele înainte de a putea vedea conversația sau a trimite mesaje.
             </p>
             <div class="flex flex-col items-center max-w-sm mx-auto">
@@ -500,7 +471,7 @@
           </div>
           <div v-else>
             <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
-            <!-- Chat global -->
+            <!-- Chat global (mesaje <= 10 minute) -->
             <div class="mb-4 bg-black border border-[#e78c00] p-4 rounded scratches max-h-60 overflow-y-auto">
               <div 
                 v-for="message in chatMessages" 
@@ -525,32 +496,30 @@
               </button>
             </div>
 
-            <!-- Zona cu 12 mese (cercuri) -->
+            <!-- Mese dispuse circular -->
             <div class="table-zone">
               <div 
                 v-for="tableNum in 12" 
                 :key="tableNum" 
                 class="table-circle"
+                :style="[computeTableStyle(tableNum), tableColor(tableNum)]"
               >
-                <!-- Ultimul mesaj, dacă există, deasupra mesei -->
+                <!-- Mesaj deasupra mesei (dispare după 3s) -->
                 <div 
                   v-if="tableLastMessages[tableNum]" 
                   class="table-message"
                 >
                   {{ tableLastMessages[tableNum].text }}
                 </div>
-                <!-- Afișăm "Masa" sus, apoi numărul jos -->
-                <div class="table-label">
-                  <span>Masa</span>
-                  <span>{{ tableNum }}</span>
-                </div>
+                <!-- Text în cerc -->
+                Masa {{ tableNum }}
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      <!-- Buton Coș (dacă avem produse) -->
+      <!-- Buton pentru Coș (dacă avem produse) -->
       <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
         <button 
           @click="toggleOrderBar" 
@@ -562,7 +531,7 @@
         </button>
       </div>
 
-      <!-- Bara laterală coș -->
+      <!-- Bara laterală a Coșului -->
       <transition name="slide-cart">
         <aside 
           v-show="isOrderOpen && orders.length > 0" 
@@ -588,7 +557,6 @@
                   <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
                   <span class="text-gray-400">x{{ order.quantity }}</span>
                   <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
-                  <!-- Ștergere produs -->
                   <button 
                     class="bg-red-600 hover:bg-red-800 text-white px-2 py-1 rounded-full" 
                     @click="removeItem(index)"
@@ -618,6 +586,7 @@
     </div>
   </div>
 
+  <!-- SCRIPT VUE + FIREBASE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import {
@@ -635,29 +604,27 @@
       orderBy
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
+    /* --- CONFIG FIREBASE (înlocuiește cu datele tale) --- */
     const firebaseConfig = {
-      apiKey: "AIzaSy...",
-      authDomain: "restaurantapp-d0256.firebaseapp.com",
-      projectId: "restaurantapp-d0256",
-      storageBucket: "restaurantapp-d0256.firebasestorage.app",
-      messagingSenderId: "275208346650",
-      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-      measurementId: "G-F44TB27G17"
-    };
+  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+  authDomain: "restaurantapp-d0256.firebaseapp.com",
+  projectId: "restaurantapp-d0256",
+  storageBucket: "restaurantapp-d0256.firebasestorage.app",
+  messagingSenderId: "275208346650",
+  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+  measurementId: "G-F44TB27G17"
+};
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
+    /* --- HELPER --- */
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
-
     function generateSessionCode() {
-      // Generează un număr aleator între 1000 și 9999
-      const code = Math.floor(1000 + Math.random() * 9000).toString();
-      return code;
+      return Math.floor(1000 + Math.random() * 9000).toString();
     }
-
     async function getOrCreateSessionCode(tableId) {
       if (!tableId) {
         throw new Error("Nu există parametru pentru masă în URL.");
@@ -706,11 +673,16 @@
 
           /* SOCIAL */
           usernameInput: "",
-          usernameSet: false,  // devine true după ce utilizatorul își setează numele
+          usernameSet: false,
           newMessage: "",
-          chatMessages: [],    // toate mesajele încărcate din Firestore (care nu au expirat)
-          tableLastMessages: {}, // stocăm ultimul mesaj pentru fiecare masă (apare 3 sec)
+          chatMessages: [],      // mesaje aduse din Firestore (<=10 min)
+          tableLastMessages: {}, // stocăm temporar msg la fiecare masă (dispare după 3 sec.)
 
+          // Stiluri
+          gradientStyle: "linear-gradient(to right, #f49032, #d35400)",
+          greyStyle: "#777",
+
+          /* -- Produse (demo) -- */
           categories: [
             {
               name: "brunch",
@@ -890,10 +862,7 @@
             for (const prod of this.products[catKey]) {
               const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
               const descNoDiac = removeDiacritics(prod.description.toLowerCase());
-              if (
-                titleNoDiac.includes(q) ||
-                descNoDiac.includes(q)
-              ) {
+              if (titleNoDiac.includes(q) || descNoDiac.includes(q)) {
                 results.push(prod);
               }
             }
@@ -922,17 +891,13 @@
           this.currentProducts = this.products[categoryName] || [];
           this.view = "produse";
           this.searchQuery = "";
-          this.$nextTick(() => {
-            window.scrollTo(0, 0);
-          });
+          this.$nextTick(() => window.scrollTo(0, 0));
         },
         backToCategories() {
           this.view = "categorii";
           this.currentProduct = null;
           this.searchQuery = "";
-          this.$nextTick(() => {
-            window.scrollTo(0, 0);
-          });
+          this.$nextTick(() => window.scrollTo(0, 0));
         },
         showProductDetails(product) {
           this.currentProduct = product;
@@ -950,9 +915,7 @@
           }
           this.currentProduct = null;
           this.isShaking = true;
-          setTimeout(() => {
-            this.isShaking = false;
-          }, 500);
+          setTimeout(() => this.isShaking = false, 500);
         },
         removeItem(index) {
           this.orders.splice(index, 1);
@@ -970,21 +933,16 @@
         },
         async checkout() {
           try {
-            // Obține sau generează un userId unic pentru utilizator
             const userId = localStorage.getItem("userId") || Date.now().toString();
             localStorage.setItem("userId", userId);
-
-            // Obține sau generează codul sesiunii pentru masă
             this.sessionCode = await getOrCreateSessionCode(this.tableId);
 
-            // Calcul puncte de fidelitate
             let pointsToAdd = 0;
             for (const item of this.orders) {
               pointsToAdd += item.price * item.quantity * 0.05;
             }
             this.clientPoints += pointsToAdd;
 
-            // Creează datele comenzii
             const orderData = {
               userId,
               tableId: this.tableId,
@@ -995,15 +953,11 @@
               status: "open",
               timestamp: serverTimestamp()
             };
-
-            // Salvează comanda în Firestore
             await addDoc(collection(db, "orders"), orderData);
 
-            // Resetează coșul și închide
             this.orders = [];
             this.isOrderOpen = false;
 
-            // Redirecționează către confirm.html
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
@@ -1019,10 +973,7 @@
               this.myOrders = [];
               return;
             }
-            const qRef = query(
-              collection(db, "orders"),
-              where("clientNumber", "==", this.clientNumber)
-            );
+            const qRef = query(collection(db, "orders"), where("clientNumber", "==", this.clientNumber));
             const snap = await getDocs(qRef);
             this.myOrders = [];
             snap.forEach(docSnap => {
@@ -1034,62 +985,47 @@
             console.error("Eroare la preluarea comenzilor:", e);
           }
         },
-
-        /* ---- Funcții pentru Social ---- */
+        /* -- SOCIAL -- */
         setUsername() {
           if (!this.usernameInput.trim()) return;
-          // Salvăm user-ul local, astfel încât să nu trebuiască reintrodus
           localStorage.setItem("username", this.usernameInput.trim());
           this.usernameSet = true;
         },
         loadMessages() {
-          // Ascultăm în timp real colecția "chatMessages", filtrăm mesaje mai vechi de 10 minute
           const qRef = query(collection(db, "chatMessages"), orderBy("timestamp", "asc"));
           onSnapshot(qRef, (snapshot) => {
             const now = new Date();
             const TEN_MIN_MS = 10 * 60 * 1000;
-            const msgs = [];
-
-            // Observăm doar schimbările, ca să rulăm logica de ephemeral la mesă
-            snapshot.docChanges().forEach((change) => {
-              if (change.type === "added") {
-                const docData = change.doc.data();
-                const docTime = docData.timestamp ? docData.timestamp.toDate() : null;
-                // Filtrare mesaje >10 minute
-                if (docTime && (now - docTime) < TEN_MIN_MS) {
-                  // Adăugăm la array
-                  msgs.push({
-                    id: change.doc.id,
-                    ...docData
-                  });
-                  // Afișare scurtă (3s) la masă
-                  this.showTemporaryMessage(docData);
-                }
-              }
-              // pot fi și changed / removed, dar pt simplitate ne ocupăm doar de "added" aici
-            });
-
-            // Reconstituim toată colecția curentă sub formă filtrată:
             const finalMsgs = [];
-            snapshot.forEach((doc) => {
-              const data = doc.data();
-              const docTime = data.timestamp ? data.timestamp.toDate() : null;
-              if (docTime && (now - docTime) < TEN_MIN_MS) {
-                finalMsgs.push({
-                  id: doc.id,
-                  ...data
-                });
+
+            // Reconstituim array-ul final, doar mesaje mai noi de 10 min
+            snapshot.forEach(docItem => {
+              const data = docItem.data();
+              if (!data.timestamp) return;
+              const docTime = data.timestamp.toDate();
+              if ((now - docTime) < TEN_MIN_MS) {
+                finalMsgs.push({ id: docItem.id, ...data });
               }
             });
             this.chatMessages = finalMsgs;
+
+            // Verificăm mesaje nou adăugate
+            snapshot.docChanges().forEach(change => {
+              if (change.type === "added") {
+                const data = change.doc.data();
+                if (!data.timestamp) return;
+                const docTime = data.timestamp.toDate();
+                if ((now - docTime) < TEN_MIN_MS) {
+                  this.showTemporaryMessage(data);
+                }
+              }
+            });
           });
         },
         showTemporaryMessage(msgData) {
-          // Reținem textul în tableLastMessages[masa] și îl ștergem după 3s
           const tNum = msgData.tableNumber;
           this.tableLastMessages[tNum] = msgData;
           setTimeout(() => {
-            // Verificăm dacă tot acest msgData e încă acolo
             if (this.tableLastMessages[tNum] === msgData) {
               this.tableLastMessages[tNum] = null;
             }
@@ -1100,14 +1036,13 @@
           try {
             const userName = localStorage.getItem("username");
             if (!userName) return;
-
             const masaParam = new URLSearchParams(window.location.search).get("masa") || "0";
             const tableNumber = parseInt(masaParam) || 0; 
 
             const docData = {
               name: userName,
               text: this.newMessage.trim(),
-              tableNumber: tableNumber,
+              tableNumber,
               timestamp: serverTimestamp()
             };
             await addDoc(collection(db, "chatMessages"), docData);
@@ -1115,6 +1050,24 @@
           } catch (err) {
             console.error("Eroare la trimiterea mesajului:", err);
           }
+        },
+        computeTableStyle(tableNum) {
+          // Poziționează mesele pe un cerc
+          const angle = (tableNum - 1) * (360 / 12) * Math.PI / 180;
+          const radius = 120;
+          const center = 175; 
+          const x = center + radius * Math.cos(angle);
+          const y = center + radius * Math.sin(angle);
+          return {
+            transform: `translate(${x}px, ${y}px)`
+          };
+        },
+        tableColor(tableNum) {
+          const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
+          return {
+            background: hasMessages ? this.gradientStyle : this.greyStyle,
+            color: hasMessages ? '#000' : '#fff'
+          };
         }
       },
       mounted() {
@@ -1149,14 +1102,14 @@
           this.myOrders = JSON.parse(storedMyOrders);
         }
 
-        // Verificăm dacă user-ul și-a setat deja numele
+        this.fetchOrders();
+
+        // Dacă username-ul e deja salvat, îl setăm direct
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
           this.usernameSet = true;
           this.usernameInput = storedUsername;
         }
-
-        this.fetchOrders();
 
         // Dacă avem deja username, încărcăm mesajele
         if (this.usernameSet) {
@@ -1165,7 +1118,6 @@
       },
       watch: {
         usernameSet(newVal) {
-          // De îndată ce se setează user-ul, încărcăm chat-ul
           if (newVal) {
             this.loadMessages();
           }
