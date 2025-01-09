@@ -194,29 +194,37 @@
     }
     .table-circle {
       position: relative;
-      width: 60px;
-      height: 60px;
-      background: #f49032;
+      width: 70px;
+      height: 70px;
+      /* Gradient la fel ca butonul */
+      background: linear-gradient(to right, #f49032, #d35400);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #000;
       font-weight: bold;
+      text-align: center;
+    }
+    .table-circle .table-label {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.8rem;
+      line-height: 1.1;
     }
     .table-message {
       position: absolute;
-      top: -30px; /* Deasupra cercului */
+      top: -20px; /* un pic mai sus */
       left: 50%;
       transform: translateX(-50%);
-      background: #000;
+      /* Fără background, doar text alb cu text-shadow */
       color: #fff;
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.25rem;
+      text-shadow: 1px 1px 2px #000;
       font-size: 0.85rem;
-      max-width: 100px;
+      max-width: 110px;
       text-align: center;
       z-index: 10;
+      white-space: nowrap;
     }
   </style>
 </head>
@@ -499,7 +507,9 @@
                 :key="message.id"
                 class="mb-2"
               >
-                <span class="font-bold text-[#f49032]">{{ message.name }}</span>:
+                <span class="font-bold text-[#f49032]">
+                  (masa {{ message.tableNumber }}) {{ message.name }}
+                </span>:
                 <span class="text-gray-300 ml-1">{{ message.text }}</span>
               </div>
             </div>
@@ -522,14 +532,17 @@
                 :key="tableNum" 
                 class="table-circle"
               >
-                <!-- Afișăm numărul mesei -->
-                Masa {{ tableNum }}
-                <!-- Afișăm ultimul mesaj, dacă există, deasupra mesei -->
+                <!-- Ultimul mesaj, dacă există, deasupra mesei -->
                 <div 
-                  v-if="lastMessageForTable(tableNum)" 
+                  v-if="tableLastMessages[tableNum]" 
                   class="table-message"
                 >
-                  {{ lastMessageForTable(tableNum).text }}
+                  {{ tableLastMessages[tableNum].text }}
+                </div>
+                <!-- Afișăm "Masa" sus, apoi numărul jos -->
+                <div class="table-label">
+                  <span>Masa</span>
+                  <span>{{ tableNum }}</span>
                 </div>
               </div>
             </div>
@@ -695,7 +708,8 @@
           usernameInput: "",
           usernameSet: false,  // devine true după ce utilizatorul își setează numele
           newMessage: "",
-          chatMessages: [],    // toate mesajele încărcate din Firestore
+          chatMessages: [],    // toate mesajele încărcate din Firestore (care nu au expirat)
+          tableLastMessages: {}, // stocăm ultimul mesaj pentru fiecare masă (apare 3 sec)
 
           categories: [
             {
@@ -1028,32 +1042,67 @@
           localStorage.setItem("username", this.usernameInput.trim());
           this.usernameSet = true;
         },
-        async loadMessages() {
-          // Ascultăm în timp real colecția "chatMessages" ordonată după timestamp
+        loadMessages() {
+          // Ascultăm în timp real colecția "chatMessages", filtrăm mesaje mai vechi de 10 minute
           const qRef = query(collection(db, "chatMessages"), orderBy("timestamp", "asc"));
           onSnapshot(qRef, (snapshot) => {
+            const now = new Date();
+            const TEN_MIN_MS = 10 * 60 * 1000;
             const msgs = [];
+
+            // Observăm doar schimbările, ca să rulăm logica de ephemeral la mesă
+            snapshot.docChanges().forEach((change) => {
+              if (change.type === "added") {
+                const docData = change.doc.data();
+                const docTime = docData.timestamp ? docData.timestamp.toDate() : null;
+                // Filtrare mesaje >10 minute
+                if (docTime && (now - docTime) < TEN_MIN_MS) {
+                  // Adăugăm la array
+                  msgs.push({
+                    id: change.doc.id,
+                    ...docData
+                  });
+                  // Afișare scurtă (3s) la masă
+                  this.showTemporaryMessage(docData);
+                }
+              }
+              // pot fi și changed / removed, dar pt simplitate ne ocupăm doar de "added" aici
+            });
+
+            // Reconstituim toată colecția curentă sub formă filtrată:
+            const finalMsgs = [];
             snapshot.forEach((doc) => {
               const data = doc.data();
-              msgs.push({
-                id: doc.id,
-                ...data
-              });
+              const docTime = data.timestamp ? data.timestamp.toDate() : null;
+              if (docTime && (now - docTime) < TEN_MIN_MS) {
+                finalMsgs.push({
+                  id: doc.id,
+                  ...data
+                });
+              }
             });
-            this.chatMessages = msgs;
+            this.chatMessages = finalMsgs;
           });
+        },
+        showTemporaryMessage(msgData) {
+          // Reținem textul în tableLastMessages[masa] și îl ștergem după 3s
+          const tNum = msgData.tableNumber;
+          this.tableLastMessages[tNum] = msgData;
+          setTimeout(() => {
+            // Verificăm dacă tot acest msgData e încă acolo
+            if (this.tableLastMessages[tNum] === msgData) {
+              this.tableLastMessages[tNum] = null;
+            }
+          }, 3000);
         },
         async postMessage() {
           if (!this.newMessage.trim()) return;
-
           try {
-            // putem lua numele din localStorage
             const userName = localStorage.getItem("username");
             if (!userName) return;
 
             const masaParam = new URLSearchParams(window.location.search).get("masa") || "0";
             const tableNumber = parseInt(masaParam) || 0; 
-            // ex: dacă user-ul e la masa 5, să reținem și masa
 
             const docData = {
               name: userName,
@@ -1066,13 +1115,6 @@
           } catch (err) {
             console.error("Eroare la trimiterea mesajului:", err);
           }
-        },
-        // Returnează ultimul mesaj de la o masă
-        lastMessageForTable(tableNum) {
-          // Filtrăm chatMessages pentru a găsi ultimul mesaj cu tableNumber = tableNum
-          const filtered = this.chatMessages.filter(m => m.tableNumber === tableNum);
-          if (filtered.length === 0) return null;
-          return filtered[filtered.length - 1];
         }
       },
       mounted() {
@@ -1116,7 +1158,7 @@
 
         this.fetchOrders();
 
-        // Dacă avem deja username, putem încărca mesajele
+        // Dacă avem deja username, încărcăm mesajele
         if (this.usernameSet) {
           this.loadMessages();
         }
