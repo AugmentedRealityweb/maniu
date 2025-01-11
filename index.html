@@ -4,14 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Meniu Restaurant - Pagina Principală</title>
+
   <!-- Vue 3 (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+
   <!-- TailwindCSS (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <!-- Google Material Icons (opțional) -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+
   <!-- Font “scris de mână” (Dancing Script) -->
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet"/>
+
   <style>
     /* ------------------------------------------------
        1. TEMA IMPLICITĂ - PORTOCALIU (fără clasă .theme-...)
@@ -479,7 +484,7 @@
       <!-- CONȚINUT PRINCIPAL, e scrollabil pe window, nu local -->
       <div class="flex-1 flex flex-col p-2">
         <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
-          <!-- 3) BARĂ mobilă: Buton stânga + Titlu centrat -->
+          <!-- BARĂ mobilă: Buton stânga + Titlu centrat (numai pe ecranele mici) -->
           <div class="flex items-center mb-4 md:hidden">
             <button 
               ref="mobileToggle"
@@ -551,12 +556,12 @@
               />
             </div>
 
-            <!-- Rezultate căutare -->
+            <!-- Rezultate căutare (dacă există un searchQuery) -->
             <div v-if="searchQuery.trim()">
               <h2 class="text-xl font-semibold mb-4 text-center">
                 Rezultate pentru: "{{ searchQuery }}"
               </h2>
-              <!-- Toggle grid / list button (vizibil și la căutare) -->
+              <!-- Buton pentru schimbare Grid / Listă -->
               <div class="flex justify-center mb-4">
                 <button 
                   class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
@@ -566,7 +571,7 @@
                   <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
                 </button>
               </div>
-              <!-- Afișare produse (grid col-3 sau listă) -->
+              <!-- Afișarea produselor filtrate -->
               <div 
                 v-if="displayedProducts.length > 0" 
                 :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
@@ -594,13 +599,14 @@
                 </p>
               </div>
             </div>
-            <!-- Categorii / Produse (fără căutare) -->
+            <!-- Categorii + Produse (fără căutare) -->
             <div v-else>
+              <!-- Afișăm categoriile -->
               <div v-if="view === 'categorii'">
                 <h2 class="text-xl font-semibold mb-4 text-center">
                   Alege Categoria
                 </h2>
-                <!-- Toggle grid / list button -->
+                <!-- Buton pentru schimbare Grid / Listă -->
                 <div class="flex justify-center mb-4">
                   <button 
                     class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
@@ -610,7 +616,7 @@
                     <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
                   </button>
                 </div>
-                <!-- Afișare categorii -->
+                <!-- Carduri cu categorii -->
                 <div 
                   :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
                 >
@@ -631,13 +637,13 @@
                   </div>
                 </div>
               </div>
-              <!-- Afișare produse dintr-o categorie -->
+              <!-- Afișăm produsele dintr-o categorie selectată -->
               <div v-else-if="view === 'produse'">
                 <div class="flex items-center justify-between mb-4">
                   <button class="btn-orange rounded-full" @click="backToCategories">
                     Înapoi la Categorii
                   </button>
-                  <!-- Toggle grid / list button -->
+                  <!-- Buton pentru schimbare Grid / Listă -->
                   <button 
                     class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
                     @click="toggleLayout"
@@ -672,7 +678,7 @@
               </div>
             </div>
 
-            <!-- Modal produs -->
+            <!-- Modal cu detalii produs -->
             <div 
               v-if="currentProduct" 
               class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
@@ -812,7 +818,7 @@
             <!-- Dacă utilizatorul și-a setat deja numele -->
             <div v-else>
               <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
-              <!-- Chat global (mesaje <= 10 minute) -->
+              <!-- Chat global (mesajele din ultimele 10 minute) -->
               <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto">
                 <div 
                   v-for="message in chatMessages" 
@@ -839,7 +845,7 @@
                   </div>
                 </div>
               </div>
-              <!-- Formular mesaj nou -->
+              <!-- Formular pentru mesaj nou -->
               <div class="flex gap-2 max-w-xl mx-auto">
                 <input 
                   v-model="newMessage" 
@@ -851,7 +857,7 @@
                 </button>
               </div>
 
-              <!-- 12 mese, 4 pe rând, checking mesaje -->
+              <!-- Afișăm cele 12 mese, 4 pe rând, evidențiem mesele care au mesaje -->
               <div class="table-zone">
                 <div 
                   v-for="tableNum in 12" 
@@ -865,7 +871,7 @@
             </div>
           </section>
 
-          <!-- TAB: DESIGN (cu 10 opțiuni) -->
+          <!-- TAB: DESIGN (cu 10 opțiuni de culoare) -->
           <section v-else-if="activeTab === 'design'">
             <h2 class="text-2xl font-bold mb-4 text-center">Tema de Design</h2>
             <p class="text-gray-300 text-center mb-4">Alege o temă de culori pentru aplicație:</p>
@@ -924,7 +930,7 @@
           </section>
         </main>
 
-        <!-- Buton Coș (dacă avem produse) -->
+        <!-- Buton Coș (dacă avem produse în coș) -->
         <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
           <button 
             @click="toggleOrderBar" 
@@ -936,7 +942,7 @@
           </button>
         </div>
 
-        <!-- Bara laterală a Coșului -->
+        <!-- Bara laterală a Coșului (slide-up de jos) -->
         <transition name="slide-cart">
           <aside 
             v-show="isOrderOpen && orders.length > 0" 
@@ -1005,6 +1011,7 @@
 
   <!-- SCRIPTUL PRINCIPAL -->
   <script type="module">
+    /* Importăm din Firebase v11 (sub modul) */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import {
       getFirestore,
@@ -1023,24 +1030,29 @@
 
     /* -- Config Firebase (înlocuiește cu datele tale) -- */
     const firebaseConfig = {
-  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-  authDomain: "restaurantapp-d0256.firebaseapp.com",
-  projectId: "restaurantapp-d0256",
-  storageBucket: "restaurantapp-d0256.firebasestorage.app",
-  messagingSenderId: "275208346650",
-  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-  measurementId: "G-F44TB27G17"
-};
+      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWq",
+      authDomain: "restaurantapp-d0256.firebaseapp.com",
+      projectId: "restaurantapp-d0256",
+      storageBucket: "restaurantapp-d0256.appspot.com",
+      messagingSenderId: "275208346650",
+      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+      measurementId: "G-F44TB27G17"
+    };
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
+    /* Funcție pentru eliminarea diacriticelor (caută corect) */
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
+
+    /* Generează un cod de sesiune (ospătar) de 4 cifre */
     function generateSessionCode() {
       return Math.floor(1000 + Math.random() * 9000).toString();
     }
+
+    /* Verifică sau creează o sesiune pentru Masa X în colecția "sessions" */
     async function getOrCreateSessionCode(tableId) {
       if (!tableId) {
         throw new Error("Nu există parametru pentru masă în URL.");
@@ -1068,6 +1080,7 @@
       }
     }
 
+    /* Inițializăm aplicația Vue */
     const app = Vue.createApp({
       data() {
         return {
@@ -1085,7 +1098,7 @@
           activeTab: "meniu",
           view: "categorii",
 
-          /* Liste/Obiecte goale pentru ca tu să le completezi ulterior */
+          /* CATEGORII + PRODUSE (mock data) */
           categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
@@ -1096,7 +1109,6 @@
             { name: "garnish", image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp" }
           ],
           products: {
-            /* brunch, soups, pasta, main, desserts, drinks, garnish */
             brunch: [
               {
                 title: "Toast cu avocado",
@@ -1447,16 +1459,14 @@
                 ingredients: ["Castraveți murați"]
               }
             ]
-          }
-        };
-      },
+          },
 
-          /* Produs curent / căutare */
+          /* Date specifice */
           currentProducts: [],
           currentProduct: null,
           searchQuery: "",
 
-          /* Client / comenzi */
+          /* Client */
           clientNumber: 0,
           clientPoints: 0,
           isFirstOrder: true,
@@ -1482,17 +1492,18 @@
             "https://i.giphy.com/11uoNyauChZR16.webp",
             "https://i.giphy.com/Wb0TGxvE50Xew.webp"
           ],
-          selectedAvatar: "" // avatar-ul selectat
+          selectedAvatar: ""
         };
       },
       computed: {
+        /* Produsele afișate, fie căutare globală, fie produse dintr-o categorie */
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
-            // dacă nu avem căutare, afișăm produsele din categoria curentă (dacă suntem pe "produse")
+            // Dacă nu avem căutare, afișăm doar produsele categoriei curente (dacă e "produse")
             return this.view === "produse" ? this.currentProducts : [];
           }
-          // altfel, căutăm prin toate categoriile
+          // În caz contrar, căutăm în toate categoriile
           const results = [];
           for (const catKey in this.products) {
             for (const prod of this.products[catKey]) {
@@ -1505,6 +1516,7 @@
           }
           return results;
         },
+        /* Totalul pentru coș */
         total() {
           return this.orders
             .reduce((sum, o) => sum + (o.price * o.quantity), 0)
@@ -1512,26 +1524,30 @@
         }
       },
       methods: {
+        /* Apariția butonului "Sus" la scroll */
         handleWindowScroll() {
           this.showBackToTop = (window.scrollY > 200);
         },
+        /* Scroll la începutul paginii */
         scrollTop() {
           window.scrollTo({ top: 0, behavior: "smooth" });
           document.body.scrollTop = 0;
           document.documentElement.scrollTop = 0;
         },
+        /* Comută între Grid și Listă */
         toggleLayout() {
           this.isGrid = !this.isGrid;
         },
+        /* Redenumire categorie (dacă vrei un dicționar, îl poți extinde) */
         renameCategory(cat) {
-          // Poți adăuga un dicționar propriu pentru redenumire:
           const dict = {
-            // brunch: "Mic Dejun",
-            // soups: "Supe",
-            // etc...
+            // Ex.: brunch: "Mic Dejun",
+            // soups: "Supe/Ciorbe",
+            // ...
           };
           return dict[cat] || cat;
         },
+        /* Intră în categoria selectată => afișăm produsele */
         enterCategory(categoryName) {
           this.currentProducts = this.products[categoryName] || [];
           this.view = "produse";
@@ -1544,9 +1560,11 @@
           this.searchQuery = "";
           window.scrollTo(0, 0);
         },
+        /* Deschide modalul cu detalii despre produs */
         showProductDetails(product) {
           this.currentProduct = product;
         },
+        /* Adaugă produsul în coș */
         addToOrder(product) {
           const existing = this.orders.find(o => o.name === product.title);
           if (existing) {
@@ -1559,12 +1577,15 @@
             });
           }
           this.currentProduct = null;
+          // Mică animație de "scuturare" a butonului coș
           this.isShaking = true;
           setTimeout(() => this.isShaking = false, 500);
         },
+        /* Șterge un produs din coș */
         removeItem(index) {
           this.orders.splice(index, 1);
         },
+        /* Ajustează cantitatea (+/-) */
         incrementQuantity(index) {
           this.orders[index].quantity++;
         },
@@ -1573,9 +1594,11 @@
             this.orders[index].quantity--;
           }
         },
+        /* Afișează / ascunde bara cu coșul */
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
+        /* Finalizare comandă = salvare în Firebase */
         async checkout() {
           try {
             const userId = localStorage.getItem("userId") || Date.now().toString();
@@ -1584,7 +1607,8 @@
             this.sessionCode = await getOrCreateSessionCode(this.tableId);
             let pointsToAdd = 0;
             for (const item of this.orders) {
-              pointsToAdd += item.price * item.quantity * 0.05; // exemplu: 5% din valoarea comenzii
+              // exemplu: 5% (0.05) din valoarea fiecărui produs
+              pointsToAdd += item.price * item.quantity * 0.05;
             }
             this.clientPoints += pointsToAdd;
 
@@ -1603,6 +1627,7 @@
             this.orders = [];
             this.isOrderOpen = false;
 
+            // Navigăm spre o pagină de confirmare
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
@@ -1612,6 +1637,7 @@
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
+        /* Preia comenzile anterioare ale clientului */
         async fetchOrders() {
           try {
             if (this.clientNumber === 0) {
@@ -1630,14 +1656,14 @@
             console.error("Eroare la preluarea comenzilor:", e);
           }
         },
-        /* Setează username + avatar */
+        /* Setează username + avatar pentru chat */
         setUsername() {
           if (!this.usernameInput.trim()) return;
           localStorage.setItem("username", this.usernameInput.trim());
           localStorage.setItem("selectedAvatar", this.selectedAvatar || "");
           this.usernameSet = true;
         },
-        /* Încarcă mesajele cu un onSnapshot + filtru 10 minute */
+        /* Încarcă mesajele cu un onSnapshot, filtrând cele mai vechi de 10 minute */
         loadMessages() {
           const qRef = query(collection(db, "chatMessages"), orderBy("timestamp", "asc"));
           onSnapshot(qRef, (snapshot) => {
@@ -1655,7 +1681,7 @@
             this.chatMessages = finalMsgs;
           });
         },
-        /* Trimite mesaj în chat cu avatar */
+        /* Trimite un mesaj în colecția "chatMessages" */
         async postMessage() {
           if (!this.newMessage.trim()) return;
           try {
@@ -1679,7 +1705,7 @@
             console.error("Eroare la trimiterea mesajului:", err);
           }
         },
-        /* Apelată la click pe reacție */
+        /* Reacții (emoji) la mesaje */
         reactToMessage(messageId, reaction) {
           const messageRef = doc(db, "chatMessages", messageId);
           getDoc(messageRef).then((docSnap) => {
@@ -1706,7 +1732,7 @@
             boxShadow: `0 0 0 4px var(--btn-shadow-color1)`
           };
         },
-        /* Închiderea sidebar-ului mobil la click în afară */
+        /* Dacă s-a deschis sidebar-ul mobil, îl închidem când user-ul dă click în afară */
         handleOutsideClick(e) {
           if (this.isSidebarVisible) {
             const mobileAside = this.$refs.mobileSidebar;
@@ -1721,20 +1747,23 @@
             }
           }
         },
-        /* Metoda pentru a aplica temele */
+        /* Aplică tema selectată */
         applyThemeClass(themeName) {
           const allThemes = [
             'theme-red','theme-blue','theme-green','theme-purple',
             'theme-pink','theme-grey','theme-brown','theme-teal','theme-lime'
           ];
+          // Eliminăm orice clasă de temă anterioară
           allThemes.forEach(t => document.body.classList.remove(t));
 
+          // Adăugăm doar clasa aferentă noii teme (dacă nu e "orange")
           if (themeName !== 'orange') {
             document.body.classList.add(`theme-${themeName}`);
           }
         }
       },
       mounted() {
+        /* Scroll + click pentru sidebar mobil */
         window.addEventListener("scroll", this.handleWindowScroll);
         document.addEventListener("click", this.handleOutsideClick);
 
@@ -1745,7 +1774,7 @@
         }
         this.applyThemeClass(this.selectedTheme);
 
-        // 2) Masa
+        // 2) Citim param. "masa" din URL
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
         if (masaParam) {
@@ -1754,7 +1783,7 @@
           this.tableId = "Masa numărul 1";
         }
 
-        // 3) Client number
+        // 3) Client number din localStorage
         const storedNumber = localStorage.getItem("clientNumber");
         if (storedNumber) {
           this.clientNumber = parseInt(storedNumber);
@@ -1762,6 +1791,7 @@
             this.isFirstOrder = false;
           }
         } else {
+          // Dacă nu există, generăm un random
           const randomNum = Math.floor(Math.random() * 90000) + 10000;
           this.clientNumber = randomNum;
           localStorage.setItem("clientNumber", randomNum);
@@ -1777,7 +1807,7 @@
         if (storedMyOrders) {
           this.myOrders = JSON.parse(storedMyOrders);
         }
-        // 5) Fetch la comenzile curente
+        // 5) Preluăm comenzile actuale (din Firebase) dacă avem un clientNumber
         this.fetchOrders();
 
         // 6) Username deja salvat?
@@ -1786,45 +1816,51 @@
           this.usernameSet = true;
           this.usernameInput = storedUsername;
         }
-        // Avatar deja salvat?
+        // 7) Avatar salvat?
         const storedAvatar = localStorage.getItem("selectedAvatar");
         if (storedAvatar) {
           this.selectedAvatar = storedAvatar;
         }
-        // 7) Dacă avem username, încărcăm direct mesajele
+        // 8) Dacă userul are deja usernameSet, încărcăm direct mesajele
         if (this.usernameSet) {
           this.loadMessages();
         }
       },
       unmounted() {
+        /* Cleanup */
         window.removeEventListener("scroll", this.handleWindowScroll);
         document.removeEventListener("click", this.handleOutsideClick);
       },
       watch: {
+        /* Când user-ul finalizează setarea numelui, încărcăm mesajele */
         usernameSet(newVal) {
           if (newVal) {
-            // Când user-ul finalizează setarea numelui, încărcăm mesajele
             this.loadMessages();
           }
         },
+        /* Salvăm în localStorage când se schimbă punctele */
         clientPoints(newVal) {
           localStorage.setItem("clientPoints", newVal);
         },
+        /* Salvăm în localStorage când se schimbă numărul de client */
         clientNumber(newVal) {
           localStorage.setItem("clientNumber", newVal);
         },
+        /* Salvăm comenzile mele */
         myOrders(newVal) {
           localStorage.setItem("myOrders", JSON.stringify(newVal));
         },
-        // După selectarea unei teme, aplicăm tema și revenim la "meniu"
+        /* După ce selectăm o temă, o aplicăm și revenim la "meniu" */
         selectedTheme(newVal) {
           localStorage.setItem('selectedTheme', newVal);
           this.applyThemeClass(newVal);
+          // Treci eventual la tab-ul "meniu"
           this.activeTab = 'meniu';
         }
       }
     });
 
+    /* Montăm aplicația pe #app */
     app.mount("#app");
   </script>
 </body>
