@@ -14,43 +14,36 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet"/>
   <style>
     /* ------------------------------------------------
-       1. VARIABILE CSS – TEMA PORTOCALIE (implicit)
+       1. TEMA IMPLICITĂ - PORTOCALIU (fără clasă .theme-...)
        ------------------------------------------------ */
     :root {
-      /* Gradient pentru background */
       --gradient-start: #000000;
       --gradient-end:   #e78c00;
 
-      /* Scrollbar */
-      --scrollbar-color: #e78c00; 
+      --scrollbar-color: #e78c00;
       --scrollbar-track: #000000;
 
-      /* Borduri principale, hover la sidebar */
       --border-color: #e78c00;
 
-      /* Butoane gradient */
       --btn-start: #f49032;
       --btn-end:   #d35400;
-
-      /* Glow butoane la hover */
       --btn-shadow-color1: #f49032;
       --btn-shadow-color2: #d35400;
 
-      /* Card border & hover shadow */
       --card-border-color: #e78c00;
       --card-hover-shadow: rgba(255,140,0,0.3);
 
-      /* Culoare preț / accent (portocaliu) */
       --price-color: #f49032;
 
-      /* Fundal "scratches" - color particule */
       --scratch-color: rgba(231,140,0,0.15);
     }
 
     /* ------------------------------------------------
-       2. TEMA ROȘU ÎNCHIS – override pentru variabile
-          (se aplică atunci când .theme-red e pe <body>)
+       2. CELELALTE 9 TEME:
+         .theme-red, .theme-blue, .theme-green, .theme-purple,
+         .theme-pink, .theme-grey, .theme-brown, .theme-teal, .theme-lime
        ------------------------------------------------ */
+
     .theme-red {
       --gradient-end:      #8B0000;
       --scrollbar-color:   #8B0000;
@@ -68,8 +61,144 @@
       --scratch-color:     rgba(139,0,0,0.15);
     }
 
+    .theme-blue {
+      --gradient-end:      #004080;
+      --scrollbar-color:   #004080;
+      --border-color:      #004080;
+
+      --btn-start:         #0066cc;
+      --btn-end:           #004080;
+      --btn-shadow-color1: #0066cc;
+      --btn-shadow-color2: #004080;
+
+      --card-border-color: #004080;
+      --card-hover-shadow: rgba(0,64,128,0.3);
+
+      --price-color:       #0066cc;
+      --scratch-color:     rgba(0,64,128,0.15);
+    }
+
+    .theme-green {
+      --gradient-end:      #004d00;
+      --scrollbar-color:   #004d00;
+      --border-color:      #004d00;
+
+      --btn-start:         #008000;
+      --btn-end:           #004d00;
+      --btn-shadow-color1: #008000;
+      --btn-shadow-color2: #004d00;
+
+      --card-border-color: #004d00;
+      --card-hover-shadow: rgba(0,77,0,0.3);
+
+      --price-color:       #008000;
+      --scratch-color:     rgba(0,77,0,0.15);
+    }
+
+    .theme-purple {
+      --gradient-end:      #4B0082;
+      --scrollbar-color:   #4B0082;
+      --border-color:      #4B0082;
+
+      --btn-start:         #6A0DAD;
+      --btn-end:           #4B0082;
+      --btn-shadow-color1: #6A0DAD;
+      --btn-shadow-color2: #4B0082;
+
+      --card-border-color: #4B0082;
+      --card-hover-shadow: rgba(75,0,130,0.3);
+
+      --price-color:       #6A0DAD;
+      --scratch-color:     rgba(75,0,130,0.15);
+    }
+
+    .theme-pink {
+      --gradient-end:      #A600A6;
+      --scrollbar-color:   #A600A6;
+      --border-color:      #A600A6;
+
+      --btn-start:         #CC00CC;
+      --btn-end:           #A600A6;
+      --btn-shadow-color1: #CC00CC;
+      --btn-shadow-color2: #A600A6;
+
+      --card-border-color: #A600A6;
+      --card-hover-shadow: rgba(166,0,166,0.3);
+
+      --price-color:       #CC00CC;
+      --scratch-color:     rgba(166,0,166,0.15);
+    }
+
+    .theme-grey {
+      --gradient-end:      #555555;
+      --scrollbar-color:   #555555;
+      --border-color:      #555555;
+
+      --btn-start:         #777777;
+      --btn-end:           #555555;
+      --btn-shadow-color1: #777777;
+      --btn-shadow-color2: #555555;
+
+      --card-border-color: #555555;
+      --card-hover-shadow: rgba(85,85,85,0.3);
+
+      --price-color:       #999999;
+      --scratch-color:     rgba(85,85,85,0.15);
+    }
+
+    .theme-brown {
+      --gradient-end:      #663300;
+      --scrollbar-color:   #663300;
+      --border-color:      #663300;
+
+      --btn-start:         #996633;
+      --btn-end:           #663300;
+      --btn-shadow-color1: #996633;
+      --btn-shadow-color2: #663300;
+
+      --card-border-color: #663300;
+      --card-hover-shadow: rgba(102,51,0,0.3);
+
+      --price-color:       #996633;
+      --scratch-color:     rgba(102,51,0,0.15);
+    }
+
+    .theme-teal {
+      --gradient-end:      #004d4d;
+      --scrollbar-color:   #004d4d;
+      --border-color:      #004d4d;
+
+      --btn-start:         #008080;
+      --btn-end:           #004d4d;
+      --btn-shadow-color1: #008080;
+      --btn-shadow-color2: #004d4d;
+
+      --card-border-color: #004d4d;
+      --card-hover-shadow: rgba(0,128,128,0.3);
+
+      --price-color:       #008080;
+      --scratch-color:     rgba(0,77,77,0.15);
+    }
+
+    .theme-lime {
+      --gradient-end:      #009900;
+      --scrollbar-color:   #009900;
+      --border-color:      #009900;
+
+      --btn-start:         #00cc00;
+      --btn-end:           #009900;
+      --btn-shadow-color1: #00cc00;
+      --btn-shadow-color2: #009900;
+
+      --card-border-color: #009900;
+      --card-hover-shadow: rgba(0,153,0,0.3);
+
+      --price-color:       #00cc00;
+      --scratch-color:     rgba(0,153,0,0.15);
+    }
+
     /* ------------------------------------------------
-       3. STILURI GENERALE – BODY înlocuiește rolul #app
+       4. STILURI DE BAZĂ PENTRU PAGINĂ
        ------------------------------------------------ */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     body {
@@ -82,9 +211,9 @@
       flex-direction: column;
     }
 
-    /* Containerele interioare */
+    /* #app conține restul elementelor */
     #app {
-      flex: 1; /* să ocupe restul ecranului */
+      flex: 1;
       display: flex;
       flex-direction: column;
     }
@@ -348,7 +477,7 @@
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='social'">
             <span class="material-icons">group</span>Social
           </button>
-          <!-- NOUL TAB: DESIGN -->
+          <!-- TAB: DESIGN -->
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='design'">
             <span class="material-icons">palette</span>Design
           </button>
@@ -708,23 +837,61 @@
             </div>
           </section>
 
-          <!-- TAB: Design (nou) -->
+          <!-- TAB: DESIGN (cu 10 opțiuni) -->
           <section v-else-if="activeTab === 'design'">
             <h2 class="text-2xl font-bold mb-4 text-center">Tema de Design</h2>
-            <div class="flex flex-col items-center gap-4">
-              <p class="text-gray-300">Alege o temă de culori pentru aplicație:</p>
-              <div>
-                <label class="inline-flex items-center gap-2 cursor-pointer">
-                  <input type="radio" value="orange" v-model="selectedTheme" />
-                  <span>Portocaliu</span>
-                </label>
-              </div>
-              <div>
-                <label class="inline-flex items-center gap-2 cursor-pointer">
-                  <input type="radio" value="red" v-model="selectedTheme" />
-                  <span>Roșu Închis</span>
-                </label>
-              </div>
+            <p class="text-gray-300 text-center mb-4">Alege o temă de culori pentru aplicație:</p>
+            <div class="flex flex-wrap gap-4 justify-center">
+              <!-- 1) Portocaliu (implicit) -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="orange" v-model="selectedTheme" />
+                <span>Portocaliu</span>
+              </label>
+              <!-- 2) Roșu -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="red" v-model="selectedTheme" />
+                <span>Roșu</span>
+              </label>
+              <!-- 3) Albastru -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="blue" v-model="selectedTheme" />
+                <span>Albastru</span>
+              </label>
+              <!-- 4) Verde -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="green" v-model="selectedTheme" />
+                <span>Verde</span>
+              </label>
+              <!-- 5) Mov -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="purple" v-model="selectedTheme" />
+                <span>Mov</span>
+              </label>
+              <!-- 6) Roz -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="pink" v-model="selectedTheme" />
+                <span>Roz</span>
+              </label>
+              <!-- 7) Gri -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="grey" v-model="selectedTheme" />
+                <span>Gri</span>
+              </label>
+              <!-- 8) Maro -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="brown" v-model="selectedTheme" />
+                <span>Maro</span>
+              </label>
+              <!-- 9) Teal -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="teal" v-model="selectedTheme" />
+                <span>Teal</span>
+              </label>
+              <!-- 10) Verde-lămâie -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="lime" v-model="selectedTheme" />
+                <span>Verde Lămâie</span>
+              </label>
             </div>
           </section>
         </main>
@@ -826,7 +993,7 @@
       orderBy
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    /* --- CONFIGUREAZĂ FIREBASE AICI --- */
+    /* -- Config Firebase (înlocuiește cu datele tale) -- */
     const firebaseConfig = {
   apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
   authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -840,7 +1007,7 @@
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    /* --- HELPER --- */
+    /* -- HELPER -- */
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
@@ -885,7 +1052,7 @@
           isGrid: true,
 
           /* Control temă */
-          selectedTheme: 'orange', // 'orange' | 'red'
+          selectedTheme: 'orange', // 'orange', 'red', 'blue', 'green', 'purple', 'pink', 'grey', 'brown', 'teal', 'lime'
 
           /* Pagini / tab-uri */
           activeTab: "meniu",
@@ -943,6 +1110,7 @@
             }
           ],
           products: {
+            /* Aceleași date extinse ca înainte (brunch, soups, main etc.) */
             brunch: [
               {
                 title: "Toast cu avocado",
@@ -1052,6 +1220,7 @@
                 ingredients: ["Coaste afumate", "Legume", "Condimente"]
               }
             ],
+            /* ... restul categoriilor (pasta, main, desserts, drinks, garnish) cu toate produsele adăugate înainte ... */
             pasta: [
               {
                 title: "Spaghete Carbonara",
@@ -1097,6 +1266,7 @@
                 image: "https://i.giphy.com/l378puWI9Fpi4OApO.webp",
                 ingredients: ["Ceafă porc", "Piure", "Ardei copți"]
               },
+              /* Produse noi Fel Principal */
               {
                 title: "Copanele la cuptor",
                 description: "110g. Copanele fragede, rumenite la cuptor.",
@@ -1445,7 +1615,7 @@
             console.error("Eroare la preluarea comenzilor:", e);
           }
         },
-        /* -- SOCIAL -- */
+        /* SOCIAL */
         setUsername() {
           if (!this.usernameInput.trim()) return;
           localStorage.setItem("username", this.usernameInput.trim());
@@ -1510,14 +1680,12 @@
         // 1) Citim tema din localStorage
         const storedTheme = localStorage.getItem('selectedTheme');
         if (storedTheme) {
-          this.selectedTheme = storedTheme; // 'orange' sau 'red'
+          this.selectedTheme = storedTheme;
         }
-        // Aplica clasa .theme-red pe <body> dacă e "red"
-        if (this.selectedTheme === 'red') {
-          document.body.classList.add('theme-red');
-        }
+        // Aplica corect tema (dacă nu e 'orange', adaugă clasa corespunzătoare)
+        this.applyThemeClass(this.selectedTheme);
 
-        // 2) Preluăm parametru "masa"
+        // 2) Masa
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
         if (masaParam) {
@@ -1526,7 +1694,7 @@
           this.tableId = "Masa numărul 1";
         }
 
-        // 3) Setăm un clientNumber random, dacă nu avem deja
+        // 3) Client number
         const storedNumber = localStorage.getItem("clientNumber");
         if (storedNumber) {
           this.clientNumber = parseInt(storedNumber);
@@ -1540,7 +1708,7 @@
           this.isFirstOrder = false;
         }
 
-        // 4) Citim punctele și comenzile anterioare
+        // 4) Puncte și comenzi anterioare
         const storedPoints = localStorage.getItem("clientPoints");
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
@@ -1553,14 +1721,13 @@
         // 5) Fetch la comenzile curente
         this.fetchOrders();
 
-        // 6) Citim username, dacă există
+        // 6) Username
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
           this.usernameSet = true;
           this.usernameInput = storedUsername;
         }
-
-        // 7) Dacă avem username, încărcăm direct mesajele
+        // 7) Dacă avem deja un username, încărcăm direct mesajele
         if (this.usernameSet) {
           this.loadMessages();
         }
@@ -1583,14 +1750,32 @@
         myOrders(newVal) {
           localStorage.setItem("myOrders", JSON.stringify(newVal));
         },
-        // Dacă se schimbă tema, adăugăm / ștergem clasa .theme-red pe <body>
         selectedTheme(newVal) {
-          if (newVal === 'red') {
-            document.body.classList.add('theme-red');
-          } else {
-            document.body.classList.remove('theme-red');
-          }
           localStorage.setItem('selectedTheme', newVal);
+          this.applyThemeClass(newVal);
+        }
+      },
+      methods: {
+        /* ... avem deja metode cu nume identic, deci extragem tot ce e nou aici ... */
+        applyThemeClass(themeName) {
+          // Eliminăm orice temă anterioară
+          const allThemes = [
+            'theme-red',
+            'theme-blue',
+            'theme-green',
+            'theme-purple',
+            'theme-pink',
+            'theme-grey',
+            'theme-brown',
+            'theme-teal',
+            'theme-lime'
+          ];
+          allThemes.forEach(t => document.body.classList.remove(t));
+
+          // Dacă userul a selectat altceva decât 'orange', adăugăm clasa
+          if (themeName !== 'orange') {
+            document.body.classList.add(`theme-${themeName}`);
+          }
         }
       }
     });
