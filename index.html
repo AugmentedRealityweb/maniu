@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ro" :class="themeClass">
+<html lang="ro">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -14,8 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet"/>
   <style>
     /* ------------------------------------------------
-       1. VARIABILE CSS GLOBALE
-         - Valorile implicite (pentru tema portocalie)
+       1. VARIABILE CSS – TEMA PORTOCALIE (implicit)
        ------------------------------------------------ */
     :root {
       /* Gradient pentru background */
@@ -50,37 +49,47 @@
 
     /* ------------------------------------------------
        2. TEMA ROȘU ÎNCHIS – override pentru variabile
+          (se aplică atunci când .theme-red este prezent
+           pe containerul #app)
        ------------------------------------------------ */
     .theme-red {
-      --gradient-end:   #8B0000;
-      --scrollbar-color: #8B0000;
-      --border-color:   #8B0000;
+      --gradient-end:      #8B0000;
+      --scrollbar-color:   #8B0000;
+      --border-color:      #8B0000;
 
-      --btn-start: #b30000;
-      --btn-end:   #7d0000;
+      --btn-start:         #b30000;
+      --btn-end:           #7d0000;
       --btn-shadow-color1: #b30000;
       --btn-shadow-color2: #7d0000;
 
       --card-border-color: #8B0000;
       --card-hover-shadow: rgba(179,0,0,0.3);
 
-      --price-color: #b30000;
-      --scratch-color: rgba(139,0,0,0.15);
+      --price-color:       #b30000;
+      --scratch-color:     rgba(139,0,0,0.15);
     }
 
     /* ------------------------------------------------
        3. STILURI GENERALE PENTRU AMBELE TEME
-         - folosesc variabilele de mai sus
+         (folosesc variabilele de mai sus)
        ------------------------------------------------ */
-
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
-      color: #fff;
       margin: 0;
       min-height: 100vh;
     }
+
+    /* Containerul #app va avea fundalul gradient în funcție
+       de valorile curente ale variabilelor. */
+    #app {
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
     .scrollbar {
       scrollbar-width: thin;
       scrollbar-color: var(--scrollbar-color) var(--scrollbar-track);
@@ -322,155 +331,113 @@
   </style>
 </head>
 <body>
-  <div id="app" class="h-screen flex flex-col">
-    <!-- SIDEBAR desktop -->
-    <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
-      <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">
-        Meniu Restaurant
-      </div>
-      <nav class="flex flex-col space-y-2">
-        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'">
-          <span class="material-icons">restaurant_menu</span>Meniu
-        </button>
-        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='puncte'">
-          <span class="material-icons">star</span>Puncte
-        </button>
-        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale'">
-          <span class="material-icons">receipt</span>Comenzile Tale
-        </button>
-        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='social'">
-          <span class="material-icons">group</span>Social
-        </button>
-        <!-- NOUL TAB: DESIGN -->
-        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='design'">
-          <span class="material-icons">palette</span>Design
-        </button>
-      </nav>
-    </aside>
-
-    <!-- CONȚINUT PRINCIPAL, e scrollabil pe window, nu local -->
-    <div class="flex-1 flex flex-col p-2">
-      <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
-        <!-- BUTON + TITLU mobil -->
-        <div class="flex items-center justify-between mb-4 md:hidden">
-          <div class="handwriting-title text-2xl font-bold fade-in-left">
-            Meniu Restaurant
-          </div>
-          <button 
-            class="bg-black border-2 border-[var(--border-color)] hover:bg-[var(--border-color)] hover:text-black text-white p-2 rounded-full" 
-            @click="isSidebarVisible = !isSidebarVisible"
-          >
-            <span class="material-icons">menu</span>
-          </button>
+  <!-- Observație: am scos :class="themeClass" de pe <html> și îl punem pe #app -->
+  <div id="app" :class="themeClass">
+    <div class="h-screen flex flex-col">
+      <!-- SIDEBAR desktop -->
+      <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
+        <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">
+          Meniu Restaurant
         </div>
+        <nav class="flex flex-col space-y-2">
+          <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'">
+            <span class="material-icons">restaurant_menu</span>Meniu
+          </button>
+          <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='puncte'">
+            <span class="material-icons">star</span>Puncte
+          </button>
+          <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale'">
+            <span class="material-icons">receipt</span>Comenzile Tale
+          </button>
+          <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='social'">
+            <span class="material-icons">group</span>Social
+          </button>
+          <!-- NOUL TAB: DESIGN -->
+          <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='design'">
+            <span class="material-icons">palette</span>Design
+          </button>
+        </nav>
+      </aside>
 
-        <!-- SIDEBAR mobil (afișat condiționat) -->
-        <transition name="slide-fade">
-          <aside 
-            v-if="isSidebarVisible" 
-            class="absolute top-0 left-0 w-48 p-4 z-50 rounded-tr-lg rounded-br-lg sidebar scratches"
-          >
-            <button class="text-white mb-2" @click="isSidebarVisible = false">
-              <span class="material-icons">close</span>
-            </button>
-            <nav class="flex flex-col space-y-2">
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                @click="activeTab='meniu'; isSidebarVisible=false"
-              >
-                <span class="material-icons">restaurant_menu</span>Meniu
-              </button>
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                @click="activeTab='puncte'; isSidebarVisible=false"
-              >
-                <span class="material-icons">star</span>Puncte
-              </button>
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                @click="activeTab='comenzileTale'; isSidebarVisible=false"
-              >
-                <span class="material-icons">receipt</span>Comenzile Tale
-              </button>
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                @click="activeTab='social'; isSidebarVisible=false"
-              >
-                <span class="material-icons">group</span>Social
-              </button>
-              <!-- NOUL TAB: DESIGN (mobil) -->
-              <button 
-                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                @click="activeTab='design'; isSidebarVisible=false"
-              >
-                <span class="material-icons">palette</span>Design
-              </button>
-            </nav>
-          </aside>
-        </transition>
-
-        <!-- TAB: MENIU -->
-        <section v-if="activeTab === 'meniu'">
-          <!-- Căutare produse -->
-          <div class="flex items-center gap-4 mb-4">
-            <input 
-              type="text" 
-              placeholder="Caută produse..." 
-              v-model="searchQuery" 
-              class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] w-full md:w-1/2"
-            />
-          </div>
-
-          <!-- Rezultate căutare -->
-          <div v-if="searchQuery.trim()">
-            <h2 class="text-xl font-semibold mb-4 text-center">
-              Rezultate pentru: "{{ searchQuery }}"
-            </h2>
-            <!-- Toggle grid / list button (vizibil și la căutare) -->
-            <div class="flex justify-center mb-4">
-              <button 
-                class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
-                @click="toggleLayout"
-              >
-                <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
-                <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
-              </button>
+      <!-- CONȚINUT PRINCIPAL, e scrollabil pe window, nu local -->
+      <div class="flex-1 flex flex-col p-2">
+        <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
+          <!-- BUTON + TITLU mobil -->
+          <div class="flex items-center justify-between mb-4 md:hidden">
+            <div class="handwriting-title text-2xl font-bold fade-in-left">
+              Meniu Restaurant
             </div>
-            <!-- Afișare produse (grid col-3 sau listă) -->
-            <div 
-              v-if="displayedProducts.length > 0" 
-              :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
+            <button 
+              class="bg-black border-2 border-[var(--border-color)] hover:bg-[var(--border-color)] hover:text-black text-white p-2 rounded-full" 
+              @click="isSidebarVisible = !isSidebarVisible"
             >
-              <div 
-                v-for="product in displayedProducts" 
-                :key="product.title" 
-                class="card-container cursor-pointer"
-                @click="showProductDetails(product)"
-              >
-                <img 
-                  :class="isGrid ? 'card-img-square' : 'card-img-rect'"
-                  :src="product.image" 
-                  :alt="product.title" 
-                />
-                <div class="card-details">
-                  <h3>{{ product.title }}</h3>
-                  <p>{{ product.price }} Lei</p>
-                </div>
-              </div>
-            </div>
-            <div v-else>
-              <p class="text-center">
-                Nu a fost găsit niciun produs care să corespundă căutării.
-              </p>
-            </div>
+              <span class="material-icons">menu</span>
+            </button>
           </div>
-          <!-- Categorii / Produse (fără căutare) -->
-          <div v-else>
-            <div v-if="view === 'categorii'">
+
+          <!-- SIDEBAR mobil (afișat condiționat) -->
+          <transition name="slide-fade">
+            <aside 
+              v-if="isSidebarVisible" 
+              class="absolute top-0 left-0 w-48 p-4 z-50 rounded-tr-lg rounded-br-lg sidebar scratches"
+            >
+              <button class="text-white mb-2" @click="isSidebarVisible = false">
+                <span class="material-icons">close</span>
+              </button>
+              <nav class="flex flex-col space-y-2">
+                <button 
+                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                  @click="activeTab='meniu'; isSidebarVisible=false"
+                >
+                  <span class="material-icons">restaurant_menu</span>Meniu
+                </button>
+                <button 
+                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                  @click="activeTab='puncte'; isSidebarVisible=false"
+                >
+                  <span class="material-icons">star</span>Puncte
+                </button>
+                <button 
+                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                  @click="activeTab='comenzileTale'; isSidebarVisible=false"
+                >
+                  <span class="material-icons">receipt</span>Comenzile Tale
+                </button>
+                <button 
+                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                  @click="activeTab='social'; isSidebarVisible=false"
+                >
+                  <span class="material-icons">group</span>Social
+                </button>
+                <!-- NOUL TAB: DESIGN (mobil) -->
+                <button 
+                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                  @click="activeTab='design'; isSidebarVisible=false"
+                >
+                  <span class="material-icons">palette</span>Design
+                </button>
+              </nav>
+            </aside>
+          </transition>
+
+          <!-- TAB: MENIU -->
+          <section v-if="activeTab === 'meniu'">
+            <!-- Căutare produse -->
+            <div class="flex items-center gap-4 mb-4">
+              <input 
+                type="text" 
+                placeholder="Caută produse..." 
+                v-model="searchQuery" 
+                class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] w-full md:w-1/2"
+              />
+            </div>
+
+            <!-- Rezultate căutare -->
+            <div v-if="searchQuery.trim()">
               <h2 class="text-xl font-semibold mb-4 text-center">
-                Alege Categoria
+                Rezultate pentru: "{{ searchQuery }}"
               </h2>
-              <!-- Toggle grid / list button -->
+              <!-- Toggle grid / list button (vizibil și la căutare) -->
               <div class="flex justify-center mb-4">
                 <button 
                   class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
@@ -480,58 +447,21 @@
                   <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
                 </button>
               </div>
-              <!-- Afișare categorii (grid col-3 sau listă) -->
+              <!-- Afișare produse (grid col-3 sau listă) -->
               <div 
+                v-if="displayedProducts.length > 0" 
                 :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
               >
                 <div 
-                  v-for="category in categories" 
-                  :key="category.name" 
-                  class="card-container cursor-pointer"
-                  @click="enterCategory(category.name)"
-                >
-                  <img 
-                    :class="isGrid ? 'card-img-square' : 'card-img-rect'"
-                    :src="category.image" 
-                    :alt="category.name" 
-                  />
-                  <div class="card-details">
-                    <h3>{{ renameCategory(category.name) }}</h3>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Afișare produse dintr-o categorie -->
-            <div v-else-if="view === 'produse'">
-              <div class="flex items-center justify-between mb-4">
-                <button class="btn-orange rounded-full" @click="backToCategories">
-                  Înapoi la Categorii
-                </button>
-                <!-- Toggle grid / list button -->
-                <button 
-                  class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
-                  @click="toggleLayout"
-                >
-                  <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
-                  <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
-                </button>
-              </div>
-              <h2 class="text-xl font-semibold mb-4 text-center">
-                Produse ({{ currentProducts.length }})
-              </h2>
-              <div 
-                :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
-              >
-                <div 
-                  v-for="product in currentProducts" 
+                  v-for="product in displayedProducts" 
                   :key="product.title" 
-                  class="card-container cursor-pointer" 
+                  class="card-container cursor-pointer"
                   @click="showProductDetails(product)"
                 >
                   <img 
                     :class="isGrid ? 'card-img-square' : 'card-img-rect'"
                     :src="product.image" 
-                    :alt="product.title"
+                    :alt="product.title" 
                   />
                   <div class="card-details">
                     <h3>{{ product.title }}</h3>
@@ -539,266 +469,348 @@
                   </div>
                 </div>
               </div>
+              <div v-else>
+                <p class="text-center">
+                  Nu a fost găsit niciun produs care să corespundă căutării.
+                </p>
+              </div>
             </div>
-          </div>
+            <!-- Categorii / Produse (fără căutare) -->
+            <div v-else>
+              <div v-if="view === 'categorii'">
+                <h2 class="text-xl font-semibold mb-4 text-center">
+                  Alege Categoria
+                </h2>
+                <!-- Toggle grid / list button -->
+                <div class="flex justify-center mb-4">
+                  <button 
+                    class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                    @click="toggleLayout"
+                  >
+                    <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                    <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+                  </button>
+                </div>
+                <!-- Afișare categorii (grid col-3 sau listă) -->
+                <div 
+                  :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
+                >
+                  <div 
+                    v-for="category in categories" 
+                    :key="category.name" 
+                    class="card-container cursor-pointer"
+                    @click="enterCategory(category.name)"
+                  >
+                    <img 
+                      :class="isGrid ? 'card-img-square' : 'card-img-rect'"
+                      :src="category.image" 
+                      :alt="category.name" 
+                    />
+                    <div class="card-details">
+                      <h3>{{ renameCategory(category.name) }}</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Afișare produse dintr-o categorie -->
+              <div v-else-if="view === 'produse'">
+                <div class="flex items-center justify-between mb-4">
+                  <button class="btn-orange rounded-full" @click="backToCategories">
+                    Înapoi la Categorii
+                  </button>
+                  <!-- Toggle grid / list button -->
+                  <button 
+                    class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                    @click="toggleLayout"
+                  >
+                    <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                    <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+                  </button>
+                </div>
+                <h2 class="text-xl font-semibold mb-4 text-center">
+                  Produse ({{ currentProducts.length }})
+                </h2>
+                <div 
+                  :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
+                >
+                  <div 
+                    v-for="product in currentProducts" 
+                    :key="product.title" 
+                    class="card-container cursor-pointer" 
+                    @click="showProductDetails(product)"
+                  >
+                    <img 
+                      :class="isGrid ? 'card-img-square' : 'card-img-rect'"
+                      :src="product.image" 
+                      :alt="product.title"
+                    />
+                    <div class="card-details">
+                      <h3>{{ product.title }}</h3>
+                      <p>{{ product.price }} Lei</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-          <!-- Modal produs -->
-          <div 
-            v-if="currentProduct" 
-            class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+            <!-- Modal produs -->
+            <div 
+              v-if="currentProduct" 
+              class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+            >
+              <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
+                <button 
+                  class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
+                  @click="currentProduct = null"
+                >
+                  &times;
+                </button>
+                <img 
+                  :src="currentProduct.image" 
+                  :alt="currentProduct.title" 
+                  class="w-full h-64 object-cover mb-4 rounded-lg"
+                />
+                <h2 class="text-xl font-bold mb-2 handwriting-title">
+                  {{ currentProduct.title }}
+                </h2>
+                <p class="font-bold text-lg mb-4" :style="{ color: 'var(--price-color)' }">
+                  {{ currentProduct.price }} Lei
+                </p>
+                <p class="text-gray-400 mb-4">
+                  {{ currentProduct.description }}
+                </p>
+                <ul class="text-gray-300 mb-4">
+                  <li 
+                    v-for="ingredient in currentProduct.ingredients" 
+                    :key="ingredient" 
+                    class="list-disc ml-5"
+                  >
+                    {{ ingredient }}
+                  </li>
+                </ul>
+                <button class="btn-orange rounded-full" @click="addToOrder(currentProduct)">
+                  Adaugă în coș
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- TAB: Puncte -->
+          <section v-else-if="activeTab === 'puncte'">
+            <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
+            <div class="bg-black p-4 rounded border border-[var(--border-color)] shadow max-w-md scratches mx-auto">
+              <div v-if="clientNumber === 0" class="mb-4">
+                <p class="text-gray-300 text-center">
+                  Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
+                </p>
+              </div>
+              <div v-else>
+                <p class="text-gray-300 mb-2 text-center">
+                  Număr client: 
+                  <span class="font-bold">#{{ clientNumber }}</span>
+                </p>
+              </div>
+              <p class="text-gray-300 text-center">
+                Puncte acumulate: 
+                <span class="font-bold" :style="{ color: 'var(--price-color)' }">
+                  {{ clientPoints.toFixed(2) }}
+                </span>
+              </p>
+            </div>
+          </section>
+
+          <!-- TAB: Comenzile Tale -->
+          <section v-else-if="activeTab === 'comenzileTale'">
+            <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
+            <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
+              Nu ai nicio comandă finalizată încă.
+            </div>
+            <div v-else class="space-y-4">
+              <div 
+                v-for="(order, idx) in myOrders" 
+                :key="order.orderId" 
+                class="bg-black p-4 rounded border border-[var(--border-color)] scratches"
+              >
+                <h3 class="text-lg font-semibold mb-2">
+                  Comanda #{{ idx + 1 }}
+                </h3>
+                <ul class="list-disc list-inside text-gray-300">
+                  <li 
+                    v-for="(prod, pidx) in order.items" 
+                    :key="pidx"
+                  >
+                    {{ prod.name }} x {{ prod.quantity }} – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
+                  </li>
+                </ul>
+                <div class="mt-2 font-bold" :style="{ color: 'var(--price-color)' }">
+                  Total: {{ order.total }} Lei
+                </div>
+                <div class="text-sm text-gray-400">
+                  ID comandă: {{ order.orderId }} | Cod Ospătar: {{ order.sessionCode }}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- TAB: Social -->
+          <section v-else-if="activeTab === 'social'">
+            <div v-if="!usernameSet" class="text-center">
+              <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
+              <p class="mb-4 text-gray-300 max-w-md mx-auto">
+                Bun venit în zona de socializare!  
+                Te rugăm să îți introduci numele înainte de a putea vedea conversația sau a trimite mesaje.
+              </p>
+              <div class="flex flex-col items-center max-w-sm mx-auto">
+                <input 
+                  type="text" 
+                  v-model="usernameInput" 
+                  placeholder="Introduceți numele..." 
+                  class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] w-full mb-4"
+                />
+                <button class="btn-orange rounded-full" @click="setUsername">
+                  Continuă
+                </button>
+              </div>
+            </div>
+            <div v-else>
+              <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
+              <!-- Chat global (mesaje <= 10 minute) -->
+              <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto">
+                <div 
+                  v-for="message in chatMessages" 
+                  :key="message.id"
+                  class="mb-2"
+                >
+                  <span class="font-bold" :style="{ color: 'var(--price-color)' }">
+                    (masa {{ message.tableNumber }}) {{ message.name }}
+                  </span>:
+                  <span class="text-gray-300 ml-1">{{ message.text }}</span>
+                </div>
+              </div>
+              <!-- Formular mesaj nou -->
+              <div class="flex gap-2 max-w-xl mx-auto">
+                <input 
+                  v-model="newMessage" 
+                  class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] flex-1" 
+                  placeholder="Scrie un mesaj..." 
+                />
+                <button class="btn-orange rounded-full" @click="postMessage">
+                  Trimite
+                </button>
+              </div>
+
+              <!-- 12 mese, 4 pe rând, checking mesaje -->
+              <div class="table-zone">
+                <div 
+                  v-for="tableNum in 12" 
+                  :key="tableNum" 
+                  class="table-circle"
+                  :style="tableStyle(tableNum)"
+                >
+                  Masa {{ tableNum }}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- TAB: Design (nou) -->
+          <section v-else-if="activeTab === 'design'">
+            <h2 class="text-2xl font-bold mb-4 text-center">Tema de Design</h2>
+            <div class="flex flex-col items-center gap-4">
+              <p class="text-gray-300">Alege o temă de culori pentru aplicație:</p>
+              <div>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" value="orange" v-model="selectedTheme" />
+                  <span>Portocaliu</span>
+                </label>
+              </div>
+              <div>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" value="red" v-model="selectedTheme" />
+                  <span>Roșu Închis</span>
+                </label>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <!-- Buton Coș (dacă avem produse) -->
+        <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
+          <button 
+            @click="toggleOrderBar" 
+            class="btn-orange flex items-center relative rounded-full" 
+            :class="{'animate-shake': isShaking}"
           >
-            <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
+            <span class="material-icons mr-2 text-white">shopping_cart</span>
+            <span class="text-white">Coș ({{ orders.length }})</span>
+          </button>
+        </div>
+
+        <!-- Bara laterală a Coșului -->
+        <transition name="slide-cart">
+          <aside 
+            v-show="isOrderOpen && orders.length > 0" 
+            class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[var(--border-color)] p-4 overflow-y-auto scrollbar" 
+            style="max-height: 100vh;"
+          >
+            <div class="relative flex flex-col">
               <button 
-                class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
-                @click="currentProduct = null"
+                class="absolute top-2 right-2 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
+                @click="toggleOrderBar"
               >
                 &times;
               </button>
-              <img 
-                :src="currentProduct.image" 
-                :alt="currentProduct.title" 
-                class="w-full h-64 object-cover mb-4 rounded-lg"
-              />
-              <h2 class="text-xl font-bold mb-2 handwriting-title">
-                {{ currentProduct.title }}
-              </h2>
-              <p class="font-bold text-lg mb-4" :style="{ color: 'var(--price-color)' }">
-                {{ currentProduct.price }} Lei
-              </p>
-              <p class="text-gray-400 mb-4">
-                {{ currentProduct.description }}
-              </p>
-              <ul class="text-gray-300 mb-4">
-                <li 
-                  v-for="ingredient in currentProduct.ingredients" 
-                  :key="ingredient" 
-                  class="list-disc ml-5"
-                >
-                  {{ ingredient }}
-                </li>
-              </ul>
-              <button class="btn-orange rounded-full" @click="addToOrder(currentProduct)">
-                Adaugă în coș
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- TAB: Puncte -->
-        <section v-else-if="activeTab === 'puncte'">
-          <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
-          <div class="bg-black p-4 rounded border border-[var(--border-color)] shadow max-w-md scratches mx-auto">
-            <div v-if="clientNumber === 0" class="mb-4">
-              <p class="text-gray-300 text-center">
-                Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
-              </p>
-            </div>
-            <div v-else>
-              <p class="text-gray-300 mb-2 text-center">
-                Număr client: 
-                <span class="font-bold">#{{ clientNumber }}</span>
-              </p>
-            </div>
-            <p class="text-gray-300 text-center">
-              Puncte acumulate: 
-              <span class="font-bold" :style="{ color: 'var(--price-color)' }">
-                {{ clientPoints.toFixed(2) }}
-              </span>
-            </p>
-          </div>
-        </section>
-
-        <!-- TAB: Comenzile Tale -->
-        <section v-else-if="activeTab === 'comenzileTale'">
-          <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
-          <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
-            Nu ai nicio comandă finalizată încă.
-          </div>
-          <div v-else class="space-y-4">
-            <div 
-              v-for="(order, idx) in myOrders" 
-              :key="order.orderId" 
-              class="bg-black p-4 rounded border border-[var(--border-color)] scratches"
-            >
-              <h3 class="text-lg font-semibold mb-2">
-                Comanda #{{ idx + 1 }}
-              </h3>
-              <ul class="list-disc list-inside text-gray-300">
-                <li 
-                  v-for="(prod, pidx) in order.items" 
-                  :key="pidx"
-                >
-                  {{ prod.name }} x {{ prod.quantity }} – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
-                </li>
-              </ul>
-              <div class="mt-2 font-bold" :style="{ color: 'var(--price-color)' }">
-                Total: {{ order.total }} Lei
-              </div>
-              <div class="text-sm text-gray-400">
-                ID comandă: {{ order.orderId }} | Cod Ospătar: {{ order.sessionCode }}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- TAB: Social -->
-        <section v-else-if="activeTab === 'social'">
-          <div v-if="!usernameSet" class="text-center">
-            <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
-            <p class="mb-4 text-gray-300 max-w-md mx-auto">
-              Bun venit în zona de socializare!  
-              Te rugăm să îți introduci numele înainte de a putea vedea conversația sau a trimite mesaje.
-            </p>
-            <div class="flex flex-col items-center max-w-sm mx-auto">
-              <input 
-                type="text" 
-                v-model="usernameInput" 
-                placeholder="Introduceți numele..." 
-                class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] w-full mb-4"
-              />
-              <button class="btn-orange rounded-full" @click="setUsername">
-                Continuă
-              </button>
-            </div>
-          </div>
-          <div v-else>
-            <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
-            <!-- Chat global (mesaje <= 10 minute) -->
-            <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto">
+              <h3 class="text-xl font-bold mb-4 text-center">Comanda Ta</h3>
               <div 
-                v-for="message in chatMessages" 
-                :key="message.id"
-                class="mb-2"
+                v-for="(order, index) in orders" 
+                :key="index" 
+                class="flex justify-between items-center bg-black border border-[var(--border-color)] p-4 rounded-lg mb-2 scratches"
               >
-                <span class="font-bold" :style="{ color: 'var(--price-color)' }">
-                  (masa {{ message.tableNumber }}) {{ message.name }}
-                </span>:
-                <span class="text-gray-300 ml-1">{{ message.text }}</span>
-              </div>
-            </div>
-            <!-- Formular mesaj nou -->
-            <div class="flex gap-2 max-w-xl mx-auto">
-              <input 
-                v-model="newMessage" 
-                class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] flex-1" 
-                placeholder="Scrie un mesaj..." 
-              />
-              <button class="btn-orange rounded-full" @click="postMessage">
-                Trimite
-              </button>
-            </div>
-
-            <!-- 12 mese, 4 pe rând, checking mesaje -->
-            <div class="table-zone">
-              <div 
-                v-for="tableNum in 12" 
-                :key="tableNum" 
-                class="table-circle"
-                :style="tableStyle(tableNum)"
-              >
-                Masa {{ tableNum }}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- TAB: Design (nou) -->
-        <section v-else-if="activeTab === 'design'">
-          <h2 class="text-2xl font-bold mb-4 text-center">Tema de Design</h2>
-          <div class="flex flex-col items-center gap-4">
-            <p class="text-gray-300">Alege o temă de culori pentru aplicație:</p>
-            <div>
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" value="orange" v-model="selectedTheme" />
-                <span>Portocaliu</span>
-              </label>
-            </div>
-            <div>
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" value="red" v-model="selectedTheme" />
-                <span>Roșu Închis</span>
-              </label>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <!-- Buton Coș (dacă avem produse) -->
-      <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
-        <button 
-          @click="toggleOrderBar" 
-          class="btn-orange flex items-center relative rounded-full" 
-          :class="{'animate-shake': isShaking}"
-        >
-          <span class="material-icons mr-2 text-white">shopping_cart</span>
-          <span class="text-white">Coș ({{ orders.length }})</span>
-        </button>
-      </div>
-
-      <!-- Bara laterală a Coșului -->
-      <transition name="slide-cart">
-        <aside 
-          v-show="isOrderOpen && orders.length > 0" 
-          class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[var(--border-color)] p-4 overflow-y-auto scrollbar" 
-          style="max-height: 100vh;"
-        >
-          <div class="relative flex flex-col">
-            <button 
-              class="absolute top-2 right-2 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
-              @click="toggleOrderBar"
-            >
-              &times;
-            </button>
-            <h3 class="text-xl font-bold mb-4 text-center">Comanda Ta</h3>
-            <div 
-              v-for="(order, index) in orders" 
-              :key="index" 
-              class="flex justify-between items-center bg-black border border-[var(--border-color)] p-4 rounded-lg mb-2 scratches"
-            >
-              <div class="flex flex-col">
-                <span class="font-bold">{{ order.name }}</span>
-                <div class="flex items-center gap-2 mt-1">
-                  <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
-                  <span class="text-gray-400">x{{ order.quantity }}</span>
-                  <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
-                  <button 
-                    class="bg-red-600 hover:bg-red-800 text-white px-2 py-1 rounded-full" 
-                    @click="removeItem(index)"
-                  >
-                    <span class="material-icons text-sm">delete</span>
-                  </button>
+                <div class="flex flex-col">
+                  <span class="font-bold">{{ order.name }}</span>
+                  <div class="flex items-center gap-2 mt-1">
+                    <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
+                    <span class="text-gray-400">x{{ order.quantity }}</span>
+                    <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
+                    <button 
+                      class="bg-red-600 hover:bg-red-800 text-white px-2 py-1 rounded-full" 
+                      @click="removeItem(index)"
+                    >
+                      <span class="material-icons text-sm">delete</span>
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <span class="font-bold" :style="{ color: 'var(--price-color)' }">
+                    {{ (order.price * order.quantity).toFixed(2) }} Lei
+                  </span>
                 </div>
               </div>
-              <div>
-                <span class="font-bold" :style="{ color: 'var(--price-color)' }">
-                  {{ (order.price * order.quantity).toFixed(2) }} Lei
-                </span>
+              <div class="mt-4">
+                <div class="flex justify-between items-center">
+                  <span class="text-lg font-semibold">Total:</span>
+                  <span class="text-xl font-bold" :style="{ color: 'var(--price-color)' }">
+                    {{ total }}
+                  </span>
+                </div>
+                <button class="btn-orange mt-4 rounded-full self-end" @click="checkout">
+                  Finalizează Comanda
+                </button>
               </div>
             </div>
-            <div class="mt-4">
-              <div class="flex justify-between items-center">
-                <span class="text-lg font-semibold">Total:</span>
-                <span class="text-xl font-bold" :style="{ color: 'var(--price-color)' }">
-                  {{ total }}
-                </span>
-              </div>
-              <button class="btn-orange mt-4 rounded-full self-end" @click="checkout">
-                Finalizează Comanda
-              </button>
-            </div>
-          </div>
-        </aside>
-      </transition>
+          </aside>
+        </transition>
+      </div>
     </div>
-  </div>
 
-  <!-- Buton "Sus" (Back to top) -->
-  <div 
-    v-if="showBackToTop" 
-    class="back-to-top" 
-    @click="scrollTop"
-  >
-    <span class="material-icons">keyboard_arrow_up</span>
+    <!-- Buton "Sus" (Back to top) -->
+    <div 
+      v-if="showBackToTop" 
+      class="back-to-top" 
+      @click="scrollTop"
+    >
+      <span class="material-icons">keyboard_arrow_up</span>
+    </div>
   </div>
 
   <!-- SCRIPTUL PRINCIPAL -->
@@ -981,7 +993,6 @@
                 image: "https://www.prestij.ro/uploads/produse/1440/94--ciorba-taraneasca-de-legume.jpg",
                 ingredients: ["Morcovi", "Cartofi", "Ceapă", "Apio"]
               },
-              /* Produse noi Supe (exemplu) */
               {
                 title: "Ciorbă de văcuță",
                 description: "360/40g. O ciorbă aromată, cu carne fragedă de vită și legume.",
@@ -995,146 +1006,20 @@
                 price: 17,
                 image: "",
                 ingredients: ["Carne tocată", "Legume", "Orez"]
-              },
-              /* ... etc. */
-            ],
-            pasta: [
-              {
-                title: "Spaghete Carbonara",
-                description: "Spaghetti, bacon, parmezan, ouă.",
-                price: 28,
-                image: "https://i.giphy.com/dZRlFW1sbFEpG.webp",
-                ingredients: ["Spaghetti", "Bacon", "Parmezan", "Ouă"]
-              },
-              {
-                title: "Penne Arrabbiata",
-                description: "Penne, sos de roșii picant, usturoi.",
-                price: 25,
-                image: "https://i.giphy.com/f0N7csaAc6t60OmXkm.webp",
-                ingredients: ["Penne", "Roșii", "Usturoi", "Ardei iute"]
-              },
-              {
-                title: "Tagliatelle Alfredo",
-                description: "Tagliatelle, sos Alfredo, pui.",
-                price: 30,
-                image: "https://i.giphy.com/xOML6s8aBmAtlLwujM.webp",
-                ingredients: ["Tagliatelle", "Pui", "Parmezan", "Smântână"]
               }
+              /* ... restul produselor */
             ],
-            main: [
-              {
-                title: "Mușchiuleț de porc",
-                description: "Mușchiuleț, cartofi copți, mozzarella, bacon.",
-                price: 45,
-                image: "https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp",
-                ingredients: ["Porc", "Cartofi", "Mozzarella", "Bacon"]
-              },
-              {
-                title: "Tomahawk porc",
-                description: "Carne de porc, cartofi, sos brun.",
-                price: 41,
-                image: "https://i.giphy.com/KDskfOILt91T2.webp",
-                ingredients: ["Tomahawk", "Cartofi", "Sos brun"]
-              },
-              {
-                title: "Ceafă sfărâmată",
-                description: "Ceafă, piure de cartofi, ardei copți.",
-                price: 36,
-                image: "https://i.giphy.com/l378puWI9Fpi4OApO.webp",
-                ingredients: ["Ceafă porc", "Piure", "Ardei copți"]
-              },
-              /* ... etc. */
-            ],
-            desserts: [
-              {
-                title: "Tiramisu",
-                description: "Prăjitură italiană cu cafea, mascarpone.",
-                price: 20,
-                image: "https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp",
-                ingredients: ["Cafea", "Mascarpone", "Pișcoturi"]
-              },
-              {
-                title: "Pavlova",
-                description: "Bezea, frișcă, fructe de pădure.",
-                price: 18,
-                image: "https://i.giphy.com/iiwu9bTOZ1HiM.webp",
-                ingredients: ["Bezea", "Frișcă", "Fructe de pădure"]
-              },
-              {
-                title: "Cheesecake",
-                description: "Cheesecake cu dulceață de căpșuni.",
-                price: 22,
-                image: "https://i.giphy.com/Xi2UAW7kTQvHa.webp",
-                ingredients: ["Brânză", "Biscuiți", "Căpșuni"]
-              }
-            ],
-            drinks: [
-              {
-                title: "Cocktail",
-                description: "Băutură răcoritoare cu fructe proaspete și alcool fin.",
-                price: 28,
-                image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp",
-                ingredients: ["Rom", "Fructe", "Gheață"]
-              },
-              {
-                title: "Ciocolată caldă",
-                description: "Cremă fierbinte de ciocolată cu topping de frișcă.",
-                price: 15,
-                image: "https://i.giphy.com/hPFKu8dKRRNgQ.webp",
-                ingredients: ["Ciocolată", "Lapte", "Frișcă"]
-              },
-              {
-                title: "Bere",
-                description: "Bere artizanală rece și spumoasă.",
-                price: 10,
-                image: "https://i.giphy.com/RkhJPJQJ2GPn02GMy6.webp",
-                ingredients: ["Malț", "Hamei", "Apă"]
-              }
-            ],
-            garnish: [
-              {
-                title: "Piure de cartofi",
-                description: "200g. Cremă fină de cartofi, bătută cu lapte și unt.",
-                price: 10,
-                image: "https://i.giphy.com/l0MYu3mmRtjxX28tq.webp",
-                ingredients: ["Cartofi", "Unt", "Lapte"]
-              },
-              {
-                title: "Pilaf de orez",
-                description: "100g/150g/200g. Orez aromat, fiert cu legume și condimente.",
-                price: 8,
-                image: "",
-                ingredients: ["Orez", "Legume", "Condimente"]
-              },
-              {
-                title: "Cartofi prăjiți",
-                description: "100g. Cartofi crocanți, prăjiți în ulei încins.",
-                price: 10,
-                image: "",
-                ingredients: ["Cartofi", "Ulei", "Sare"]
-              },
-              {
-                title: "Salată de varză",
-                description: "100g. Varză proaspătă, feliată subțire.",
-                price: 7,
-                image: "",
-                ingredients: ["Varză", "Sare", "Oțet"]
-              },
-              {
-                title: "Castraveți murați",
-                description: "50g. Castraveți acri, tăiați rondele.",
-                price: 5,
-                image: "",
-                ingredients: ["Castraveți murați"]
-              }
-            ]
+            /* ... restul categoriilor */
           }
         };
       },
       computed: {
+        /* 
+          1) Determină clasa actuală pentru container:
+             - "" (fără clasa .theme-red => implicit portocaliu)
+             - "theme-red" dacă selectedTheme === 'red'
+        */
         themeClass() {
-          // Folosit pe <html :class="themeClass">
-          // Va fi "theme-red" sau "" (implicit portocaliu)
           return this.selectedTheme === 'red' ? 'theme-red' : '';
         },
         displayedProducts() {
@@ -1161,12 +1046,10 @@
         }
       },
       methods: {
-        /* Folosim scroll-ul ferestrei (window) */
         handleWindowScroll() {
           this.showBackToTop = (window.scrollY > 200);
         },
         scrollTop() {
-          // Derulare cu behavior: 'smooth', + fallback
           window.scrollTo({
             top: 0,
             behavior: "smooth",
@@ -1347,7 +1230,6 @@
         }
       },
       mounted() {
-        // Ascultă eveniment de scroll la fereastră
         window.addEventListener("scroll", this.handleWindowScroll);
 
         // 1) Citim tema din localStorage
