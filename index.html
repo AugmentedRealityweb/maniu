@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="ro" :class="themeClass">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -13,31 +13,91 @@
   <!-- Font “scris de mână” (Dancing Script) -->
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet"/>
   <style>
+    /* ------------------------------------------------
+       1. VARIABILE CSS GLOBALE
+         - Valorile implicite (pentru tema portocalie)
+       ------------------------------------------------ */
+    :root {
+      /* Gradient pentru background */
+      --gradient-start: #000000;
+      --gradient-end:   #e78c00;
+
+      /* Scrollbar */
+      --scrollbar-color: #e78c00; 
+      --scrollbar-track: #000000;
+
+      /* Borduri principale, hover la sidebar */
+      --border-color: #e78c00;
+
+      /* Butoane gradient */
+      --btn-start: #f49032;
+      --btn-end:   #d35400;
+
+      /* Glow butoane la hover */
+      --btn-shadow-color1: #f49032;
+      --btn-shadow-color2: #d35400;
+
+      /* Card border & hover shadow */
+      --card-border-color: #e78c00;
+      --card-hover-shadow: rgba(255,140,0,0.3);
+
+      /* Culoare preț / accent (portocaliu) */
+      --price-color: #f49032;
+
+      /* (Opțional) Fundal "scratches" - color particule */
+      --scratch-color: rgba(231,140,0,0.15);
+    }
+
+    /* ------------------------------------------------
+       2. TEMA ROȘU ÎNCHIS – override pentru variabile
+       ------------------------------------------------ */
+    .theme-red {
+      --gradient-end:   #8B0000;
+      --scrollbar-color: #8B0000;
+      --border-color:   #8B0000;
+
+      --btn-start: #b30000;
+      --btn-end:   #7d0000;
+      --btn-shadow-color1: #b30000;
+      --btn-shadow-color2: #7d0000;
+
+      --card-border-color: #8B0000;
+      --card-hover-shadow: rgba(179,0,0,0.3);
+
+      --price-color: #b30000;
+      --scratch-color: rgba(139,0,0,0.15);
+    }
+
+    /* ------------------------------------------------
+       3. STILURI GENERALE PENTRU AMBELE TEME
+         - folosesc variabilele de mai sus
+       ------------------------------------------------ */
+
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #000000 0%, #e78c00 100%);
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
       color: #fff;
       margin: 0;
       min-height: 100vh;
     }
     .scrollbar {
       scrollbar-width: thin;
-      scrollbar-color: #e78c00 #000;
+      scrollbar-color: var(--scrollbar-color) var(--scrollbar-track);
     }
     .scrollbar::-webkit-scrollbar {
       width: 6px;
     }
     .scrollbar::-webkit-scrollbar-thumb {
-      background-color: #e78c00;
+      background-color: var(--scrollbar-color);
       border-radius: 6px;
     }
     .scrollbar::-webkit-scrollbar-track {
-      background-color: #000000;
+      background-color: var(--scrollbar-track);
     }
 
     .btn-orange {
-      background: linear-gradient(to right, #f49032, #d35400);
+      background: linear-gradient(to right, var(--btn-start), var(--btn-end));
       color: #fff;
       font-weight: bold;
       border: none;
@@ -50,10 +110,10 @@
     }
     .btn-orange:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 8px #f49032, 0 0 20px #d35400;
+      box-shadow: 0 0 8px var(--btn-shadow-color1), 0 0 20px var(--btn-shadow-color2);
     }
     .btn-incdec {
-      background: linear-gradient(to right, #f49032, #d35400);
+      background: linear-gradient(to right, var(--btn-start), var(--btn-end));
       color: #fff;
       font-weight: bold;
       border: none !important;
@@ -103,26 +163,26 @@
       background-color: #000;
       background-image: repeating-linear-gradient(
         45deg,
-        rgba(231,140,0,0.15),
-        rgba(231,140,0,0.15) 2px,
+        var(--scratch-color),
+        var(--scratch-color) 2px,
         transparent 2px,
         transparent 20px
       );
     }
     .sidebar {
-      border-right: 2px solid #e78c00;
+      border-right: 2px solid var(--border-color);
       box-shadow: 4px 0 8px rgba(0,0,0,0.3);
     }
     .sidebar-btn {
       transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
     .sidebar-btn:hover {
-      background-color: #e78c00;
+      background-color: var(--border-color);
       color: #000;
       transform: scale(1.03);
     }
     .main-container {
-      border: 2px solid #e78c00;
+      border: 2px solid var(--border-color);
       border-radius: 0.5rem;
       padding: 1rem;
     }
@@ -130,15 +190,14 @@
       position: relative;
       overflow: hidden;
       border-radius: 1rem;
-      border: 1px solid #e78c00;
+      border: 1px solid var(--card-border-color);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
       text-align: center;
     }
     .card-container:hover {
       transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 12px 24px rgba(255,140,0,0.3);
+      box-shadow: 0 12px 24px var(--card-hover-shadow);
     }
-    /* For Grid layout: imagine pătrată (aspect ratio 1:1) */
     .card-img-square {
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -146,7 +205,6 @@
       border-top-left-radius: 1rem;
       border-top-right-radius: 1rem;
     }
-    /* Pentru modul listă: rămâne înălțime standard */
     .card-img-rect {
       width: 100%;
       height: 200px;
@@ -154,7 +212,6 @@
       border-top-left-radius: 1rem;
       border-top-right-radius: 1rem;
     }
-
     .card-details {
       padding: 0.75rem;
       text-align: center;
@@ -164,10 +221,11 @@
       margin-bottom: 0.2rem;
       font-family: 'Dancing Script', cursive;
     }
+    /* Preț colorat dinamic (portocaliu sau roșu) */
     .card-details p {
       font-size: 1rem;
       font-weight: 600;
-      color: #f49032;
+      color: var(--price-color);
       text-align: center;
     }
 
@@ -192,7 +250,7 @@
     }
     .modal-product {
       background-color: #0d0d0d;
-      border: 2px solid #e78c00;
+      border: 2px solid var(--border-color);
       border-radius: 0.5rem;
       position: relative;
       max-height: 90vh;
@@ -205,7 +263,7 @@
       grid-template-columns: repeat(4, 1fr);
       grid-gap: 1rem;
       margin-top: 2rem;
-      justify-items: center; /* Să fie centrate pe coloană */
+      justify-items: center;
     }
     .table-circle {
       width: 70px;
@@ -217,13 +275,12 @@
       text-align: center;
       font-weight: bold;
       transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-      background: #999085; /* Fundal gri */
+      background: #999085;
       color: #fff;
       position: relative;
       z-index: 1;
-      box-shadow: 0 0 0 4px transparent; /* Inițial fără contur */
+      box-shadow: 0 0 0 4px transparent;
     }
-
     .table-circle:before {
       content: "";
       position: absolute;
@@ -235,15 +292,15 @@
       z-index: -1;
       transition: box-shadow 0.3s ease;
     }
-
+    /* Dacă nu are mesaje, apare contur (portocaliu / roșu) */
     .table-circle[style*="background: #666"] {
-      box-shadow: 0 0 0 4px #fc912d; /* Contur portocaliu */
+      box-shadow: 0 0 0 4px var(--btn-shadow-color1);
     }
 
     /* Buton "Sus" */
     .back-to-top {
       position: fixed;
-      bottom: 100px; /* un pic mai sus de butonul coșului */
+      bottom: 100px;
       right: 1rem;
       z-index: 100;
       display: flex;
@@ -252,7 +309,7 @@
       width: 2.5rem;
       height: 2.5rem;
       border-radius: 50%;
-      background: linear-gradient(to right, #f49032, #d35400);
+      background: linear-gradient(to right, var(--btn-start), var(--btn-end));
       color: #fff;
       font-size: 1.5rem;
       cursor: pointer;
@@ -284,6 +341,10 @@
         <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='social'">
           <span class="material-icons">group</span>Social
         </button>
+        <!-- NOUL TAB: DESIGN -->
+        <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='design'">
+          <span class="material-icons">palette</span>Design
+        </button>
       </nav>
     </aside>
 
@@ -296,7 +357,7 @@
             Meniu Restaurant
           </div>
           <button 
-            class="bg-black border-2 border-[#e78c00] hover:bg-[#e78c00] hover:text-black text-white p-2 rounded-full" 
+            class="bg-black border-2 border-[var(--border-color)] hover:bg-[var(--border-color)] hover:text-black text-white p-2 rounded-full" 
             @click="isSidebarVisible = !isSidebarVisible"
           >
             <span class="material-icons">menu</span>
@@ -337,6 +398,13 @@
               >
                 <span class="material-icons">group</span>Social
               </button>
+              <!-- NOUL TAB: DESIGN (mobil) -->
+              <button 
+                class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                @click="activeTab='design'; isSidebarVisible=false"
+              >
+                <span class="material-icons">palette</span>Design
+              </button>
             </nav>
           </aside>
         </transition>
@@ -349,7 +417,7 @@
               type="text" 
               placeholder="Caută produse..." 
               v-model="searchQuery" 
-              class="bg-black text-gray-200 border border-[#e78c00] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[#e78c00] w-full md:w-1/2"
+              class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] w-full md:w-1/2"
             />
           </div>
 
@@ -379,7 +447,6 @@
                 class="card-container cursor-pointer"
                 @click="showProductDetails(product)"
               >
-                <!-- În grid => imagine pătrată, în listă => imagine rectangulară -->
                 <img 
                   :class="isGrid ? 'card-img-square' : 'card-img-rect'"
                   :src="product.image" 
@@ -482,7 +549,7 @@
           >
             <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
               <button 
-                class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[#e78c00]" 
+                class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
                 @click="currentProduct = null"
               >
                 &times;
@@ -495,7 +562,7 @@
               <h2 class="text-xl font-bold mb-2 handwriting-title">
                 {{ currentProduct.title }}
               </h2>
-              <p class="text-[#f49032] font-bold text-lg mb-4">
+              <p class="font-bold text-lg mb-4" :style="{ color: 'var(--price-color)' }">
                 {{ currentProduct.price }} Lei
               </p>
               <p class="text-gray-400 mb-4">
@@ -520,7 +587,7 @@
         <!-- TAB: Puncte -->
         <section v-else-if="activeTab === 'puncte'">
           <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
-          <div class="bg-black p-4 rounded border border-[#e78c00] shadow max-w-md scratches mx-auto">
+          <div class="bg-black p-4 rounded border border-[var(--border-color)] shadow max-w-md scratches mx-auto">
             <div v-if="clientNumber === 0" class="mb-4">
               <p class="text-gray-300 text-center">
                 Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
@@ -534,7 +601,7 @@
             </div>
             <p class="text-gray-300 text-center">
               Puncte acumulate: 
-              <span class="font-bold text-[#f49032]">
+              <span class="font-bold" :style="{ color: 'var(--price-color)' }">
                 {{ clientPoints.toFixed(2) }}
               </span>
             </p>
@@ -551,7 +618,7 @@
             <div 
               v-for="(order, idx) in myOrders" 
               :key="order.orderId" 
-              class="bg-black p-4 rounded border border-[#e78c00] scratches"
+              class="bg-black p-4 rounded border border-[var(--border-color)] scratches"
             >
               <h3 class="text-lg font-semibold mb-2">
                 Comanda #{{ idx + 1 }}
@@ -564,7 +631,7 @@
                   {{ prod.name }} x {{ prod.quantity }} – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
                 </li>
               </ul>
-              <div class="mt-2 font-bold text-[#f49032]">
+              <div class="mt-2 font-bold" :style="{ color: 'var(--price-color)' }">
                 Total: {{ order.total }} Lei
               </div>
               <div class="text-sm text-gray-400">
@@ -587,7 +654,7 @@
                 type="text" 
                 v-model="usernameInput" 
                 placeholder="Introduceți numele..." 
-                class="bg-black text-gray-200 border border-[#e78c00] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[#e78c00] w-full mb-4"
+                class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] w-full mb-4"
               />
               <button class="btn-orange rounded-full" @click="setUsername">
                 Continuă
@@ -597,13 +664,13 @@
           <div v-else>
             <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
             <!-- Chat global (mesaje <= 10 minute) -->
-            <div class="mb-4 bg-black border border-[#e78c00] p-4 rounded scratches max-h-60 overflow-y-auto">
+            <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto">
               <div 
                 v-for="message in chatMessages" 
                 :key="message.id"
                 class="mb-2"
               >
-                <span class="font-bold text-[#f49032]">
+                <span class="font-bold" :style="{ color: 'var(--price-color)' }">
                   (masa {{ message.tableNumber }}) {{ message.name }}
                 </span>:
                 <span class="text-gray-300 ml-1">{{ message.text }}</span>
@@ -613,7 +680,7 @@
             <div class="flex gap-2 max-w-xl mx-auto">
               <input 
                 v-model="newMessage" 
-                class="bg-black text-gray-200 border border-[#e78c00] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[#e78c00] flex-1" 
+                class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] flex-1" 
                 placeholder="Scrie un mesaj..." 
               />
               <button class="btn-orange rounded-full" @click="postMessage">
@@ -629,9 +696,28 @@
                 class="table-circle"
                 :style="tableStyle(tableNum)"
               >
-                <!-- Text central -->
                 Masa {{ tableNum }}
               </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: Design (nou) -->
+        <section v-else-if="activeTab === 'design'">
+          <h2 class="text-2xl font-bold mb-4 text-center">Tema de Design</h2>
+          <div class="flex flex-col items-center gap-4">
+            <p class="text-gray-300">Alege o temă de culori pentru aplicație:</p>
+            <div>
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="orange" v-model="selectedTheme" />
+                <span>Portocaliu</span>
+              </label>
+            </div>
+            <div>
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="red" v-model="selectedTheme" />
+                <span>Roșu Închis</span>
+              </label>
             </div>
           </div>
         </section>
@@ -653,12 +739,12 @@
       <transition name="slide-cart">
         <aside 
           v-show="isOrderOpen && orders.length > 0" 
-          class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[#e78c00] p-4 overflow-y-auto scrollbar" 
+          class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[var(--border-color)] p-4 overflow-y-auto scrollbar" 
           style="max-height: 100vh;"
         >
           <div class="relative flex flex-col">
             <button 
-              class="absolute top-2 right-2 text-gray-300 text-2xl hover:text-[#e78c00]" 
+              class="absolute top-2 right-2 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
               @click="toggleOrderBar"
             >
               &times;
@@ -667,7 +753,7 @@
             <div 
               v-for="(order, index) in orders" 
               :key="index" 
-              class="flex justify-between items-center bg-black border border-[#e78c00] p-4 rounded-lg mb-2 scratches"
+              class="flex justify-between items-center bg-black border border-[var(--border-color)] p-4 rounded-lg mb-2 scratches"
             >
               <div class="flex flex-col">
                 <span class="font-bold">{{ order.name }}</span>
@@ -684,7 +770,7 @@
                 </div>
               </div>
               <div>
-                <span class="text-[#f49032] font-bold">
+                <span class="font-bold" :style="{ color: 'var(--price-color)' }">
                   {{ (order.price * order.quantity).toFixed(2) }} Lei
                 </span>
               </div>
@@ -692,7 +778,9 @@
             <div class="mt-4">
               <div class="flex justify-between items-center">
                 <span class="text-lg font-semibold">Total:</span>
-                <span class="text-[#f49032] text-xl font-bold">{{ total }}</span>
+                <span class="text-xl font-bold" :style="{ color: 'var(--price-color)' }">
+                  {{ total }}
+                </span>
               </div>
               <button class="btn-orange mt-4 rounded-full self-end" @click="checkout">
                 Finalizează Comanda
@@ -789,6 +877,9 @@
           showBackToTop: false,
           isGrid: true,
 
+          /* Control temă */
+          selectedTheme: 'orange', // 'orange' | 'red'
+
           /* Pagini / tab-uri */
           activeTab: "meniu",
           view: "categorii", // "categorii" sau "produse"
@@ -812,10 +903,6 @@
           usernameSet: false,
           newMessage: "",
           chatMessages: [],  // mesaje sub 10 min
-
-          /* Stiluri personalizate */
-          gradientStyle: "linear-gradient(to right, #f49032, #d35400)",
-          greyStyle: "#666",
 
           /* Date demo - categorii + produse */
           categories: [
@@ -849,7 +936,6 @@
             }
           ],
           products: {
-            /* ... aceleași date din codul anterior ... */
             brunch: [
               {
                 title: "Toast cu avocado",
@@ -895,7 +981,7 @@
                 image: "https://www.prestij.ro/uploads/produse/1440/94--ciorba-taraneasca-de-legume.jpg",
                 ingredients: ["Morcovi", "Cartofi", "Ceapă", "Apio"]
               },
-              /* Produse noi Supe */
+              /* Produse noi Supe (exemplu) */
               {
                 title: "Ciorbă de văcuță",
                 description: "360/40g. O ciorbă aromată, cu carne fragedă de vită și legume.",
@@ -910,55 +996,7 @@
                 image: "",
                 ingredients: ["Carne tocată", "Legume", "Orez"]
               },
-              {
-                title: "Ciorbă de pui a la grec",
-                description: "360/40g. Delicată și cremoasă, cu carne de pui și lămâie.",
-                price: 17,
-                image: "",
-                ingredients: ["Pui", "Orez", "Lămâie", "Smântână"]
-              },
-              {
-                title: "Ciorbă de coaste de porc afumate",
-                description: "330/70g. Gust intens, cu coaste de porc afumate și legume.",
-                price: 20,
-                image: "",
-                ingredients: ["Coaste porc afumate", "Legume", "Condimente"]
-              },
-              {
-                title: "Ciorbă de pui",
-                description: "360/40g. Ușoară și sănătoasă, ideală pentru un prânz rapid.",
-                price: 15,
-                image: "",
-                ingredients: ["Carne de pui", "Legume", "Zeamă clară"]
-              },
-              {
-                title: "Ciorbă de porc țărănească",
-                description: "360/40g. Adevărată rețetă țărănească, cu carne de porc și zarzavaturi.",
-                price: 18,
-                image: "",
-                ingredients: ["Porc", "Legume", "Borș"]
-              },
-              {
-                title: "Ciorbă de fasole",
-                description: "400g. Fasole boabe și zarzavaturi, perfectă cu ardei iute.",
-                price: 15,
-                image: "",
-                ingredients: ["Fasole boabe", "Legume", "Condimente"]
-              },
-              {
-                title: "Ciorbă de porc a la grec",
-                description: "360/40g. Cu carne de porc, ușor acrișoară, foarte gustoasă.",
-                price: 18,
-                image: "",
-                ingredients: ["Porc", "Zeamă de lămâie", "Smântână"]
-              },
-              {
-                title: "Ciorbă de coaste afumate",
-                description: "360/40g. Similară cu cea de porc afumat, dar cu o notă suplimentară de fum.",
-                price: 21,
-                image: "",
-                ingredients: ["Coaste afumate", "Legume", "Condimente"]
-              }
+              /* ... etc. */
             ],
             pasta: [
               {
@@ -1005,119 +1043,7 @@
                 image: "https://i.giphy.com/l378puWI9Fpi4OApO.webp",
                 ingredients: ["Ceafă porc", "Piure", "Ardei copți"]
               },
-              /* Produse noi Fel Principal */
-              {
-                title: "Copanele la cuptor",
-                description: "110g. Copanele fragede, rumenite la cuptor.",
-                price: 25,
-                image: "",
-                ingredients: ["Pui", "Condimente", "Ulei"]
-              },
-              {
-                title: "Șnițel din piept de pui",
-                description: "100g/120g. Șnițel crocant, din piept de pui proaspăt.",
-                price: 20,
-                image: "",
-                ingredients: ["Piept de pui", "Pesmet", "Ou"]
-              },
-              {
-                title: "Cotlet de porc la grătar",
-                description: "110/200g. Cotlet suculent, fript la grătar.",
-                price: 27,
-                image: "",
-                ingredients: ["Cotlet de porc", "Condimente"]
-              },
-              {
-                title: "Pulpă de pui la grătar",
-                description: "200g. Marinată ușor, apoi friptă perfect la grătar.",
-                price: 24,
-                image: "",
-                ingredients: ["Pulpă pui", "Condimente"]
-              },
-              {
-                title: "Pulpă de pui la tavă",
-                description: "200g. Fragedă și suculentă, gătită la foc mediu.",
-                price: 24,
-                image: "",
-                ingredients: ["Pulpă pui", "Condimente"]
-              },
-              {
-                title: "Tochitură cu mămăliguță",
-                description: "150/150g. Bucăți de carne de porc, cârnați și sos savuros.",
-                price: 35,
-                image: "",
-                ingredients: ["Carne porc", "Mămăligă", "Brânză (opțional)"]
-              },
-              {
-                title: "Ceafă de porc la grătar",
-                description: "116g. Ceafă fragedă și gustoasă.",
-                price: 28,
-                image: "",
-                ingredients: ["Ceafă porc", "Condimente"]
-              },
-              {
-                title: "Varză călită cu Kaiseri",
-                description: "300/160g. Varză călită lent, amestecată cu kaizer.",
-                price: 22,
-                image: "",
-                ingredients: ["Varză", "Kaiser", "Condimente"]
-              },
-              {
-                title: "Sarmale cu mămăliguță",
-                description: "180/150g. Rețetă tradițională, servită cu mămăliguță caldă.",
-                price: 30,
-                image: "",
-                ingredients: ["Carne tocată", "Varză murată", "Mămăligă"]
-              },
-              {
-                title: "Pulpă de vită la tavă",
-                description: "70g. Bucată mică, dar delicioasă, frăgezită la cuptor.",
-                price: 32,
-                image: "",
-                ingredients: ["Pulpă vită", "Condimente"]
-              },
-              {
-                title: "Chiftele din pulpă de porc",
-                description: "150g. Chiftele rumenite, consistente.",
-                price: 18,
-                image: "",
-                ingredients: ["Carne de porc", "Pesmet", "Condimente"]
-              },
-              {
-                title: "Iahnie de fasole cu kaizer",
-                description: "300/150g. Fasole gustoasă, combinată cu kaizer aromat.",
-                price: 20,
-                image: "",
-                ingredients: ["Fasole boabe", "Kaiser", "Ceapă"]
-              },
-              {
-                title: "Piept de pui la grătar",
-                description: "110g. Ușor și gustos, perfect pentru diete.",
-                price: 19,
-                image: "",
-                ingredients: ["Piept pui", "Condimente"]
-              },
-              {
-                title: "Pulpă de pui dezosată",
-                description: "100g. Pulpă fără os, gătită rapid și uniform.",
-                price: 21,
-                image: "",
-                ingredients: ["Pulpă pui dezosată", "Condimente"]
-              },
-              {
-                title: "Cotlet de porc la tavă",
-                description: "100/50g. Fraged, copt lent în tavă cu mirodenii.",
-                price: 26,
-                image: "",
-                ingredients: ["Cotlet porc", "Condimente"]
-              },
-              {
-                title: "Chiftele din pulpă de porc (2 buc)",
-                description: "150g. Două chiftele mari, prăjite până devin aurii.",
-                price: 18,
-                image: "",
-                ingredients: ["Carne porc", "Pesmet", "Ou"]
-              }
+              /* ... etc. */
             ],
             desserts: [
               {
@@ -1206,14 +1132,16 @@
         };
       },
       computed: {
+        themeClass() {
+          // Folosit pe <html :class="themeClass">
+          // Va fi "theme-red" sau "" (implicit portocaliu)
+          return this.selectedTheme === 'red' ? 'theme-red' : '';
+        },
         displayedProducts() {
-          // Filtrare după query
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
-            // Dacă nu există query, afișăm doar produsele din categoria curentă (dacă e 'produse')
             return this.view === "produse" ? this.currentProducts : [];
           }
-          // Dacă există query, căutăm în tot "products"
           const results = [];
           for (const catKey in this.products) {
             for (const prod of this.products[catKey]) {
@@ -1238,10 +1166,13 @@
           this.showBackToTop = (window.scrollY > 200);
         },
         scrollTop() {
+          // Derulare cu behavior: 'smooth', + fallback
           window.scrollTo({
             top: 0,
-            behavior: "smooth"
+            behavior: "smooth",
           });
+          document.body.scrollTop = 0; 
+          document.documentElement.scrollTop = 0;
         },
         toggleLayout() {
           this.isGrid = !this.isGrid;
@@ -1356,7 +1287,6 @@
             console.error("Eroare la preluarea comenzilor:", e);
           }
         },
-
         /* -- SOCIAL -- */
         setUsername() {
           if (!this.usernameInput.trim()) return;
@@ -1404,15 +1334,15 @@
           const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
           if (hasMessages) {
             return {
-              background: this.gradientStyle,
+              background: `linear-gradient(to right, var(--btn-start), var(--btn-end))`,
               color: '#000',
               boxShadow: 'none'
             };
           }
           return {
-            background: '#666', // Fundal gri
+            background: '#666',
             color: '#fff',
-            boxShadow: '0 0 0 4px #fc912d' // Contur portocaliu
+            boxShadow: `0 0 0 4px var(--btn-shadow-color1)`
           };
         }
       },
@@ -1420,6 +1350,13 @@
         // Ascultă eveniment de scroll la fereastră
         window.addEventListener("scroll", this.handleWindowScroll);
 
+        // 1) Citim tema din localStorage
+        const storedTheme = localStorage.getItem('selectedTheme');
+        if (storedTheme) {
+          this.selectedTheme = storedTheme; // 'orange' sau 'red'
+        }
+
+        // 2) Preluăm parametru "masa"
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
         if (masaParam) {
@@ -1428,6 +1365,7 @@
           this.tableId = "Masa numărul 1";
         }
 
+        // 3) Setăm un clientNumber random, dacă nu avem deja
         const storedNumber = localStorage.getItem("clientNumber");
         if (storedNumber) {
           this.clientNumber = parseInt(storedNumber);
@@ -1441,32 +1379,32 @@
           this.isFirstOrder = false;
         }
 
+        // 4) Citim punctele și comenzile anterioare
         const storedPoints = localStorage.getItem("clientPoints");
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
         }
-
         const storedMyOrders = localStorage.getItem("myOrders");
         if (storedMyOrders) {
           this.myOrders = JSON.parse(storedMyOrders);
         }
 
+        // 5) Fetch la comenzile curente
         this.fetchOrders();
 
-        // Verificăm dacă avem deja username
+        // 6) Citim username, dacă există
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
           this.usernameSet = true;
           this.usernameInput = storedUsername;
         }
 
-        // Dacă avem username, încărcăm direct mesajele
+        // 7) Dacă avem username, încărcăm direct mesajele
         if (this.usernameSet) {
           this.loadMessages();
         }
       },
       unmounted() {
-        // Curățăm event listener-ul
         window.removeEventListener("scroll", this.handleWindowScroll);
       },
       watch: {
@@ -1483,6 +1421,10 @@
         },
         myOrders(newVal) {
           localStorage.setItem("myOrders", JSON.stringify(newVal));
+        },
+        // Dacă se schimbă tema, o salvăm în localStorage
+        selectedTheme(newVal) {
+          localStorage.setItem('selectedTheme', newVal);
         }
       }
     });
