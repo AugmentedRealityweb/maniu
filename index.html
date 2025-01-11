@@ -43,7 +43,7 @@
       /* Culoare preț / accent (portocaliu) */
       --price-color: #f49032;
 
-      /* (Opțional) Fundal "scratches" - color particule */
+      /* Fundal "scratches" - color particule */
       --scratch-color: rgba(231,140,0,0.15);
     }
 
@@ -71,7 +71,6 @@
 
     /* ------------------------------------------------
        3. STILURI GENERALE PENTRU AMBELE TEME
-         (folosesc variabilele de mai sus)
        ------------------------------------------------ */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     body {
@@ -80,8 +79,7 @@
       min-height: 100vh;
     }
 
-    /* Containerul #app va avea fundalul gradient în funcție
-       de valorile curente ale variabilelor. */
+    /* #app cu gradient de fundal în funcție de variabile */
     #app {
       background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
       color: #fff;
@@ -230,7 +228,6 @@
       margin-bottom: 0.2rem;
       font-family: 'Dancing Script', cursive;
     }
-    /* Preț colorat dinamic (portocaliu sau roșu) */
     .card-details p {
       font-size: 1rem;
       font-weight: 600;
@@ -301,7 +298,6 @@
       z-index: -1;
       transition: box-shadow 0.3s ease;
     }
-    /* Dacă nu are mesaje, apare contur (portocaliu / roșu) */
     .table-circle[style*="background: #666"] {
       box-shadow: 0 0 0 4px var(--btn-shadow-color1);
     }
@@ -331,7 +327,7 @@
   </style>
 </head>
 <body>
-  <!-- Observație: am scos :class="themeClass" de pe <html> și îl punem pe #app -->
+  <!-- #app cu :class="themeClass" -->
   <div id="app" :class="themeClass">
     <div class="h-screen flex flex-col">
       <!-- SIDEBAR desktop -->
@@ -409,7 +405,6 @@
                 >
                   <span class="material-icons">group</span>Social
                 </button>
-                <!-- NOUL TAB: DESIGN (mobil) -->
                 <button 
                   class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
                   @click="activeTab='design'; isSidebarVisible=false"
@@ -916,7 +911,7 @@
           newMessage: "",
           chatMessages: [],  // mesaje sub 10 min
 
-          /* Date demo - categorii + produse */
+          /* Date demo - categorii + produse (cu tot ce era înainte) */
           categories: [
             {
               name: "brunch",
@@ -1006,19 +1001,304 @@
                 price: 17,
                 image: "",
                 ingredients: ["Carne tocată", "Legume", "Orez"]
+              },
+              {
+                title: "Ciorbă de pui a la grec",
+                description: "360/40g. Delicată și cremoasă, cu carne de pui și lămâie.",
+                price: 17,
+                image: "",
+                ingredients: ["Pui", "Orez", "Lămâie", "Smântână"]
+              },
+              {
+                title: "Ciorbă de coaste de porc afumate",
+                description: "330/70g. Gust intens, cu coaste de porc afumate și legume.",
+                price: 20,
+                image: "",
+                ingredients: ["Coaste porc afumate", "Legume", "Condimente"]
+              },
+              {
+                title: "Ciorbă de pui",
+                description: "360/40g. Ușoară și sănătoasă, ideală pentru un prânz rapid.",
+                price: 15,
+                image: "",
+                ingredients: ["Carne de pui", "Legume", "Zeamă clară"]
+              },
+              {
+                title: "Ciorbă de porc țărănească",
+                description: "360/40g. Adevărată rețetă țărănească, cu carne de porc și zarzavaturi.",
+                price: 18,
+                image: "",
+                ingredients: ["Porc", "Legume", "Borș"]
+              },
+              {
+                title: "Ciorbă de fasole",
+                description: "400g. Fasole boabe și zarzavaturi, perfectă cu ardei iute.",
+                price: 15,
+                image: "",
+                ingredients: ["Fasole boabe", "Legume", "Condimente"]
+              },
+              {
+                title: "Ciorbă de porc a la grec",
+                description: "360/40g. Cu carne de porc, ușor acrișoară, foarte gustoasă.",
+                price: 18,
+                image: "",
+                ingredients: ["Porc", "Zeamă de lămâie", "Smântână"]
+              },
+              {
+                title: "Ciorbă de coaste afumate",
+                description: "360/40g. Similară cu cea de porc afumat, dar cu o notă suplimentară de fum.",
+                price: 21,
+                image: "",
+                ingredients: ["Coaste afumate", "Legume", "Condimente"]
               }
-              /* ... restul produselor */
             ],
-            /* ... restul categoriilor */
+            pasta: [
+              {
+                title: "Spaghete Carbonara",
+                description: "Spaghetti, bacon, parmezan, ouă.",
+                price: 28,
+                image: "https://i.giphy.com/dZRlFW1sbFEpG.webp",
+                ingredients: ["Spaghetti", "Bacon", "Parmezan", "Ouă"]
+              },
+              {
+                title: "Penne Arrabbiata",
+                description: "Penne, sos de roșii picant, usturoi.",
+                price: 25,
+                image: "https://i.giphy.com/f0N7csaAc6t60OmXkm.webp",
+                ingredients: ["Penne", "Roșii", "Usturoi", "Ardei iute"]
+              },
+              {
+                title: "Tagliatelle Alfredo",
+                description: "Tagliatelle, sos Alfredo, pui.",
+                price: 30,
+                image: "https://i.giphy.com/xOML6s8aBmAtlLwujM.webp",
+                ingredients: ["Tagliatelle", "Pui", "Parmezan", "Smântână"]
+              }
+            ],
+            main: [
+              {
+                title: "Mușchiuleț de porc",
+                description: "Mușchiuleț, cartofi copți, mozzarella, bacon.",
+                price: 45,
+                image: "https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp",
+                ingredients: ["Porc", "Cartofi", "Mozzarella", "Bacon"]
+              },
+              {
+                title: "Tomahawk porc",
+                description: "Carne de porc, cartofi, sos brun.",
+                price: 41,
+                image: "https://i.giphy.com/KDskfOILt91T2.webp",
+                ingredients: ["Tomahawk", "Cartofi", "Sos brun"]
+              },
+              {
+                title: "Ceafă sfărâmată",
+                description: "Ceafă, piure de cartofi, ardei copți.",
+                price: 36,
+                image: "https://i.giphy.com/l378puWI9Fpi4OApO.webp",
+                ingredients: ["Ceafă porc", "Piure", "Ardei copți"]
+              },
+              {
+                title: "Copanele la cuptor",
+                description: "110g. Copanele fragede, rumenite la cuptor.",
+                price: 25,
+                image: "",
+                ingredients: ["Pui", "Condimente", "Ulei"]
+              },
+              {
+                title: "Șnițel din piept de pui",
+                description: "100g/120g. Șnițel crocant, din piept de pui proaspăt.",
+                price: 20,
+                image: "",
+                ingredients: ["Piept de pui", "Pesmet", "Ou"]
+              },
+              {
+                title: "Cotlet de porc la grătar",
+                description: "110/200g. Cotlet suculent, fript la grătar.",
+                price: 27,
+                image: "",
+                ingredients: ["Cotlet de porc", "Condimente"]
+              },
+              {
+                title: "Pulpă de pui la grătar",
+                description: "200g. Marinată ușor, apoi friptă perfect la grătar.",
+                price: 24,
+                image: "",
+                ingredients: ["Pulpă pui", "Condimente"]
+              },
+              {
+                title: "Pulpă de pui la tavă",
+                description: "200g. Fragedă și suculentă, gătită la foc mediu.",
+                price: 24,
+                image: "",
+                ingredients: ["Pulpă pui", "Condimente"]
+              },
+              {
+                title: "Tochitură cu mămăliguță",
+                description: "150/150g. Bucăți de carne de porc, cârnați și sos savuros.",
+                price: 35,
+                image: "",
+                ingredients: ["Carne porc", "Mămăligă", "Brânză (opțional)"]
+              },
+              {
+                title: "Ceafă de porc la grătar",
+                description: "116g. Ceafă fragedă și gustoasă.",
+                price: 28,
+                image: "",
+                ingredients: ["Ceafă porc", "Condimente"]
+              },
+              {
+                title: "Varză călită cu Kaiseri",
+                description: "300/160g. Varză călită lent, amestecată cu kaizer.",
+                price: 22,
+                image: "",
+                ingredients: ["Varză", "Kaiser", "Condimente"]
+              },
+              {
+                title: "Sarmale cu mămăliguță",
+                description: "180/150g. Rețetă tradițională, servită cu mămăliguță caldă.",
+                price: 30,
+                image: "",
+                ingredients: ["Carne tocată", "Varză murată", "Mămăligă"]
+              },
+              {
+                title: "Pulpă de vită la tavă",
+                description: "70g. Bucată mică, dar delicioasă, frăgezită la cuptor.",
+                price: 32,
+                image: "",
+                ingredients: ["Pulpă vită", "Condimente"]
+              },
+              {
+                title: "Chiftele din pulpă de porc",
+                description: "150g. Chiftele rumenite, consistente.",
+                price: 18,
+                image: "",
+                ingredients: ["Carne de porc", "Pesmet", "Condimente"]
+              },
+              {
+                title: "Iahnie de fasole cu kaizer",
+                description: "300/150g. Fasole gustoasă, combinată cu kaizer aromat.",
+                price: 20,
+                image: "",
+                ingredients: ["Fasole boabe", "Kaiser", "Ceapă"]
+              },
+              {
+                title: "Piept de pui la grătar",
+                description: "110g. Ușor și gustos, perfect pentru diete.",
+                price: 19,
+                image: "",
+                ingredients: ["Piept pui", "Condimente"]
+              },
+              {
+                title: "Pulpă de pui dezosată",
+                description: "100g. Pulpă fără os, gătită rapid și uniform.",
+                price: 21,
+                image: "",
+                ingredients: ["Pulpă pui dezosată", "Condimente"]
+              },
+              {
+                title: "Cotlet de porc la tavă",
+                description: "100/50g. Fraged, copt lent în tavă cu mirodenii.",
+                price: 26,
+                image: "",
+                ingredients: ["Cotlet porc", "Condimente"]
+              },
+              {
+                title: "Chiftele din pulpă de porc (2 buc)",
+                description: "150g. Două chiftele mari, prăjite până devin aurii.",
+                price: 18,
+                image: "",
+                ingredients: ["Carne porc", "Pesmet", "Ou"]
+              }
+            ],
+            desserts: [
+              {
+                title: "Tiramisu",
+                description: "Prăjitură italiană cu cafea, mascarpone.",
+                price: 20,
+                image: "https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp",
+                ingredients: ["Cafea", "Mascarpone", "Pișcoturi"]
+              },
+              {
+                title: "Pavlova",
+                description: "Bezea, frișcă, fructe de pădure.",
+                price: 18,
+                image: "https://i.giphy.com/iiwu9bTOZ1HiM.webp",
+                ingredients: ["Bezea", "Frișcă", "Fructe de pădure"]
+              },
+              {
+                title: "Cheesecake",
+                description: "Cheesecake cu dulceață de căpșuni.",
+                price: 22,
+                image: "https://i.giphy.com/Xi2UAW7kTQvHa.webp",
+                ingredients: ["Brânză", "Biscuiți", "Căpșuni"]
+              }
+            ],
+            drinks: [
+              {
+                title: "Cocktail",
+                description: "Băutură răcoritoare cu fructe proaspete și alcool fin.",
+                price: 28,
+                image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp",
+                ingredients: ["Rom", "Fructe", "Gheață"]
+              },
+              {
+                title: "Ciocolată caldă",
+                description: "Cremă fierbinte de ciocolată cu topping de frișcă.",
+                price: 15,
+                image: "https://i.giphy.com/hPFKu8dKRRNgQ.webp",
+                ingredients: ["Ciocolată", "Lapte", "Frișcă"]
+              },
+              {
+                title: "Bere",
+                description: "Bere artizanală rece și spumoasă.",
+                price: 10,
+                image: "https://i.giphy.com/RkhJPJQJ2GPn02GMy6.webp",
+                ingredients: ["Malț", "Hamei", "Apă"]
+              }
+            ],
+            garnish: [
+              {
+                title: "Piure de cartofi",
+                description: "200g. Cremă fină de cartofi, bătută cu lapte și unt.",
+                price: 10,
+                image: "https://i.giphy.com/l0MYu3mmRtjxX28tq.webp",
+                ingredients: ["Cartofi", "Unt", "Lapte"]
+              },
+              {
+                title: "Pilaf de orez",
+                description: "100g/150g/200g. Orez aromat, fiert cu legume și condimente.",
+                price: 8,
+                image: "",
+                ingredients: ["Orez", "Legume", "Condimente"]
+              },
+              {
+                title: "Cartofi prăjiți",
+                description: "100g. Cartofi crocanți, prăjiți în ulei încins.",
+                price: 10,
+                image: "",
+                ingredients: ["Cartofi", "Ulei", "Sare"]
+              },
+              {
+                title: "Salată de varză",
+                description: "100g. Varză proaspătă, feliată subțire.",
+                price: 7,
+                image: "",
+                ingredients: ["Varză", "Sare", "Oțet"]
+              },
+              {
+                title: "Castraveți murați",
+                description: "50g. Castraveți acri, tăiați rondele.",
+                price: 5,
+                image: "",
+                ingredients: ["Castraveți murați"]
+              }
+            ]
           }
         };
       },
       computed: {
-        /* 
-          1) Determină clasa actuală pentru container:
-             - "" (fără clasa .theme-red => implicit portocaliu)
-             - "theme-red" dacă selectedTheme === 'red'
-        */
+        /* Returnează "theme-red" dacă selectedTheme === 'red',
+           altfel "" => implicit tema portocalie */
         themeClass() {
           return this.selectedTheme === 'red' ? 'theme-red' : '';
         },
@@ -1230,6 +1510,7 @@
         }
       },
       mounted() {
+        // Ascultă eveniment de scroll la fereastră
         window.addEventListener("scroll", this.handleWindowScroll);
 
         // 1) Citim tema din localStorage
