@@ -458,7 +458,8 @@
     <div class="h-screen flex flex-col">
       <!-- SIDEBAR desktop -->
       <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
-        <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left">
+        <!-- 2) Meniu Restaurant pe mijloc -->
+        <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left text-center">
           Meniu Restaurant
         </div>
         <nav class="flex flex-col space-y-2">
@@ -484,23 +485,26 @@
       <!-- CONȚINUT PRINCIPAL, e scrollabil pe window, nu local -->
       <div class="flex-1 flex flex-col p-2">
         <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
-          <!-- BUTON + TITLU mobil -->
-          <div class="flex items-center justify-between mb-4 md:hidden">
-            <div class="handwriting-title text-2xl font-bold fade-in-left">
-              Meniu Restaurant
-            </div>
+          <!-- 3) BARĂ mobilă: Buton stânga + Titlu centrat -->
+          <div class="flex items-center mb-4 md:hidden">
             <button 
-              class="bg-black border-2 border-[var(--border-color)] hover:bg-[var(--border-color)] hover:text-black text-white p-2 rounded-full" 
+              ref="mobileToggle"
+              class="bg-black border-2 border-[var(--border-color)] hover:bg-[var(--border-color)] hover:text-black 
+                     text-white p-2 rounded-full mr-2"
               @click="isSidebarVisible = !isSidebarVisible"
             >
               <span class="material-icons">menu</span>
             </button>
+            <div class="handwriting-title text-2xl font-bold fade-in-left text-center flex-1">
+              Meniu Restaurant
+            </div>
           </div>
 
           <!-- SIDEBAR mobil (afișat condiționat) -->
           <transition name="slide-fade">
             <aside 
               v-if="isSidebarVisible" 
+              ref="mobileSidebar"
               class="absolute top-0 left-0 w-48 p-4 z-50 rounded-tr-lg rounded-br-lg sidebar scratches"
             >
               <button class="text-white mb-2" @click="isSidebarVisible = false">
@@ -992,14 +996,14 @@
 
     /* -- Config Firebase (înlocuiește cu datele tale) -- */
     const firebaseConfig = {
-  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-  authDomain: "restaurantapp-d0256.firebaseapp.com",
-  projectId: "restaurantapp-d0256",
-  storageBucket: "restaurantapp-d0256.firebasestorage.app",
-  messagingSenderId: "275208346650",
-  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-  measurementId: "G-F44TB27G17"
-};
+      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWq",
+      authDomain: "restaurantapp-d0256.firebaseapp.com",
+      projectId: "restaurantapp-d0256",
+      storageBucket: "restaurantapp-d0256.firebasestorage.app",
+      messagingSenderId: "275208346650",
+      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+      measurementId: "G-F44TB27G17"
+    };
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
@@ -1643,6 +1647,22 @@
           };
         },
 
+        // Închiderea sidebar-ului mobil la click în afară
+        handleOutsideClick(e) {
+          if (this.isSidebarVisible) {
+            const mobileAside = this.$refs.mobileSidebar;
+            const toggleBtn = this.$refs.mobileToggle;
+            if (
+              mobileAside && 
+              !mobileAside.contains(e.target) && 
+              toggleBtn &&
+              !toggleBtn.contains(e.target)
+            ) {
+              this.isSidebarVisible = false;
+            }
+          }
+        },
+
         // Metoda pentru a aplica temele
         applyThemeClass(themeName) {
           const allThemes = [
@@ -1658,6 +1678,7 @@
       },
       mounted() {
         window.addEventListener("scroll", this.handleWindowScroll);
+        document.addEventListener("click", this.handleOutsideClick);
 
         // 1) Citim tema din localStorage
         const storedTheme = localStorage.getItem('selectedTheme');
@@ -1715,6 +1736,7 @@
       },
       unmounted() {
         window.removeEventListener("scroll", this.handleWindowScroll);
+        document.removeEventListener("click", this.handleOutsideClick);
       },
       watch: {
         usernameSet(newVal) {
@@ -1731,9 +1753,11 @@
         myOrders(newVal) {
           localStorage.setItem("myOrders", JSON.stringify(newVal));
         },
+        // 1) După selectarea unei teme, aplicăm tema și mergem înapoi la "meniu"
         selectedTheme(newVal) {
           localStorage.setItem('selectedTheme', newVal);
           this.applyThemeClass(newVal);
+          this.activeTab = 'meniu'; // la schimbarea temei, comutăm pe tabul meniu
         }
       }
     });
