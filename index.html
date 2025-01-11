@@ -34,14 +34,11 @@
       --card-hover-shadow: rgba(255,140,0,0.3);
 
       --price-color: #f49032;
-
       --scratch-color: rgba(231,140,0,0.15);
     }
 
     /* ------------------------------------------------
-       2. CELELALTE 9 TEME:
-         .theme-red, .theme-blue, .theme-green, .theme-purple,
-         .theme-pink, .theme-grey, .theme-brown, .theme-teal, .theme-lime
+       2. CELELALTE 9 TEME: .theme-red, .theme-blue, etc.
        ------------------------------------------------ */
 
     .theme-red {
@@ -615,7 +612,7 @@
                     <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
                   </button>
                 </div>
-                <!-- Afișare categorii (grid col-3 sau listă) -->
+                <!-- Afișare categorii -->
                 <div 
                   :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
                 >
@@ -1007,7 +1004,6 @@
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    /* -- HELPER -- */
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
@@ -1052,11 +1048,11 @@
           isGrid: true,
 
           /* Control temă */
-          selectedTheme: 'orange', // 'orange', 'red', 'blue', 'green', 'purple', 'pink', 'grey', 'brown', 'teal', 'lime'
+          selectedTheme: 'orange', // 'orange', 'red', 'blue', 'green', 'purple', etc.
 
           /* Pagini / tab-uri */
           activeTab: "meniu",
-          view: "categorii", // "categorii" sau "produse"
+          view: "categorii",
 
           /* Produse */
           currentProducts: [],
@@ -1076,41 +1072,20 @@
           usernameInput: "",
           usernameSet: false,
           newMessage: "",
-          chatMessages: [],  // mesaje sub 10 min
+          chatMessages: [],
 
-          /* Date demo - categorii + produse */
+          /* Date demo */
           categories: [
-            {
-              name: "brunch",
-              image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp"
-            },
-            {
-              name: "soups",
-              image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg"
-            },
-            {
-              name: "pasta",
-              image: "https://i.giphy.com/dZRlFW1sbFEpG.webp"
-            },
-            {
-              name: "main",
-              image: "https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp"
-            },
-            {
-              name: "desserts",
-              image: "https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp"
-            },
-            {
-              name: "drinks",
-              image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp"
-            },
-            {
-              name: "garnish",
-              image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp"
-            }
+            { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
+            { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
+            { name: "pasta",   image: "https://i.giphy.com/dZRlFW1sbFEpG.webp" },
+            { name: "main",    image: "https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp" },
+            { name: "desserts",image: "https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp" },
+            { name: "drinks",  image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp" },
+            { name: "garnish", image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp" }
           ],
           products: {
-            /* Aceleași date extinse ca înainte (brunch, soups, main etc.) */
+            /* brunch, soups, pasta, main, desserts, drinks, garnish */
             brunch: [
               {
                 title: "Toast cu avocado",
@@ -1220,7 +1195,6 @@
                 ingredients: ["Coaste afumate", "Legume", "Condimente"]
               }
             ],
-            /* ... restul categoriilor (pasta, main, desserts, drinks, garnish) cu toate produsele adăugate înainte ... */
             pasta: [
               {
                 title: "Spaghete Carbonara",
@@ -1266,7 +1240,6 @@
                 image: "https://i.giphy.com/l378puWI9Fpi4OApO.webp",
                 ingredients: ["Ceafă porc", "Piure", "Ardei copți"]
               },
-              /* Produse noi Fel Principal */
               {
                 title: "Copanele la cuptor",
                 description: "110g. Copanele fragede, rumenite la cuptor.",
@@ -1495,11 +1468,8 @@
           this.showBackToTop = (window.scrollY > 200);
         },
         scrollTop() {
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          });
-          document.body.scrollTop = 0; 
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          document.body.scrollTop = 0;
           document.documentElement.scrollTop = 0;
         },
         toggleLayout() {
@@ -1615,7 +1585,6 @@
             console.error("Eroare la preluarea comenzilor:", e);
           }
         },
-        /* SOCIAL */
         setUsername() {
           if (!this.usernameInput.trim()) return;
           localStorage.setItem("username", this.usernameInput.trim());
@@ -1672,6 +1641,19 @@
             color: '#fff',
             boxShadow: `0 0 0 4px var(--btn-shadow-color1)`
           };
+        },
+
+        // Metoda pentru a aplica temele
+        applyThemeClass(themeName) {
+          const allThemes = [
+            'theme-red','theme-blue','theme-green','theme-purple',
+            'theme-pink','theme-grey','theme-brown','theme-teal','theme-lime'
+          ];
+          allThemes.forEach(t => document.body.classList.remove(t));
+
+          if (themeName !== 'orange') {
+            document.body.classList.add(`theme-${themeName}`);
+          }
         }
       },
       mounted() {
@@ -1682,7 +1664,6 @@
         if (storedTheme) {
           this.selectedTheme = storedTheme;
         }
-        // Aplica corect tema (dacă nu e 'orange', adaugă clasa corespunzătoare)
         this.applyThemeClass(this.selectedTheme);
 
         // 2) Masa
@@ -1721,13 +1702,13 @@
         // 5) Fetch la comenzile curente
         this.fetchOrders();
 
-        // 6) Username
+        // 6) Username deja salvat?
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
           this.usernameSet = true;
           this.usernameInput = storedUsername;
         }
-        // 7) Dacă avem deja un username, încărcăm direct mesajele
+        // 7) Dacă avem username, încărcăm direct mesajele
         if (this.usernameSet) {
           this.loadMessages();
         }
@@ -1753,29 +1734,6 @@
         selectedTheme(newVal) {
           localStorage.setItem('selectedTheme', newVal);
           this.applyThemeClass(newVal);
-        }
-      },
-      methods: {
-        /* ... avem deja metode cu nume identic, deci extragem tot ce e nou aici ... */
-        applyThemeClass(themeName) {
-          // Eliminăm orice temă anterioară
-          const allThemes = [
-            'theme-red',
-            'theme-blue',
-            'theme-green',
-            'theme-purple',
-            'theme-pink',
-            'theme-grey',
-            'theme-brown',
-            'theme-teal',
-            'theme-lime'
-          ];
-          allThemes.forEach(t => document.body.classList.remove(t));
-
-          // Dacă userul a selectat altceva decât 'orange', adăugăm clasa
-          if (themeName !== 'orange') {
-            document.body.classList.add(`theme-${themeName}`);
-          }
         }
       }
     });
