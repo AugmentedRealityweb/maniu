@@ -8,24 +8,203 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Definim temele exact ca în index.html -->
   <style>
+    /* TEMA IMPLICITĂ - PORTOCALIU (fără clasă .theme-...) */
+    :root {
+      --gradient-start: #000000;
+      --gradient-end:   #e78c00;
+
+      --scrollbar-color: #e78c00;
+      --scrollbar-track: #000000;
+
+      --border-color: #e78c00;
+
+      --btn-start: #f49032;
+      --btn-end:   #d35400;
+      --btn-shadow-color1: #f49032;
+      --btn-shadow-color2: #d35400;
+
+      --card-border-color: #e78c00;
+      --card-hover-shadow: rgba(255,140,0,0.3);
+
+      --price-color: #f49032;
+      --scratch-color: rgba(231,140,0,0.15);
+    }
+
+    /* CELELALTE 9 TEME: .theme-red, .theme-blue, etc. */
+    .theme-red {
+      --gradient-end:      #8B0000;
+      --scrollbar-color:   #8B0000;
+      --border-color:      #8B0000;
+
+      --btn-start:         #b30000;
+      --btn-end:           #7d0000;
+      --btn-shadow-color1: #b30000;
+      --btn-shadow-color2: #7d0000;
+
+      --card-border-color: #8B0000;
+      --card-hover-shadow: rgba(179,0,0,0.3);
+
+      --price-color:       #b30000;
+      --scratch-color:     rgba(139,0,0,0.15);
+    }
+
+    .theme-blue {
+      --gradient-end:      #004080;
+      --scrollbar-color:   #004080;
+      --border-color:      #004080;
+
+      --btn-start:         #0066cc;
+      --btn-end:           #004080;
+      --btn-shadow-color1: #0066cc;
+      --btn-shadow-color2: #004080;
+
+      --card-border-color: #004080;
+      --card-hover-shadow: rgba(0,64,128,0.3);
+
+      --price-color:       #0066cc;
+      --scratch-color:     rgba(0,64,128,0.15);
+    }
+
+    .theme-green {
+      --gradient-end:      #004d00;
+      --scrollbar-color:   #004d00;
+      --border-color:      #004d00;
+
+      --btn-start:         #008000;
+      --btn-end:           #004d00;
+      --btn-shadow-color1: #008000;
+      --btn-shadow-color2: #004d00;
+
+      --card-border-color: #004d00;
+      --card-hover-shadow: rgba(0,77,0,0.3);
+
+      --price-color:       #008000;
+      --scratch-color:     rgba(0,77,0,0.15);
+    }
+
+    .theme-purple {
+      --gradient-end:      #4B0082;
+      --scrollbar-color:   #4B0082;
+      --border-color:      #4B0082;
+
+      --btn-start:         #6A0DAD;
+      --btn-end:           #4B0082;
+      --btn-shadow-color1: #6A0DAD;
+      --btn-shadow-color2: #4B0082;
+
+      --card-border-color: #4B0082;
+      --card-hover-shadow: rgba(75,0,130,0.3);
+
+      --price-color:       #6A0DAD;
+      --scratch-color:     rgba(75,0,130,0.15);
+    }
+
+    .theme-pink {
+      --gradient-end:      #A600A6;
+      --scrollbar-color:   #A600A6;
+      --border-color:      #A600A6;
+
+      --btn-start:         #CC00CC;
+      --btn-end:           #A600A6;
+      --btn-shadow-color1: #CC00CC;
+      --btn-shadow-color2: #A600A6;
+
+      --card-border-color: #A600A6;
+      --card-hover-shadow: rgba(166,0,166,0.3);
+
+      --price-color:       #CC00CC;
+      --scratch-color:     rgba(166,0,166,0.15);
+    }
+
+    .theme-grey {
+      --gradient-end:      #555555;
+      --scrollbar-color:   #555555;
+      --border-color:      #555555;
+
+      --btn-start:         #777777;
+      --btn-end:           #555555;
+      --btn-shadow-color1: #777777;
+      --btn-shadow-color2: #555555;
+
+      --card-border-color: #555555;
+      --card-hover-shadow: rgba(85,85,85,0.3);
+
+      --price-color:       #999999;
+      --scratch-color:     rgba(85,85,85,0.15);
+    }
+
+    .theme-brown {
+      --gradient-end:      #663300;
+      --scrollbar-color:   #663300;
+      --border-color:      #663300;
+
+      --btn-start:         #996633;
+      --btn-end:           #663300;
+      --btn-shadow-color1: #996633;
+      --btn-shadow-color2: #663300;
+
+      --card-border-color: #663300;
+      --card-hover-shadow: rgba(102,51,0,0.3);
+
+      --price-color:       #996633;
+      --scratch-color:     rgba(102,51,0,0.15);
+    }
+
+    .theme-teal {
+      --gradient-end:      #004d4d;
+      --scrollbar-color:   #004d4d;
+      --border-color:      #004d4d;
+
+      --btn-start:         #008080;
+      --btn-end:           #004d4d;
+      --btn-shadow-color1: #008080;
+      --btn-shadow-color2: #004d4d;
+
+      --card-border-color: #004d4d;
+      --card-hover-shadow: rgba(0,128,128,0.3);
+
+      --price-color:       #008080;
+      --scratch-color:     rgba(0,77,77,0.15);
+    }
+
+    .theme-lime {
+      --gradient-end:      #009900;
+      --scrollbar-color:   #009900;
+      --border-color:      #009900;
+
+      --btn-start:         #00cc00;
+      --btn-end:           #009900;
+      --btn-shadow-color1: #00cc00;
+      --btn-shadow-color2: #009900;
+
+      --card-border-color: #009900;
+      --card-hover-shadow: rgba(0,153,0,0.3);
+
+      --price-color:       #00cc00;
+      --scratch-color:     rgba(0,153,0,0.15);
+    }
+
+    /* Stil de bază: fundal tip gradient, text alb etc. */
     body {
-      background-color: #111827; 
-      color: #fff;
-      font-family: 'Inter', sans-serif;
       margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: #fff;
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: flex-start;
       padding: 2rem;
     }
+
     .container {
       max-width: 400px;
       width: 100%;
     }
     .price {
-      color: #f49032;
+      color: var(--price-color);
       font-weight: bold;
     }
     .product-row {
@@ -37,7 +216,7 @@
       margin-right: 1rem;
     }
     .pulse {
-      color: #f49032;
+      color: var(--price-color);
       font-size: 1.5rem;
       font-weight: bold;
       text-align: center;
@@ -59,13 +238,23 @@
       font-size: 1rem;
       margin-top: 0.5rem;
     }
+    .box {
+      background: #1f2937; /* #1f2937 = Tailwind gray-800 */
+      padding: 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      width: 100%;
+    }
+    .border-custom {
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1 class="text-2xl font-bold text-center mb-6">Comanda Ta</h1>
 
-    <div class="bg-gray-800 p-4 rounded shadow">
+    <div class="box">
       <!-- Afișăm sessionCode -->
       <h2 id="sessionCodeElem" class="pulse"></h2>
       <p id="subtitleElem" class="subtitle">Spune acest cod ospătarului</p>
@@ -74,14 +263,14 @@
       <div id="itemsList" class="mb-4"></div>
 
       <!-- Total final -->
-      <div class="product-row border-t border-gray-700 pt-2">
+      <div class="product-row border-custom pt-2">
         <span class="font-semibold">Total Comenzi:</span>
         <span id="orderTotal" class="price"></span>
       </div>
 
       <!-- Link Înapoi -->
       <div class="text-center mt-4">
-        <a id="backLinkElem" class="text-[#f49032] underline cursor-pointer">Înapoi la Meniu</a>
+        <a id="backLinkElem" class="underline cursor-pointer" style="color: var(--price-color)">Înapoi la Meniu</a>
       </div>
     </div>
   </div>
@@ -97,6 +286,30 @@
       getDocs 
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
+    /* 1) Citim tema din localStorage și o aplicăm */
+    window.addEventListener("DOMContentLoaded", function() {
+      let storedTheme = localStorage.getItem('selectedTheme');
+      if (!storedTheme) {
+        storedTheme = 'orange'; 
+      }
+      applyThemeClass(storedTheme);
+    });
+
+    function applyThemeClass(themeName) {
+      const allThemes = [
+        'theme-red','theme-blue','theme-green','theme-purple',
+        'theme-pink','theme-grey','theme-brown','theme-teal','theme-lime'
+      ];
+      // Eliminăm toate temele de pe <body>
+      allThemes.forEach(t => document.body.classList.remove(t));
+
+      // Dacă nu e orange (implicit), adăugăm clasa respectivă
+      if (themeName !== 'orange') {
+        document.body.classList.add(`theme-${themeName}`);
+      }
+    }
+
+    /* 2) Inițializare Firebase */
     const firebaseConfig = {
       apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -106,10 +319,10 @@
       appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
       measurementId: "G-F44TB27G17"
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    /* 3) Citim parametrii din URL (sessionCode, masa) + userId localStorage */
     const params = new URLSearchParams(window.location.search);
     const sessionCode = params.get("sessionCode");
     const masaNumber  = params.get("masa");
@@ -133,9 +346,9 @@
 
     const userId = localStorage.getItem("userId");
 
+    /* 4) Căutăm în Firestore comenzile făcute cu (sessionCode + userId) */
     async function fetchSessionOrders() {
       if (!sessionCode || !userId) return;
-
       try {
         const cRef = collection(db, "orders");
         const qRef = query(
@@ -163,7 +376,7 @@
               </div>
             `;
           });
-
+          // Dacă vrei o linie de separare între comenzi 
           htmlRows += `<hr class="border-gray-700 my-2"/>`;
         });
 
