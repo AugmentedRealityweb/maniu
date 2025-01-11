@@ -49,8 +49,7 @@
 
     /* ------------------------------------------------
        2. TEMA ROȘU ÎNCHIS – override pentru variabile
-          (se aplică atunci când .theme-red este prezent
-           pe containerul #app)
+          (se aplică atunci când .theme-red e pe <body>)
        ------------------------------------------------ */
     .theme-red {
       --gradient-end:      #8B0000;
@@ -70,20 +69,22 @@
     }
 
     /* ------------------------------------------------
-       3. STILURI GENERALE PENTRU AMBELE TEME
+       3. STILURI GENERALE – BODY înlocuiește rolul #app
        ------------------------------------------------ */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     body {
       font-family: 'Inter', sans-serif;
       margin: 0;
       min-height: 100vh;
+      color: #fff;
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+      display: flex;
+      flex-direction: column;
     }
 
-    /* #app cu gradient de fundal în funcție de variabile */
+    /* Containerele interioare */
     #app {
-      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
-      color: #fff;
-      min-height: 100vh;
+      flex: 1; /* să ocupe restul ecranului */
       display: flex;
       flex-direction: column;
     }
@@ -327,8 +328,7 @@
   </style>
 </head>
 <body>
-  <!-- #app cu :class="themeClass" -->
-  <div id="app" :class="themeClass">
+  <div id="app">
     <div class="h-screen flex flex-col">
       <!-- SIDEBAR desktop -->
       <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
@@ -911,7 +911,7 @@
           newMessage: "",
           chatMessages: [],  // mesaje sub 10 min
 
-          /* Date demo - categorii + produse (cu tot ce era înainte) */
+          /* Date demo - categorii + produse */
           categories: [
             {
               name: "brunch",
@@ -1297,11 +1297,6 @@
         };
       },
       computed: {
-        /* Returnează "theme-red" dacă selectedTheme === 'red',
-           altfel "" => implicit tema portocalie */
-        themeClass() {
-          return this.selectedTheme === 'red' ? 'theme-red' : '';
-        },
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
@@ -1510,13 +1505,16 @@
         }
       },
       mounted() {
-        // Ascultă eveniment de scroll la fereastră
         window.addEventListener("scroll", this.handleWindowScroll);
 
         // 1) Citim tema din localStorage
         const storedTheme = localStorage.getItem('selectedTheme');
         if (storedTheme) {
           this.selectedTheme = storedTheme; // 'orange' sau 'red'
+        }
+        // Aplica clasa .theme-red pe <body> dacă e "red"
+        if (this.selectedTheme === 'red') {
+          document.body.classList.add('theme-red');
         }
 
         // 2) Preluăm parametru "masa"
@@ -1585,8 +1583,13 @@
         myOrders(newVal) {
           localStorage.setItem("myOrders", JSON.stringify(newVal));
         },
-        // Dacă se schimbă tema, o salvăm în localStorage
+        // Dacă se schimbă tema, adăugăm / ștergem clasa .theme-red pe <body>
         selectedTheme(newVal) {
+          if (newVal === 'red') {
+            document.body.classList.add('theme-red');
+          } else {
+            document.body.classList.remove('theme-red');
+          }
           localStorage.setItem('selectedTheme', newVal);
         }
       }
