@@ -546,18 +546,235 @@
 
           <!-- TAB: MENIU -->
           <section v-if="activeTab === 'meniu'">
-            <!-- Aici pui secțiunea ta de meniu, categorii, produse, etc. -->
-            <!-- ... (ne-am concentrat pe chat, așa că nu repetăm tot conținutul de produse) -->
+            <!-- Căutare produse -->
+            <div class="flex items-center gap-4 mb-4">
+              <input 
+                type="text" 
+                placeholder="Caută produse..." 
+                v-model="searchQuery" 
+                class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] w-full md:w-1/2"
+              />
+            </div>
+
+            <!-- Rezultate căutare (dacă există un searchQuery) -->
+            <div v-if="searchQuery.trim()">
+              <h2 class="text-xl font-semibold mb-4 text-center">
+                Rezultate pentru: "{{ searchQuery }}"
+              </h2>
+              <!-- Buton pentru schimbare Grid / Listă -->
+              <div class="flex justify-center mb-4">
+                <button 
+                  class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                  @click="toggleLayout"
+                >
+                  <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                  <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+                </button>
+              </div>
+              <!-- Afișarea produselor filtrate -->
+              <div 
+                v-if="displayedProducts.length > 0" 
+                :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
+              >
+                <div 
+                  v-for="product in displayedProducts" 
+                  :key="product.title" 
+                  class="card-container cursor-pointer"
+                  @click="showProductDetails(product)"
+                >
+                  <img 
+                    :class="isGrid ? 'card-img-square' : 'card-img-rect'"
+                    :src="product.image" 
+                    :alt="product.title" 
+                  />
+                  <div class="card-details">
+                    <h3>{{ product.title }}</h3>
+                    <p>{{ product.price }} Lei</p>
+                  </div>
+                </div>
+              </div>
+              <div v-else>
+                <p class="text-center">
+                  Nu a fost găsit niciun produs care să corespundă căutării.
+                </p>
+              </div>
+            </div>
+            <!-- Categorii + Produse (fără căutare) -->
+            <div v-else>
+              <!-- Afișăm categoriile -->
+              <div v-if="view === 'categorii'">
+                <h2 class="text-xl font-semibold mb-4 text-center">
+                  Alege Categoria
+                </h2>
+                <!-- Buton pentru schimbare Grid / Listă -->
+                <div class="flex justify-center mb-4">
+                  <button 
+                    class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                    @click="toggleLayout"
+                  >
+                    <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                    <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+                  </button>
+                </div>
+                <!-- Carduri cu categorii -->
+                <div 
+                  :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
+                >
+                  <div 
+                    v-for="category in categories" 
+                    :key="category.name" 
+                    class="card-container cursor-pointer"
+                    @click="enterCategory(category.name)"
+                  >
+                    <img 
+                      :class="isGrid ? 'card-img-square' : 'card-img-rect'"
+                      :src="category.image" 
+                      :alt="category.name" 
+                    />
+                    <div class="card-details">
+                      <h3>{{ renameCategory(category.name) }}</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Afișăm produsele dintr-o categorie selectată -->
+              <div v-else-if="view === 'produse'">
+                <div class="flex items-center justify-between mb-4">
+                  <button class="btn-orange rounded-full" @click="backToCategories">
+                    Înapoi la Categorii
+                  </button>
+                  <!-- Buton pentru schimbare Grid / Listă -->
+                  <button 
+                    class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                    @click="toggleLayout"
+                  >
+                    <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                    <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+                  </button>
+                </div>
+                <h2 class="text-xl font-semibold mb-4 text-center">
+                  Produse ({{ currentProducts.length }})
+                </h2>
+                <div 
+                  :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
+                >
+                  <div 
+                    v-for="product in currentProducts" 
+                    :key="product.title" 
+                    class="card-container cursor-pointer" 
+                    @click="showProductDetails(product)"
+                  >
+                    <img 
+                      :class="isGrid ? 'card-img-square' : 'card-img-rect'"
+                      :src="product.image" 
+                      :alt="product.title"
+                    />
+                    <div class="card-details">
+                      <h3>{{ product.title }}</h3>
+                      <p>{{ product.price }} Lei</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modal cu detalii produs -->
+            <div 
+              v-if="currentProduct" 
+              class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+            >
+              <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
+                <button 
+                  class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
+                  @click="currentProduct = null"
+                >
+                  &times;
+                </button>
+                <img 
+                  :src="currentProduct.image" 
+                  :alt="currentProduct.title" 
+                  class="w-full h-64 object-cover mb-4 rounded-lg"
+                />
+                <h2 class="text-xl font-bold mb-2 handwriting-title">
+                  {{ currentProduct.title }}
+                </h2>
+                <p class="font-bold text-lg mb-4" :style="{ color: 'var(--price-color)' }">
+                  {{ currentProduct.price }} Lei
+                </p>
+                <p class="text-gray-400 mb-4">
+                  {{ currentProduct.description }}
+                </p>
+                <ul class="text-gray-300 mb-4">
+                  <li 
+                    v-for="ingredient in currentProduct.ingredients" 
+                    :key="ingredient" 
+                    class="list-disc ml-5"
+                  >
+                    {{ ingredient }}
+                  </li>
+                </ul>
+                <button class="btn-orange rounded-full" @click="addToOrder(currentProduct)">
+                  Adaugă în coș
+                </button>
+              </div>
+            </div>
           </section>
 
           <!-- TAB: Puncte -->
           <section v-else-if="activeTab === 'puncte'">
-            <!-- ... -->
+            <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
+            <div class="bg-black p-4 rounded border border-[var(--border-color)] shadow max-w-md scratches mx-auto">
+              <div v-if="clientNumber === 0" class="mb-4">
+                <p class="text-gray-300 text-center">
+                  Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
+                </p>
+              </div>
+              <div v-else>
+                <p class="text-gray-300 mb-2 text-center">
+                  Număr client: 
+                  <span class="font-bold">#{{ clientNumber }}</span>
+                </p>
+              </div>
+              <p class="text-gray-300 text-center">
+                Puncte acumulate: 
+                <span class="font-bold" :style="{ color: 'var(--price-color)' }">
+                  {{ clientPoints.toFixed(2) }}
+                </span>
+              </p>
+            </div>
           </section>
 
           <!-- TAB: Comenzile Tale -->
           <section v-else-if="activeTab === 'comenzileTale'">
-            <!-- ... -->
+            <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
+            <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
+              Nu ai nicio comandă finalizată încă.
+            </div>
+            <div v-else class="space-y-4">
+              <div 
+                v-for="(order, idx) in myOrders" 
+                :key="order.orderId" 
+                class="bg-black p-4 rounded border border-[var(--border-color)] scratches"
+              >
+                <h3 class="text-lg font-semibold mb-2">
+                  Comanda #{{ idx + 1 }}
+                </h3>
+                <ul class="list-disc list-inside text-gray-300">
+                  <li 
+                    v-for="(prod, pidx) in order.items" 
+                    :key="pidx"
+                  >
+                    {{ prod.name }} x {{ prod.quantity }} – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
+                  </li>
+                </ul>
+                <div class="mt-2 font-bold" :style="{ color: 'var(--price-color)' }">
+                  Total: {{ order.total }} Lei
+                </div>
+                <div class="text-sm text-gray-400">
+                  ID comandă: {{ order.orderId }} | Cod Ospătar: {{ order.sessionCode }}
+                </div>
+              </div>
+            </div>
           </section>
 
           <!-- TAB: Social (mesaje tip “WhatsApp”) -->
@@ -698,7 +915,60 @@
 
           <!-- TAB: DESIGN (cu 10 opțiuni de culoare) -->
           <section v-else-if="activeTab === 'design'">
-            <!-- ... -->
+            <h2 class="text-2xl font-bold mb-4 text-center">Tema de Design</h2>
+            <p class="text-gray-300 text-center mb-4">Alege o temă de culori pentru aplicație:</p>
+            <div class="flex flex-wrap gap-4 justify-center">
+              <!-- 1) Portocaliu (implicit) -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="orange" v-model="selectedTheme" />
+                <span>Portocaliu</span>
+              </label>
+              <!-- 2) Roșu -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="red" v-model="selectedTheme" />
+                <span>Roșu</span>
+              </label>
+              <!-- 3) Albastru -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="blue" v-model="selectedTheme" />
+                <span>Albastru</span>
+              </label>
+              <!-- 4) Verde -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="green" v-model="selectedTheme" />
+                <span>Verde</span>
+              </label>
+              <!-- 5) Mov -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="purple" v-model="selectedTheme" />
+                <span>Mov</span>
+              </label>
+              <!-- 6) Roz -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="pink" v-model="selectedTheme" />
+                <span>Roz</span>
+              </label>
+              <!-- 7) Gri -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="grey" v-model="selectedTheme" />
+                <span>Gri</span>
+              </label>
+              <!-- 8) Maro -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="brown" v-model="selectedTheme" />
+                <span>Maro</span>
+              </label>
+              <!-- 9) Teal -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="teal" v-model="selectedTheme" />
+                <span>Teal</span>
+              </label>
+              <!-- 10) Verde-lămâie -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="lime" v-model="selectedTheme" />
+                <span>Verde Lămâie</span>
+              </label>
+            </div>
           </section>
         </main>
 
@@ -828,14 +1098,14 @@
 
     /* -- Config Firebase (înlocuiește cu datele tale) -- */
     const firebaseConfig = {
-  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
-  authDomain: "restaurantapp-d0256.firebaseapp.com",
-  projectId: "restaurantapp-d0256",
-  storageBucket: "restaurantapp-d0256.firebasestorage.app",
-  messagingSenderId: "275208346650",
-  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-  measurementId: "G-F44TB27G17"
-};
+      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+      authDomain: "restaurantapp-d0256.firebaseapp.com",
+      projectId: "restaurantapp-d0256",
+      storageBucket: "restaurantapp-d0256.firebasestorage.app",
+      messagingSenderId: "275208346650",
+      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+      measurementId: "G-F44TB27G17"
+    };
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
@@ -895,7 +1165,7 @@
           activeTab: "meniu",
           view: "categorii",
 
-          /* Categorii + Produse (completează cu datele tale) */
+          /* Definim categoriile și produsele exact cum ai menționat */
           categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
@@ -1296,7 +1566,7 @@
         };
       },
       computed: {
-        /* Filtrare produse: fie căutare globală, fie doar produsele categoriei selectate */
+        // Afișăm produsele filtrate (caută global) sau doar produsele dintr-o categorie
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
@@ -1314,7 +1584,7 @@
           }
           return results;
         },
-        /* Total coș */
+        // Total coș
         total() {
           return this.orders
             .reduce((sum, o) => sum + (o.price * o.quantity), 0)
@@ -1355,10 +1625,14 @@
           if (existing) {
             existing.quantity++;
           } else {
-            this.orders.push({ name: product.title, price: product.price, quantity: 1 });
+            this.orders.push({
+              name: product.title,
+              price: product.price,
+              quantity: 1
+            });
           }
           this.currentProduct = null;
-          // mică animație
+          // Animație scurtă la coș
           this.isShaking = true;
           setTimeout(() => this.isShaking = false, 500);
         },
@@ -1376,6 +1650,7 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
+        // Finalizează comanda => adaugă în Firebase + redirect la confirm
         async checkout() {
           try {
             const userId = localStorage.getItem("userId") || Date.now().toString();
@@ -1446,6 +1721,7 @@
               const data = docItem.data();
               if (!data.timestamp) return;
               const docTime = data.timestamp.toDate();
+              // doar mesajele din ultimele 10 minute
               if ((now - docTime) < TEN_MIN_MS) {
                 finalMsgs.push({ id: docItem.id, ...data });
               }
@@ -1486,13 +1762,14 @@
             }
           }).catch((err) => console.error("Eroare la reacționare:", err));
           
-          // declanșăm animația timp de 2s
+          // declanșăm animația timp de 2 secunde
           this.reactionAnimation = reaction;
           setTimeout(() => {
             this.reactionAnimation = "";
           }, 2000);
         },
         tableStyle(tableNum) {
+          // evidențiem mesele care au mesaje
           const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
           if (hasMessages) {
             return {
@@ -1514,7 +1791,7 @@
             if (
               mobileAside && 
               !mobileAside.contains(e.target) && 
-              toggleBtn &&
+              toggleBtn && 
               !toggleBtn.contains(e.target)
             ) {
               this.isSidebarVisible = false;
@@ -1587,7 +1864,8 @@
         if (storedAvatar) {
           this.selectedAvatar = storedAvatar;
         }
-        // 6) dacă avem username => încărcăm mesajele
+
+        // 6) Dacă avem username => încărcăm direct mesajele
         if (this.usernameSet) {
           this.loadMessages();
         }
@@ -1614,6 +1892,7 @@
         selectedTheme(newVal) {
           localStorage.setItem('selectedTheme', newVal);
           this.applyThemeClass(newVal);
+          // Comutăm la tab-ul Meniu
           this.activeTab = 'meniu';
         }
       }
