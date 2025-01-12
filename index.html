@@ -452,6 +452,14 @@
     .back-to-top:hover {
       transform: scale(1.1);
     }
+
+    /* Animație simplă (Fade/Pop) pentru reacție */
+    .pop-enter-active, .pop-leave-active {
+      transition: opacity 0.4s;
+    }
+    .pop-enter, .pop-leave-to {
+      opacity: 0;
+    }
   </style>
 </head>
 <body>
@@ -777,7 +785,7 @@
             </div>
           </section>
 
-          <!-- TAB: Social (cu mesaje tip WhatsApp) -->
+          <!-- TAB: Social (mesaje tip “WhatsApp”) -->
           <section v-else-if="activeTab === 'social'">
             <!-- Dacă utilizatorul nu și-a setat numele încă -->
             <div v-if="!usernameSet" class="text-center">
@@ -827,15 +835,15 @@
                   v-for="message in chatMessages"
                   :key="message.id"
                   :class="[
-                    'mb-2',
+                    'mb-3',
                     'flex',
                     'items-center',
-                    // Dacă e user-ul curent => aliniere la dreapta, altfel la stânga
+                    // user => 'justify-end', altul => 'justify-start'
                     message.name === usernameInput ? 'justify-end' : 'justify-start'
                   ]"
                 >
                   <!-- Container pentru avatar și “bula” de mesaj -->
-                  <div class="max-w-xs md:max-w-md relative flex items-start">
+                  <div class="relative flex items-start max-w-[70%]">
                     <!-- Avatar -->
                     <img 
                       :src="message.avatar || 'https://via.placeholder.com/40'" 
@@ -843,19 +851,23 @@
                       :class="[
                         'rounded-full', 
                         'object-cover',
+                        // Utilizatorul curent => dreapta (order-2 + ml-2),
+                        // ceilalți => stânga (order-1 + mr-2)
                         message.name === usernameInput 
-                          ? 'order-2 ml-2 w-12 h-12' 
+                          ? 'order-2 ml-2 w-12 h-12'
                           : 'order-1 mr-2 w-12 h-12'
                       ]"
                     />
                     
-                    <!-- Bula de mesaj -->
+                    <!-- Bula de mesaj (mai lată, mai rotunjită) -->
                     <div 
                       :class="[
-                        'p-3',
-                        'rounded-lg',
+                        'py-2 px-4',
+                        'rounded-3xl',
+                        'leading-tight', 
+                        // user => 'bg-green-600 text-right mr-2', altul => 'bg-gray-700 text-left ml-2'
                         message.name === usernameInput 
-                          ? 'bg-green-600 text-white text-right mr-2' 
+                          ? 'bg-green-600 text-white text-right mr-2'
                           : 'bg-gray-700 text-white text-left ml-2'
                       ]"
                     >
@@ -1056,6 +1068,33 @@
     >
       <span class="material-icons">keyboard_arrow_up</span>
     </div>
+
+    <!-- Animatie reacție (overlay) -->
+    <transition name="pop">
+      <div 
+        v-if="reactionAnimation" 
+        class="fixed inset-0 flex items-center justify-center pointer-events-none z-50"
+      >
+        <div 
+          v-if="reactionAnimation === '❤️'" 
+          class="text-red-500 text-7xl animate-bounce"
+        >
+          ❤️
+        </div>
+        <div 
+          v-else-if="reactionAnimation === '😂'" 
+          class="text-white text-7xl animate-bounce"
+        >
+          😂
+        </div>
+        <div 
+          v-else-if="reactionAnimation === '👍'" 
+          class="text-white text-7xl animate-bounce"
+        >
+          👍
+        </div>
+      </div>
+    </transition>
   </div>
 
   <!-- SCRIPTUL PRINCIPAL -->
@@ -1078,14 +1117,14 @@
 
     /* -- Config Firebase (înlocuiește cu datele tale) -- */
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWq",
-      authDomain: "restaurantapp-d0256.firebaseapp.com",
-      projectId: "restaurantapp-d0256",
-      storageBucket: "restaurantapp-d0256.appspot.com",
-      messagingSenderId: "275208346650",
-      appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
-      measurementId: "G-F44TB27G17"
-    };
+  apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+  authDomain: "restaurantapp-d0256.firebaseapp.com",
+  projectId: "restaurantapp-d0256",
+  storageBucket: "restaurantapp-d0256.firebasestorage.app",
+  messagingSenderId: "275208346650",
+  appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
+  measurementId: "G-F44TB27G17"
+};
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
@@ -1507,7 +1546,6 @@
               }
             ]
           },
-
           /* Produs curent / căutare */
           currentProducts: [],
           currentProduct: null,
@@ -1539,7 +1577,10 @@
             "https://i.giphy.com/11uoNyauChZR16.webp",
             "https://i.giphy.com/Wb0TGxvE50Xew.webp"
           ],
-          selectedAvatar: ""
+          selectedAvatar: "",
+
+          /* Control pentru animația reacției */
+          reactionAnimation: ""
         };
       },
       computed: {
@@ -1582,9 +1623,7 @@
           this.isGrid = !this.isGrid;
         },
         renameCategory(cat) {
-          const dict = {
-            // brunch: "Mic Dejun", etc.
-          };
+          const dict = {};
           return dict[cat] || cat;
         },
         enterCategory(categoryName) {
@@ -1746,6 +1785,12 @@
               setDoc(messageRef, { reactions: currentReactions }, { merge: true });
             }
           }).catch((err) => console.error("Eroare la reacționare:", err));
+          
+          // Afișăm animația (2 sec)
+          this.reactionAnimation = reaction;
+          setTimeout(() => {
+            this.reactionAnimation = "";
+          }, 2000);
         },
         /* Colorează mesele care au mesaje */
         tableStyle(tableNum) {
