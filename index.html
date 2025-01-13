@@ -315,6 +315,9 @@
       border-radius: 0.5rem;
       padding: 1rem;
     }
+    /* ------------------------------------------------
+       AICI AM ADAUGAT BOX-SHADOW PENTRU .card-container
+       ------------------------------------------------ */
     .card-container {
       position: relative;
       overflow: hidden;
@@ -322,6 +325,8 @@
       border: 1px solid var(--card-border-color);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
       text-align: center;
+      /* Umbra implicită care ia culoarea temei */
+      box-shadow: 0 -5px 20px var(--card-hover-shadow);
     }
     .card-container:hover {
       transform: translateY(-4px) scale(1.02);
@@ -1098,7 +1103,7 @@
 
     /* -- Config Firebase (înlocuiește cu datele tale) -- */
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWq",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
       projectId: "restaurantapp-d0256",
       storageBucket: "restaurantapp-d0256.firebasestorage.app",
@@ -1165,7 +1170,7 @@
           activeTab: "meniu",
           view: "categorii",
 
-          /* Definim categoriile și produsele exact cum ai menționat */
+          /* Definim categoriile și produsele */
           categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
