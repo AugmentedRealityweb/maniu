@@ -315,6 +315,9 @@
       border-radius: 0.5rem;
       padding: 1rem;
     }
+    /* ------------------------------------------------
+       AICI AM ADAUGAT BOX-SHADOW PENTRU .card-container
+       ------------------------------------------------ */
     .card-container {
       position: relative;
       overflow: hidden;
@@ -322,6 +325,7 @@
       border: 1px solid var(--card-border-color);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
       text-align: center;
+      /* Umbra implicită care ia culoarea temei */
       box-shadow: 0 -10px 20px var(--card-hover-shadow);
     }
     .card-container:hover {
@@ -446,6 +450,7 @@
       transform: scale(1.1);
     }
 
+    /* Animație simplă (Fade/Pop) pentru reacție */
     .pop-enter-active, .pop-leave-active {
       transition: opacity 0.4s;
     }
@@ -457,7 +462,7 @@
 <body>
   <div id="app">
     <div class="h-screen flex flex-col">
-      <!-- SIDEBAR DESKTOP -->
+      <!-- SIDEBAR desktop -->
       <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
         <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left text-center">
           Meniu Restaurant
@@ -481,10 +486,10 @@
         </nav>
       </aside>
 
-      <!-- CONȚINUT PRINCIPAL (scroll pe window) -->
+      <!-- CONȚINUT PRINCIPAL, e scrollabil pe window, nu local -->
       <div class="flex-1 flex flex-col p-2">
         <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
-          <!-- SIDEBAR MOBIL (buton + titlu) -->
+          <!-- BARĂ mobilă: Buton stânga + Titlu centrat (numai pe ecranele mici) -->
           <div class="flex items-center mb-4 md:hidden">
             <button 
               ref="mobileToggle"
@@ -499,7 +504,7 @@
             </div>
           </div>
 
-          <!-- SIDEBAR MOBIL (afișat cond. la isSidebarVisible) -->
+          <!-- SIDEBAR mobil (afișat condiționat) -->
           <transition name="slide-fade">
             <aside 
               v-if="isSidebarVisible" 
@@ -556,11 +561,12 @@
               />
             </div>
 
-            <!-- Rezultate căutare -->
+            <!-- Rezultate căutare (dacă există un searchQuery) -->
             <div v-if="searchQuery.trim()">
               <h2 class="text-xl font-semibold mb-4 text-center">
                 Rezultate pentru: "{{ searchQuery }}"
               </h2>
+              <!-- Buton pentru schimbare Grid / Listă -->
               <div class="flex justify-center mb-4">
                 <button 
                   class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
@@ -570,6 +576,7 @@
                   <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
                 </button>
               </div>
+              <!-- Afișarea produselor filtrate -->
               <div 
                 v-if="displayedProducts.length > 0" 
                 :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
@@ -599,10 +606,12 @@
             </div>
             <!-- Categorii + Produse (fără căutare) -->
             <div v-else>
+              <!-- Afișăm categoriile -->
               <div v-if="view === 'categorii'">
                 <h2 class="text-xl font-semibold mb-4 text-center">
                   Alege Categoria
                 </h2>
+                <!-- Buton pentru schimbare Grid / Listă -->
                 <div class="flex justify-center mb-4">
                   <button 
                     class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
@@ -612,6 +621,7 @@
                     <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
                   </button>
                 </div>
+                <!-- Carduri cu categorii -->
                 <div 
                   :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
                 >
@@ -632,11 +642,13 @@
                   </div>
                 </div>
               </div>
+              <!-- Afișăm produsele dintr-o categorie selectată -->
               <div v-else-if="view === 'produse'">
                 <div class="flex items-center justify-between mb-4">
                   <button class="btn-orange rounded-full" @click="backToCategories">
                     Înapoi la Categorii
                   </button>
+                  <!-- Buton pentru schimbare Grid / Listă -->
                   <button 
                     class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
                     @click="toggleLayout"
@@ -671,7 +683,7 @@
               </div>
             </div>
 
-            <!-- Modal detalii produs -->
+            <!-- Modal cu detalii produs -->
             <div 
               v-if="currentProduct" 
               class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
@@ -715,26 +727,262 @@
 
           <!-- TAB: Puncte -->
           <section v-else-if="activeTab === 'puncte'">
-            <!-- ... logica ta pentru puncte ... -->
+            <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
+            <div class="bg-black p-4 rounded border border-[var(--border-color)] shadow max-w-md scratches mx-auto">
+              <div v-if="clientNumber === 0" class="mb-4">
+                <p class="text-gray-300 text-center">
+                  Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
+                </p>
+              </div>
+              <div v-else>
+                <p class="text-gray-300 mb-2 text-center">
+                  Număr client: 
+                  <span class="font-bold">#{{ clientNumber }}</span>
+                </p>
+              </div>
+              <p class="text-gray-300 text-center">
+                Puncte acumulate: 
+                <span class="font-bold" :style="{ color: 'var(--price-color)' }">
+                  {{ clientPoints.toFixed(2) }}
+                </span>
+              </p>
+            </div>
           </section>
 
           <!-- TAB: Comenzile Tale -->
           <section v-else-if="activeTab === 'comenzileTale'">
-            <!-- ... logica "Comenzile Tale" ... -->
+            <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
+            <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
+              Nu ai nicio comandă finalizată încă.
+            </div>
+            <div v-else class="space-y-4">
+              <div 
+                v-for="(order, idx) in myOrders" 
+                :key="order.orderId" 
+                class="bg-black p-4 rounded border border-[var(--border-color)] scratches"
+              >
+                <h3 class="text-lg font-semibold mb-2">
+                  Comanda #{{ idx + 1 }}
+                </h3>
+                <ul class="list-disc list-inside text-gray-300">
+                  <li 
+                    v-for="(prod, pidx) in order.items" 
+                    :key="pidx"
+                  >
+                    {{ prod.name }} x {{ prod.quantity }} – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
+                  </li>
+                </ul>
+                <div class="mt-2 font-bold" :style="{ color: 'var(--price-color)' }">
+                  Total: {{ order.total }} Lei
+                </div>
+                <!-- Afișăm text dacă ospătarul a marcat comanda ca plasată -->
+                <div v-if="order.placedByWaiter" class="mt-2 text-green-400 font-bold">
+                  Comanda a fost plasată!
+                </div>
+                <!-- Afișăm doar codul ospătarului, nu și ID-ul comenzii -->
+                <div class="text-sm text-gray-400">
+                  Cod Ospătar: {{ order.sessionCode }}
+                </div>
+              </div>
+            </div>
           </section>
 
-          <!-- TAB: Social -->
+          <!-- TAB: Social (mesaje tip “WhatsApp”) -->
           <section v-else-if="activeTab === 'social'">
-            <!-- ... logica "Social" ... -->
+            <!-- Dacă utilizatorul nu și-a setat numele încă -->
+            <div v-if="!usernameSet" class="text-center">
+              <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
+              <p class="mb-4 text-gray-300 max-w-md mx-auto">
+                Bun venit în zona de socializare!  
+                Te rugăm să îți introduci numele și să alegi un avatar înainte de a vedea conversația sau a trimite mesaje.
+              </p>
+              <!-- Introducere nume și selecție avatar -->
+              <div class="flex flex-col items-center max-w-sm mx-auto">
+                <input 
+                  type="text" 
+                  v-model="usernameInput" 
+                  placeholder="Introduceți numele..." 
+                  class="bg-black text-gray-200 border border-[var(--border-color)] 
+                         rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] 
+                         w-full mb-4"
+                />
+                <!-- Selecție avatar -->
+                <div class="flex flex-wrap gap-4 justify-center mb-4">
+                  <div 
+                    v-for="(av, i) in availableAvatars" 
+                    :key="i" 
+                    class="w-14 h-14 rounded-full border-2 border-gray-500 cursor-pointer overflow-hidden"
+                    :class="{'border-green-400': selectedAvatar === av}"
+                    @click="selectedAvatar = av"
+                  >
+                    <img 
+                      :src="av" 
+                      alt="avatar" 
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+                <button class="btn-orange rounded-full" @click="setUsername">
+                  Continuă
+                </button>
+              </div>
+            </div>
+            <!-- Dacă utilizatorul și-a setat deja numele => chat -->
+            <div v-else>
+              <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
+              
+              <!-- Chat global (mesajele din ultimele 10 minute) -->
+              <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto">
+                <div
+                  v-for="message in chatMessages"
+                  :key="message.id"
+                  class="mb-3 flex items-center"
+                  :class="message.name === usernameInput ? 'justify-end' : 'justify-start'"
+                >
+                  <!-- Container pentru avatar + bulă -->
+                  <!-- 'flex-row-reverse' pentru user curent, normal pentru ceilalți -->
+                  <div 
+                    class="relative flex items-start" 
+                    :class="message.name === usernameInput ? 'flex-row-reverse' : 'flex-row'"
+                  >
+                    <!-- Avatar (stânga la ceilalți, dreapta la user) -->
+                    <img 
+                      :src="message.avatar || 'https://via.placeholder.com/40'" 
+                      alt="Avatar" 
+                      class="w-10 h-10 rounded-full object-cover m-2"
+                    />
+                    
+                    <!-- Bula de mesaj (mai lată, mai îngustă) -->
+                    <div 
+                      class="leading-tight py-1 px-4 rounded-3xl" 
+                      style="max-width: 400px;" 
+                      :class="[
+                        message.name === usernameInput 
+                          ? 'bg-green-600 text-right mr-2' 
+                          : 'bg-gray-700 text-left ml-2'
+                      ]"
+                    >
+                      <!-- Nume / Masa (opțional) -->
+                      <div class="font-bold" :style="{ color: 'var(--price-color)' }">
+                        (masa {{ message.tableNumber }}) {{ message.name }}
+                      </div>
+                      <!-- Textul mesajului -->
+                      <div class="text-gray-100">
+                        {{ message.text }}
+                      </div>
+                      <!-- Reacții sub fiecare mesaj -->
+                      <div class="flex gap-2 mt-2 text-sm">
+                        <button @click="reactToMessage(message.id, '❤️')">
+                          ❤️ 
+                          <span v-if="message.reactions && message.reactions['❤️']">
+                            ({{ message.reactions['❤️'] }})
+                          </span>
+                        </button>
+                        <button @click="reactToMessage(message.id, '😂')">
+                          😂 
+                          <span v-if="message.reactions && message.reactions['😂']">
+                            ({{ message.reactions['😂'] }})
+                          </span>
+                        </button>
+                        <button @click="reactToMessage(message.id, '👍')">
+                          👍 
+                          <span v-if="message.reactions && message.reactions['👍']">
+                            ({{ message.reactions['👍'] }})
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Formular pentru mesaj nou -->
+              <div class="flex gap-2 max-w-xl mx-auto">
+                <input 
+                  v-model="newMessage" 
+                  class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 
+                         outline-none focus:ring-2 focus:ring-[var(--border-color)] flex-1" 
+                  placeholder="Scrie un mesaj..." 
+                />
+                <button class="btn-orange rounded-full" @click="postMessage">
+                  Trimite
+                </button>
+              </div>
+
+              <!-- Cele 12 mese, 4 pe rând, evidențiem mesele care au mesaje -->
+              <div class="table-zone">
+                <div 
+                  v-for="tableNum in 12" 
+                  :key="tableNum" 
+                  class="table-circle"
+                  :style="tableStyle(tableNum)"
+                >
+                  Masa {{ tableNum }}
+                </div>
+              </div>
+            </div>
           </section>
 
-          <!-- TAB: Design -->
+          <!-- TAB: DESIGN (cu 10 opțiuni de culoare) -->
           <section v-else-if="activeTab === 'design'">
-            <!-- ... logica "Design" ... -->
+            <h2 class="text-2xl font-bold mb-4 text-center">Tema de Design</h2>
+            <p class="text-gray-300 text-center mb-4">Alege o temă de culori pentru aplicație:</p>
+            <div class="flex flex-wrap gap-4 justify-center">
+              <!-- 1) Portocaliu (implicit) -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="orange" v-model="selectedTheme" />
+                <span>Portocaliu</span>
+              </label>
+              <!-- 2) Roșu -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="red" v-model="selectedTheme" />
+                <span>Roșu</span>
+              </label>
+              <!-- 3) Albastru -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="blue" v-model="selectedTheme" />
+                <span>Albastru</span>
+              </label>
+              <!-- 4) Verde -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="green" v-model="selectedTheme" />
+                <span>Verde</span>
+              </label>
+              <!-- 5) Mov -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="purple" v-model="selectedTheme" />
+                <span>Mov</span>
+              </label>
+              <!-- 6) Roz -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="pink" v-model="selectedTheme" />
+                <span>Roz</span>
+              </label>
+              <!-- 7) Gri -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="grey" v-model="selectedTheme" />
+                <span>Gri</span>
+              </label>
+              <!-- 8) Maro -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="brown" v-model="selectedTheme" />
+                <span>Maro</span>
+              </label>
+              <!-- 9) Teal -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="teal" v-model="selectedTheme" />
+                <span>Teal</span>
+              </label>
+              <!-- 10) Verde-lămâie -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="lime" v-model="selectedTheme" />
+                <span>Verde Lămâie</span>
+              </label>
+            </div>
           </section>
         </main>
 
-        <!-- Buton Coș (dacă avem produse) -->
+        <!-- Buton Coș (dacă avem produse în coș) -->
         <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
           <button 
             @click="toggleOrderBar" 
@@ -746,7 +994,7 @@
           </button>
         </div>
 
-        <!-- Bara laterală a coșului -->
+        <!-- Bara laterală a Coșului (slide-up de jos) -->
         <transition name="slide-cart">
           <aside 
             v-show="isOrderOpen && orders.length > 0" 
@@ -803,7 +1051,7 @@
       </div>
     </div>
 
-    <!-- Buton "Sus" -->
+    <!-- Buton "Sus" (Back to top) -->
     <div 
       v-if="showBackToTop" 
       class="back-to-top" 
@@ -812,7 +1060,7 @@
       <span class="material-icons">keyboard_arrow_up</span>
     </div>
 
-    <!-- Animație reacție (overlay) -->
+    <!-- Animatie reacție (overlay) -->
     <transition name="pop">
       <div 
         v-if="reactionAnimation" 
@@ -869,10 +1117,11 @@
       appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
       measurementId: "G-F44TB27G17"
     };
+
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    /* Elimină diacritice */
+    /* Elimină diacritice (pentru căutare) */
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
@@ -884,7 +1133,9 @@
 
     /* Obține sau creează codul de sesiune pentru masa dată */
     async function getOrCreateSessionCode(tableId) {
-      // Aici folosim ID de tip "Masa-1", "Masa-2" etc.
+      if (!tableId) {
+        throw new Error("Nu există parametru pentru masă în URL.");
+      }
       const docRef = doc(db, "sessions", tableId);
       try {
         const snap = await getDoc(docRef);
@@ -903,7 +1154,7 @@
           return newSessionCode;
         }
       } catch (error) {
-        console.error("Eroare la session code:", error);
+        console.error(`Eroare la obținerea/crearea session code pentru ${tableId}:`, error);
         throw new Error("A apărut o eroare la obținerea/crearea session code-ului.");
       }
     }
@@ -925,7 +1176,7 @@
           activeTab: "meniu",
           view: "categorii",
 
-          /* Categoriile & produsele (ai deja codul complet) */
+          /* Definim categoriile și produsele */
           categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
@@ -1288,11 +1539,12 @@
             ]
           },
 
+          /* Produs curent / căutare */
           currentProducts: [],
           currentProduct: null,
           searchQuery: "",
 
-          /* Client & comenzi */
+          /* Client / comenzi */
           clientNumber: 0,
           clientPoints: 0,
           isFirstOrder: true,
@@ -1308,14 +1560,24 @@
           chatMessages: [],
 
           /* Avatare disponibile */
-          availableAvatars: [ /* ... */ ],
+          availableAvatars: [
+            "https://i.giphy.com/NlGLQ1FU9mVDsMjeIU.webp",
+            "https://i.giphy.com/17A0SmzhN6a4AGSrQ9.webp",
+            "https://i.giphy.com/uK1v8dVSrc7yp7Ciqn.webp",
+            "https://i.giphy.com/1vh1PXneQqN1e.webp",
+            "https://i.giphy.com/XEOdmFHVznCerkI6CI.webp",
+            "https://i.giphy.com/hPTZgtzfRIB5Nfb5rL.webp",
+            "https://i.giphy.com/11uoNyauChZR16.webp",
+            "https://i.giphy.com/Wb0TGxvE50Xew.webp"
+          ],
           selectedAvatar: "",
 
-          /* Animație reacție */
+          /* Pentru animația reacției */
           reactionAnimation: ""
         };
       },
       computed: {
+        // Afișăm produsele filtrate (caută global) sau doar produsele dintr-o categorie
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
@@ -1333,6 +1595,7 @@
           }
           return results;
         },
+        // Total coș
         total() {
           return this.orders
             .reduce((sum, o) => sum + (o.price * o.quantity), 0)
@@ -1398,23 +1661,19 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
-        // Finalizează comanda => setăm "occupied" + adăugăm comanda
+        // Finalizează comanda => adaugă în Firebase + setăm status occupied + redirect la confirm
         async checkout() {
           try {
             const userId = localStorage.getItem("userId") || Date.now().toString();
             localStorage.setItem("userId", userId);
 
-            // Obținem/creăm sessionCode
             this.sessionCode = await getOrCreateSessionCode(this.tableId);
-
-            // Calcul puncte
             let pointsToAdd = 0;
             for (const item of this.orders) {
               pointsToAdd += item.price * item.quantity * 0.05;
             }
             this.clientPoints += pointsToAdd;
 
-            // Salvăm comanda
             const orderData = {
               userId,
               tableId: this.tableId,
@@ -1423,20 +1682,22 @@
               items: this.orders,
               total: parseFloat(this.total),
               status: "open",
-              placedByWaiter: false,
+              placedByWaiter: false, // inițial ospătarul nu a plasat comanda
               timestamp: serverTimestamp()
             };
+
+            // 1) Adăugăm comanda în "orders"
             await addDoc(collection(db, "orders"), orderData);
 
-            // Setăm masa la "occupied"
+            // 2) Setăm "status" = "occupied" pentru masa respectivă
             const tableRef = doc(db, "sessions", this.tableId);
             await setDoc(tableRef, { status: "occupied" }, { merge: true });
 
-            // Golește coșul
+            // 3) Golește coșul
             this.orders = [];
             this.isOrderOpen = false;
 
-            // Redirect la confirm
+            // 4) Redirect la confirm
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
@@ -1480,6 +1741,7 @@
               const data = docItem.data();
               if (!data.timestamp) return;
               const docTime = data.timestamp.toDate();
+              // doar mesajele din ultimele 10 minute
               if ((now - docTime) < TEN_MIN_MS) {
                 finalMsgs.push({ id: docItem.id, ...data });
               }
@@ -1495,7 +1757,7 @@
             if (!userName) return;
 
             const masaParam = new URLSearchParams(window.location.search).get("masa") || "0";
-            const tableNumber = parseInt(masaParam) || 0;
+            const tableNumber = parseInt(masaParam) || 0; 
 
             const docData = {
               name: userName,
@@ -1519,14 +1781,15 @@
               setDoc(messageRef, { reactions: currentReactions }, { merge: true });
             }
           }).catch((err) => console.error("Eroare la reacționare:", err));
-
-          // declanșăm animația
+          
+          // declanșăm animația timp de 2 secunde
           this.reactionAnimation = reaction;
           setTimeout(() => {
             this.reactionAnimation = "";
           }, 2000);
         },
         tableStyle(tableNum) {
+          // evidențiem mesele care au mesaje
           const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
           if (hasMessages) {
             return {
@@ -1577,13 +1840,13 @@
         }
         this.applyThemeClass(this.selectedTheme);
 
-        // 2) Parametru masă => "Masa-1"
+        // 2) Parametru masă
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
         if (masaParam) {
-          this.tableId = `Masa-${masaParam}`;
+          this.tableId = `Masa numărul ${masaParam}`;
         } else {
-          this.tableId = "Masa-1";
+          this.tableId = "Masa numărul 1";
         }
 
         // 3) Client number
@@ -1622,7 +1885,7 @@
           this.selectedAvatar = storedAvatar;
         }
 
-        // 6) Dacă avem username, încărcăm direct mesajele
+        // 6) Dacă avem username => încărcăm direct mesajele
         if (this.usernameSet) {
           this.loadMessages();
         }
@@ -1649,6 +1912,7 @@
         selectedTheme(newVal) {
           localStorage.setItem('selectedTheme', newVal);
           this.applyThemeClass(newVal);
+          // Comutăm la tab-ul Meniu
           this.activeTab = 'meniu';
         }
       }
