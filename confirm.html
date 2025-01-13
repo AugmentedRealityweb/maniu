@@ -10,7 +10,9 @@
 
   <!-- Definim temele exact ca în index.html -->
   <style>
-    /* TEMA IMPLICITĂ - PORTOCALIU (fără clasă .theme-...) */
+    /* ------------------------------------------------
+       1) TEMA IMPLICITĂ - PORTOCALIU (fără clasă .theme-...)
+       ------------------------------------------------ */
     :root {
       --gradient-start: #000000;
       --gradient-end:   #e78c00;
@@ -32,7 +34,9 @@
       --scratch-color: rgba(231,140,0,0.15);
     }
 
-    /* CELELALTE 9 TEME: .theme-red, .theme-blue, etc. */
+    /* ------------------------------------------------
+       2) CELELALTE 9 TEME: .theme-red, .theme-blue etc.
+       ------------------------------------------------ */
     .theme-red {
       --gradient-end:      #8B0000;
       --scrollbar-color:   #8B0000;
@@ -49,7 +53,6 @@
       --price-color:       #b30000;
       --scratch-color:     rgba(139,0,0,0.15);
     }
-
     .theme-blue {
       --gradient-end:      #004080;
       --scrollbar-color:   #004080;
@@ -66,7 +69,6 @@
       --price-color:       #0066cc;
       --scratch-color:     rgba(0,64,128,0.15);
     }
-
     .theme-green {
       --gradient-end:      #004d00;
       --scrollbar-color:   #004d00;
@@ -83,7 +85,6 @@
       --price-color:       #008000;
       --scratch-color:     rgba(0,77,0,0.15);
     }
-
     .theme-purple {
       --gradient-end:      #4B0082;
       --scrollbar-color:   #4B0082;
@@ -100,7 +101,6 @@
       --price-color:       #6A0DAD;
       --scratch-color:     rgba(75,0,130,0.15);
     }
-
     .theme-pink {
       --gradient-end:      #A600A6;
       --scrollbar-color:   #A600A6;
@@ -117,7 +117,6 @@
       --price-color:       #CC00CC;
       --scratch-color:     rgba(166,0,166,0.15);
     }
-
     .theme-grey {
       --gradient-end:      #555555;
       --scrollbar-color:   #555555;
@@ -134,7 +133,6 @@
       --price-color:       #999999;
       --scratch-color:     rgba(85,85,85,0.15);
     }
-
     .theme-brown {
       --gradient-end:      #663300;
       --scrollbar-color:   #663300;
@@ -151,7 +149,6 @@
       --price-color:       #996633;
       --scratch-color:     rgba(102,51,0,0.15);
     }
-
     .theme-teal {
       --gradient-end:      #004d4d;
       --scrollbar-color:   #004d4d;
@@ -168,7 +165,6 @@
       --price-color:       #008080;
       --scratch-color:     rgba(0,77,77,0.15);
     }
-
     .theme-lime {
       --gradient-end:      #009900;
       --scrollbar-color:   #009900;
@@ -186,35 +182,33 @@
       --scratch-color:     rgba(0,153,0,0.15);
     }
 
-    /* Stil de bază: fundal tip gradient, text alb etc. */
+    /* ------------------------------------------------
+       3) STIL DE BAZĂ
+       ------------------------------------------------ */
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
       color: #fff;
       background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
       min-height: 100vh;
+
       display: flex;
       justify-content: center;
       align-items: flex-start;
       padding: 2rem;
     }
-
     .container {
       max-width: 400px;
       width: 100%;
     }
-    .price {
-      color: var(--price-color);
-      font-weight: bold;
+    .box {
+      background: #1f2937; /* echivalent cu Tailwind gray-800 */
+      padding: 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      width: 100%;
     }
-    .product-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-    }
-    .product-name {
-      margin-right: 1rem;
-    }
+
     .pulse {
       color: var(--price-color);
       font-size: 1.5rem;
@@ -232,33 +226,39 @@
         opacity: 0.8;
       }
     }
+
     .subtitle {
       text-align: center;
       color: #f3f3f3;
       font-size: 1rem;
       margin-top: 0.5rem;
     }
-    .box {
-      background: #1f2937; /* #1f2937 = Tailwind gray-800 */
-      padding: 1rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      width: 100%;
-    }
     .border-custom {
       border-top: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .product-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    .product-name {
+      margin-right: 1rem;
+    }
+    .price {
+      color: var(--price-color);
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1 class="text-2xl font-bold text-center mb-6">Comanda Ta</h1>
-
     <div class="box">
       <!-- Afișăm sessionCode -->
       <h2 id="sessionCodeElem" class="pulse"></h2>
       <p id="subtitleElem" class="subtitle">Spune acest cod ospătarului</p>
-      
+
       <!-- Lista de produse -->
       <div id="itemsList" class="mb-4"></div>
 
@@ -270,7 +270,9 @@
 
       <!-- Link Înapoi -->
       <div class="text-center mt-4">
-        <a id="backLinkElem" class="underline cursor-pointer" style="color: var(--price-color)">Înapoi la Meniu</a>
+        <a id="backLinkElem" class="underline cursor-pointer" style="color: var(--price-color)">
+          Înapoi la Meniu
+        </a>
       </div>
     </div>
   </div>
@@ -286,12 +288,9 @@
       getDocs 
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    /* 1) Citim tema din localStorage și o aplicăm */
+    /** 1) Aplica tema stocată în localStorage (sau fallback la 'orange') */
     window.addEventListener("DOMContentLoaded", function() {
-      let storedTheme = localStorage.getItem('selectedTheme');
-      if (!storedTheme) {
-        storedTheme = 'orange'; 
-      }
+      let storedTheme = localStorage.getItem('selectedTheme') || 'orange';
       applyThemeClass(storedTheme);
     });
 
@@ -302,14 +301,13 @@
       ];
       // Eliminăm toate temele de pe <body>
       allThemes.forEach(t => document.body.classList.remove(t));
-
       // Dacă nu e orange (implicit), adăugăm clasa respectivă
       if (themeName !== 'orange') {
         document.body.classList.add(`theme-${themeName}`);
       }
     }
 
-    /* 2) Inițializare Firebase */
+    /** 2) Inițializare Firebase (aceeași config ca în index.html / waiter.html) */
     const firebaseConfig = {
       apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -322,31 +320,35 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    /* 3) Citim parametrii din URL (sessionCode, masa) + userId localStorage */
+    /** 3) Citim parametrii din URL (sessionCode, masa) + userId din localStorage */
     const params = new URLSearchParams(window.location.search);
     const sessionCode = params.get("sessionCode");
     const masaNumber  = params.get("masa");
+
+    const userId = localStorage.getItem("userId");
 
     const sessionCodeElem = document.getElementById("sessionCodeElem");
     const itemsListElem   = document.getElementById("itemsList");
     const orderTotalElem  = document.getElementById("orderTotal");
     const backLinkElem    = document.getElementById("backLinkElem");
 
+    /** 4) Setăm textul sessionCodeElem sau un fallback */
     if (sessionCode) {
-      sessionCodeElem.textContent = "Codul Comenzii: " + sessionCode;
+      sessionCodeElem.textContent = "Cod Sesiune: " + sessionCode;
     } else {
       sessionCodeElem.textContent = "Nu există niciun cod de sesiune!";
     }
 
-    let backLink = "https://meniu-test.vercel.app/";
+    /** 5) Construim linkul "Înapoi la Meniu" */
+    let baseUrl = window.location.origin;
+    // Dacă site-ul tău e pe alt server, îl pui manual. Exemplu: let baseUrl = "https://exemplu.com";
+    let backLink = `${baseUrl}/index.html`; 
     if (masaNumber) {
       backLink += `?masa=${masaNumber}`;
     }
     backLinkElem.href = backLink;
 
-    const userId = localStorage.getItem("userId");
-
-    /* 4) Căutăm în Firestore comenzile făcute cu (sessionCode + userId) */
+    /** 6) Citim din Firestore toate comenzile userului curent cu sessionCode-ul dat */
     async function fetchSessionOrders() {
       if (!sessionCode || !userId) return;
       try {
@@ -356,11 +358,11 @@
           where("sessionCode", "==", sessionCode),
           where("userId", "==", userId)
         );
-
         const snap = await getDocs(qRef);
 
         let totalAll = 0;
         let htmlRows = "";
+
         snap.forEach((docSnap) => {
           const data = docSnap.data();
           const items = data.items || [];
@@ -368,7 +370,6 @@
           items.forEach((item) => {
             const thisSum = item.price * item.quantity;
             totalAll += thisSum;
-
             htmlRows += `
               <div class="product-row">
                 <span class="product-name">${item.name} x ${item.quantity}</span>
@@ -376,7 +377,7 @@
               </div>
             `;
           });
-          // Dacă vrei o linie de separare între comenzi 
+          // O linie de separare între comenzi (opțional)
           htmlRows += `<hr class="border-gray-700 my-2"/>`;
         });
 
