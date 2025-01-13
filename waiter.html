@@ -92,12 +92,10 @@
           :key="ord.docId"
           class="order-box"
         >
-          <div class="font-bold mb-2">
-            <!-- Afișăm ID comenzii aici doar pentru ospătar (intern) -->
-            Comanda #{{ ord.docId }}  
-            (Client #{{ ord.clientNumber }}) - <em>{{ ord.status }}</em>
+          <div class="font-bold">
+            Comanda #{{ ord.docId }} (Client #{{ ord.clientNumber }}) - <em>{{ ord.status }}</em>
           </div>
-          <ul class="order-item text-gray-200">
+          <ul class="order-item">
             <li
               v-for="(item, iidx) in ord.items"
               :key="iidx"
@@ -107,16 +105,6 @@
           </ul>
           <div class="font-bold mt-1 text-[#f49032]">
             Subtotal: {{ ord.total.toFixed(2) }} Lei
-          </div>
-          <!-- Butonul Comanda Plasată apare doar dacă ord.status = 'open' și placedByWaiter = false -->
-          <div class="mt-2">
-            <button
-              v-if="ord.status === 'open' && !ord.placedByWaiter"
-              class="btn"
-              @click="markOrderAsPlaced(ord.docId)"
-            >
-              Comanda Plasată
-            </button>
           </div>
         </div>
       </div>
@@ -225,23 +213,6 @@
           } catch (e) {
             console.error("Eroare la loadOrdersBySession:", e);
             alert("Eroare la încărcarea comenzilor!");
-          }
-        },
-
-        // Marchează comanda ca plasată, adică placedByWaiter = true
-        async markOrderAsPlaced(orderId) {
-          try {
-            const docRef_ = doc(db, "orders", orderId);
-            await updateDoc(docRef_, { placedByWaiter: true });
-            // Actualizăm local array-ul orders
-            const orderIndex = this.orders.findIndex(o => o.docId === orderId);
-            if (orderIndex !== -1) {
-              this.orders[orderIndex].placedByWaiter = true;
-            }
-            alert("Comanda a fost marcată ca plasată!");
-          } catch (err) {
-            console.error("Eroare la markOrderAsPlaced:", err);
-            alert("Nu s-a putut marca această comandă ca plasată!");
           }
         }
       }
