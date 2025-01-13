@@ -1,134 +1,1109 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ospătar - Gestionare Mese</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meniu Restaurant - Pagina Principală</title>
+
+  <!-- Vue 3 (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+
+  <!-- TailwindCSS (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Material Icons (opțional) -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+
+  <!-- Font “scris de mână” (Dancing Script) -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet"/>
+
   <style>
+    /* ------------------------------------------------
+       1. TEMA IMPLICITĂ - PORTOCALIU (fără clasă .theme-...)
+       ------------------------------------------------ */
+    :root {
+      --gradient-start: #000000;
+      --gradient-end:   #e78c00;
+
+      --scrollbar-color: #e78c00;
+      --scrollbar-track: #000000;
+
+      --border-color: #e78c00;
+
+      --btn-start: #f49032;
+      --btn-end:   #d35400;
+      --btn-shadow-color1: #f49032;
+      --btn-shadow-color2: #d35400;
+
+      --card-border-color: #e78c00;
+      --card-hover-shadow: rgba(255,140,0,0.3);
+
+      --price-color: #f49032;
+      --scratch-color: rgba(231,140,0,0.15);
+    }
+
+    /* ------------------------------------------------
+       2. CELELALTE 9 TEME (theme-red, theme-blue etc.)
+       ------------------------------------------------ */
+    .theme-red {
+      --gradient-end:      #8B0000;
+      --scrollbar-color:   #8B0000;
+      --border-color:      #8B0000;
+
+      --btn-start:         #b30000;
+      --btn-end:           #7d0000;
+      --btn-shadow-color1: #b30000;
+      --btn-shadow-color2: #7d0000;
+
+      --card-border-color: #8B0000;
+      --card-hover-shadow: rgba(179,0,0,0.3);
+
+      --price-color:       #b30000;
+      --scratch-color:     rgba(139,0,0,0.15);
+    }
+    .theme-blue {
+      --gradient-end:      #004080;
+      --scrollbar-color:   #004080;
+      --border-color:      #004080;
+
+      --btn-start:         #0066cc;
+      --btn-end:           #004080;
+      --btn-shadow-color1: #0066cc;
+      --btn-shadow-color2: #004080;
+
+      --card-border-color: #004080;
+      --card-hover-shadow: rgba(0,64,128,0.3);
+
+      --price-color:       #0066cc;
+      --scratch-color:     rgba(0,64,128,0.15);
+    }
+    .theme-green {
+      --gradient-end:      #004d00;
+      --scrollbar-color:   #004d00;
+      --border-color:      #004d00;
+
+      --btn-start:         #008000;
+      --btn-end:           #004d00;
+      --btn-shadow-color1: #008000;
+      --btn-shadow-color2: #004d00;
+
+      --card-border-color: #004d00;
+      --card-hover-shadow: rgba(0,77,0,0.3);
+
+      --price-color:       #008000;
+      --scratch-color:     rgba(0,77,0,0.15);
+    }
+    .theme-purple {
+      --gradient-end:      #4B0082;
+      --scrollbar-color:   #4B0082;
+      --border-color:      #4B0082;
+
+      --btn-start:         #6A0DAD;
+      --btn-end:           #4B0082;
+      --btn-shadow-color1: #6A0DAD;
+      --btn-shadow-color2: #4B0082;
+
+      --card-border-color: #4B0082;
+      --card-hover-shadow: rgba(75,0,130,0.3);
+
+      --price-color:       #6A0DAD;
+      --scratch-color:     rgba(75,0,130,0.15);
+    }
+    .theme-pink {
+      --gradient-end:      #A600A6;
+      --scrollbar-color:   #A600A6;
+      --border-color:      #A600A6;
+
+      --btn-start:         #CC00CC;
+      --btn-end:           #A600A6;
+      --btn-shadow-color1: #CC00CC;
+      --btn-shadow-color2: #A600A6;
+
+      --card-border-color: #A600A6;
+      --card-hover-shadow: rgba(166,0,166,0.3);
+
+      --price-color:       #CC00CC;
+      --scratch-color:     rgba(166,0,166,0.15);
+    }
+    .theme-grey {
+      --gradient-end:      #555555;
+      --scrollbar-color:   #555555;
+      --border-color:      #555555;
+
+      --btn-start:         #777777;
+      --btn-end:           #555555;
+      --btn-shadow-color1: #777777;
+      --btn-shadow-color2: #555555;
+
+      --card-border-color: #555555;
+      --card-hover-shadow: rgba(85,85,85,0.3);
+
+      --price-color:       #999999;
+      --scratch-color:     rgba(85,85,85,0.15);
+    }
+    .theme-brown {
+      --gradient-end:      #663300;
+      --scrollbar-color:   #663300;
+      --border-color:      #663300;
+
+      --btn-start:         #996633;
+      --btn-end:           #663300;
+      --btn-shadow-color1: #996633;
+      --btn-shadow-color2: #663300;
+
+      --card-border-color: #663300;
+      --card-hover-shadow: rgba(102,51,0,0.3);
+
+      --price-color:       #996633;
+      --scratch-color:     rgba(102,51,0,0.15);
+    }
+    .theme-teal {
+      --gradient-end:      #004d4d;
+      --scrollbar-color:   #004d4d;
+      --border-color:      #004d4d;
+
+      --btn-start:         #008080;
+      --btn-end:           #004d4d;
+      --btn-shadow-color1: #008080;
+      --btn-shadow-color2: #004d4d;
+
+      --card-border-color: #004d4d;
+      --card-hover-shadow: rgba(0,128,128,0.3);
+
+      --price-color:       #008080;
+      --scratch-color:     rgba(0,77,77,0.15);
+    }
+    .theme-lime {
+      --gradient-end:      #009900;
+      --scrollbar-color:   #009900;
+      --border-color:      #009900;
+
+      --btn-start:         #00cc00;
+      --btn-end:           #009900;
+      --btn-shadow-color1: #00cc00;
+      --btn-shadow-color2: #009900;
+
+      --card-border-color: #009900;
+      --card-hover-shadow: rgba(0,153,0,0.3);
+
+      --price-color:       #00cc00;
+      --scratch-color:     rgba(0,153,0,0.15);
+    }
+
+    /* ------------------------------------------------
+       4. STILURI DE BAZĂ PENTRU PAGINĂ
+       ------------------------------------------------ */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     body {
-      background-color: #111827;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      margin: 0; 
-      padding: 1rem;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
       min-height: 100vh;
-    }
-    .btn {
-      background-color: #f49032;
-      padding: 8px 16px;
-      border-radius: 6px;
       color: #fff;
-      cursor: pointer;
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    #app {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-color) var(--scrollbar-track);
+    }
+    .scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .scrollbar::-webkit-scrollbar-thumb {
+      background-color: var(--scrollbar-color);
+      border-radius: 6px;
+    }
+    .scrollbar::-webkit-scrollbar-track {
+      background-color: var(--scrollbar-track);
+    }
+
+    .btn-orange {
+      background: linear-gradient(to right, var(--btn-start), var(--btn-end));
+      color: #fff;
+      font-weight: bold;
       border: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 0.75rem;
+      font-size: 0.875rem;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
     }
-    .btn:hover {
-      background-color: #d35400;
+    .btn-orange:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 8px var(--btn-shadow-color1), 0 0 20px var(--btn-shadow-color2);
     }
-    .table-box {
-      border: 1px solid #f49032;
-      margin-bottom: 1rem;
+    .btn-incdec {
+      background: linear-gradient(to right, var(--btn-start), var(--btn-end));
+      color: #fff;
+      font-weight: bold;
+      border: none !important;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .btn-incdec:hover {
+      transform: scale(1.1);
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+    .animate-shake {
+      animation: shake 0.5s;
+    }
+
+    .slide-cart-enter-active,
+    .slide-cart-leave-active {
+      transition: max-height 0.5s ease, opacity 0.5s ease;
+      overflow: hidden;
+    }
+    .slide-cart-enter-from,
+    .slide-cart-leave-to {
+      max-height: 0;
+      opacity: 0;
+    }
+    .slide-fade-enter-active,
+    .slide-fade-leave-active {
+      transition: all 0.3s ease;
+    }
+    .slide-fade-enter,
+    .slide-fade-leave-to {
+      transform: translateX(-50px);
+      opacity: 0;
+    }
+
+    .scratches {
+      background-color: #000;
+      background-image: repeating-linear-gradient(
+        45deg,
+        var(--scratch-color),
+        var(--scratch-color) 2px,
+        transparent 2px,
+        transparent 20px
+      );
+    }
+    .sidebar {
+      border-right: 2px solid var(--border-color);
+      box-shadow: 4px 0 8px rgba(0,0,0,0.3);
+    }
+    .sidebar-btn {
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+    .sidebar-btn:hover {
+      background-color: var(--border-color);
+      color: #000;
+      transform: scale(1.03);
+    }
+    .main-container {
+      border: 2px solid var(--border-color);
+      border-radius: 0.5rem;
       padding: 1rem;
-      border-radius: 6px;
     }
-    .order-box {
-      border: 1px solid #e78c00;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
-      border-radius: 6px;
+    /* ------------------------------------------------
+       AICI AM ADAUGAT BOX-SHADOW PENTRU .card-container
+       ------------------------------------------------ */
+    .card-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1rem;
+      border: 1px solid var(--card-border-color);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-align: center;
+      /* Umbra implicită care ia culoarea temei */
+      box-shadow: 0 -10px 20px var(--card-hover-shadow);
     }
-    .order-item {
-      margin-left: 1rem;
+    .card-container:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 24px var(--card-hover-shadow);
+    }
+    .card-img-square {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+    }
+    .card-img-rect {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+    }
+    .card-details {
+      padding: 0.75rem;
+      text-align: center;
+    }
+    .card-details h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.2rem;
+      font-family: 'Dancing Script', cursive;
+    }
+    .card-details p {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--price-color);
+      text-align: center;
+    }
+
+    @keyframes fadeInLeft {
+      0% {
+        transform: translateX(-50px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    .fade-in-left {
+      animation: fadeInLeft 2s ease forwards;
+    }
+    .handwriting-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: center;
+    }
+    .modal-product {
+      background-color: #0d0d0d;
+      border: 2px solid var(--border-color);
+      border-radius: 0.5rem;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .table-zone {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 1rem;
+      margin-top: 2rem;
+      justify-items: center;
+    }
+    .table-circle {
+      width: 70px;
+      height: 70px;
+      border-radius: 30%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-weight: bold;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      background: #999085;
+      color: #fff;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 0 0 4px transparent;
+    }
+    .table-circle:before {
+      content: "";
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      border-radius: 30%;
+      z-index: -1;
+      transition: box-shadow 0.3s ease;
+    }
+    .table-circle[style*="background: #666"] {
+      box-shadow: 0 0 0 4px var(--btn-shadow-color1);
+    }
+
+    .back-to-top {
+      position: fixed;
+      bottom: 100px;
+      right: 1rem;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background: linear-gradient(to right, var(--btn-start), var(--btn-end));
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .back-to-top:hover {
+      transform: scale(1.1);
+    }
+
+    /* Animație simplă (Fade/Pop) pentru reacție */
+    .pop-enter-active, .pop-leave-active {
+      transition: opacity 0.4s;
+    }
+    .pop-enter, .pop-leave-to {
+      opacity: 0;
     }
   </style>
 </head>
 <body>
-  <h1 class="text-2xl font-bold mb-4 text-center">Aplicație Ospătar - Gestionare Mese</h1>
+  <div id="app">
+    <div class="h-screen flex flex-col">
+      <!-- SIDEBAR desktop -->
+      <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
+        <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left text-center">
+          Meniu Restaurant
+        </div>
+        <nav class="flex flex-col space-y-2">
+          <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'">
+            <span class="material-icons">restaurant_menu</span>Meniu
+          </button>
+          <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='puncte'">
+            <span class="material-icons">star</span>Puncte
+          </button>
+          <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale'">
+            <span class="material-icons">receipt</span>Comenzile Tale
+          </button>
+          <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='social'">
+            <span class="material-icons">group</span>Social
+          </button>
+          <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='design'">
+            <span class="material-icons">palette</span>Design
+          </button>
+        </nav>
+      </aside>
 
-  <div id="app" class="max-w-3xl mx-auto">
-    <!-- Buton: Vezi Mesele "occupied" -->
-    <div class="mb-4">
-      <button class="btn" @click="fetchOccupiedTables">Vezi Mesele Ocupate</button>
-    </div>
-
-    <!-- Lista meselor occupied -->
-    <div v-if="occupiedTables.length > 0">
-      <h2 class="text-xl font-bold mb-2">Mese Ocupate:</h2>
-      <div
-        v-for="(tbl, idx) in occupiedTables"
-        :key="tbl.tableId"
-        class="table-box"
-      >
-        <div class="flex justify-between items-center">
-          <div>
-            <strong>{{ tbl.tableId }}</strong>
-            <br/>
-            <em>Cod sesiune: {{ tbl.sessionCode }}</em>
+      <!-- CONȚINUT PRINCIPAL, e scrollabil pe window, nu local -->
+      <div class="flex-1 flex flex-col p-2">
+        <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
+          <!-- BARĂ mobilă: Buton stânga + Titlu centrat (numai pe ecranele mici) -->
+          <div class="flex items-center mb-4 md:hidden">
+            <button 
+              ref="mobileToggle"
+              class="bg-black border-2 border-[var(--border-color)] hover:bg-[var(--border-color)] hover:text-black 
+                     text-white p-2 rounded-full mr-2"
+              @click="isSidebarVisible = !isSidebarVisible"
+            >
+              <span class="material-icons">menu</span>
+            </button>
+            <div class="handwriting-title text-2xl font-bold fade-in-left text-center flex-1">
+              Meniu Restaurant
+            </div>
           </div>
-          <!-- Ospătarul introduce codul => deblochează masa -->
-          <button class="btn" @click="askForCode(tbl.tableId, tbl.sessionCode)">
-            Deblochează Masa
+
+          <!-- SIDEBAR mobil (afișat condiționat) -->
+          <transition name="slide-fade">
+            <aside 
+              v-if="isSidebarVisible" 
+              ref="mobileSidebar"
+              class="absolute top-0 left-0 w-48 p-4 z-50 rounded-tr-lg rounded-br-lg sidebar scratches"
+            >
+              <button class="text-white mb-2" @click="isSidebarVisible = false">
+                <span class="material-icons">close</span>
+              </button>
+              <nav class="flex flex-col space-y-2">
+                <button 
+                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                  @click="activeTab='meniu'; isSidebarVisible=false"
+                >
+                  <span class="material-icons">restaurant_menu</span>Meniu
+                </button>
+                <button 
+                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                  @click="activeTab='puncte'; isSidebarVisible=false"
+                >
+                  <span class="material-icons">star</span>Puncte
+                </button>
+                <button 
+                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                  @click="activeTab='comenzileTale'; isSidebarVisible=false"
+                >
+                  <span class="material-icons">receipt</span>Comenzile Tale
+                </button>
+                <button 
+                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                  @click="activeTab='social'; isSidebarVisible=false"
+                >
+                  <span class="material-icons">group</span>Social
+                </button>
+                <button 
+                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                  @click="activeTab='design'; isSidebarVisible=false"
+                >
+                  <span class="material-icons">palette</span>Design
+                </button>
+              </nav>
+            </aside>
+          </transition>
+
+          <!-- TAB: MENIU -->
+          <section v-if="activeTab === 'meniu'">
+            <!-- Căutare produse -->
+            <div class="flex items-center gap-4 mb-4">
+              <input 
+                type="text" 
+                placeholder="Caută produse..." 
+                v-model="searchQuery" 
+                class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] w-full md:w-1/2"
+              />
+            </div>
+
+            <!-- Rezultate căutare (dacă există un searchQuery) -->
+            <div v-if="searchQuery.trim()">
+              <h2 class="text-xl font-semibold mb-4 text-center">
+                Rezultate pentru: "{{ searchQuery }}"
+              </h2>
+              <!-- Buton pentru schimbare Grid / Listă -->
+              <div class="flex justify-center mb-4">
+                <button 
+                  class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                  @click="toggleLayout"
+                >
+                  <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                  <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+                </button>
+              </div>
+              <!-- Afișarea produselor filtrate -->
+              <div 
+                v-if="displayedProducts.length > 0" 
+                :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
+              >
+                <div 
+                  v-for="product in displayedProducts" 
+                  :key="product.title" 
+                  class="card-container cursor-pointer"
+                  @click="showProductDetails(product)"
+                >
+                  <img 
+                    :class="isGrid ? 'card-img-square' : 'card-img-rect'"
+                    :src="product.image" 
+                    :alt="product.title" 
+                  />
+                  <div class="card-details">
+                    <h3>{{ product.title }}</h3>
+                    <p>{{ product.price }} Lei</p>
+                  </div>
+                </div>
+              </div>
+              <div v-else>
+                <p class="text-center">
+                  Nu a fost găsit niciun produs care să corespundă căutării.
+                </p>
+              </div>
+            </div>
+            <!-- Categorii + Produse (fără căutare) -->
+            <div v-else>
+              <!-- Afișăm categoriile -->
+              <div v-if="view === 'categorii'">
+                <h2 class="text-xl font-semibold mb-4 text-center">
+                  Alege Categoria
+                </h2>
+                <!-- Buton pentru schimbare Grid / Listă -->
+                <div class="flex justify-center mb-4">
+                  <button 
+                    class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                    @click="toggleLayout"
+                  >
+                    <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                    <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+                  </button>
+                </div>
+                <!-- Carduri cu categorii -->
+                <div 
+                  :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
+                >
+                  <div 
+                    v-for="category in categories" 
+                    :key="category.name" 
+                    class="card-container cursor-pointer"
+                    @click="enterCategory(category.name)"
+                  >
+                    <img 
+                      :class="isGrid ? 'card-img-square' : 'card-img-rect'"
+                      :src="category.image" 
+                      :alt="category.name" 
+                    />
+                    <div class="card-details">
+                      <h3>{{ renameCategory(category.name) }}</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Afișăm produsele dintr-o categorie selectată -->
+              <div v-else-if="view === 'produse'">
+                <div class="flex items-center justify-between mb-4">
+                  <button class="btn-orange rounded-full" @click="backToCategories">
+                    Înapoi la Categorii
+                  </button>
+                  <!-- Buton pentru schimbare Grid / Listă -->
+                  <button 
+                    class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                    @click="toggleLayout"
+                  >
+                    <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                    <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+                  </button>
+                </div>
+                <h2 class="text-xl font-semibold mb-4 text-center">
+                  Produse ({{ currentProducts.length }})
+                </h2>
+                <div 
+                  :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
+                >
+                  <div 
+                    v-for="product in currentProducts" 
+                    :key="product.title" 
+                    class="card-container cursor-pointer" 
+                    @click="showProductDetails(product)"
+                  >
+                    <img 
+                      :class="isGrid ? 'card-img-square' : 'card-img-rect'"
+                      :src="product.image" 
+                      :alt="product.title"
+                    />
+                    <div class="card-details">
+                      <h3>{{ product.title }}</h3>
+                      <p>{{ product.price }} Lei</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modal cu detalii produs -->
+            <div 
+              v-if="currentProduct" 
+              class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+            >
+              <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
+                <button 
+                  class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
+                  @click="currentProduct = null"
+                >
+                  &times;
+                </button>
+                <img 
+                  :src="currentProduct.image" 
+                  :alt="currentProduct.title" 
+                  class="w-full h-64 object-cover mb-4 rounded-lg"
+                />
+                <h2 class="text-xl font-bold mb-2 handwriting-title">
+                  {{ currentProduct.title }}
+                </h2>
+                <p class="font-bold text-lg mb-4" :style="{ color: 'var(--price-color)' }">
+                  {{ currentProduct.price }} Lei
+                </p>
+                <p class="text-gray-400 mb-4">
+                  {{ currentProduct.description }}
+                </p>
+                <ul class="text-gray-300 mb-4">
+                  <li 
+                    v-for="ingredient in currentProduct.ingredients" 
+                    :key="ingredient" 
+                    class="list-disc ml-5"
+                  >
+                    {{ ingredient }}
+                  </li>
+                </ul>
+                <button class="btn-orange rounded-full" @click="addToOrder(currentProduct)">
+                  Adaugă în coș
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- TAB: Puncte -->
+          <section v-else-if="activeTab === 'puncte'">
+            <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
+            <div class="bg-black p-4 rounded border border-[var(--border-color)] shadow max-w-md scratches mx-auto">
+              <div v-if="clientNumber === 0" class="mb-4">
+                <p class="text-gray-300 text-center">
+                  Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
+                </p>
+              </div>
+              <div v-else>
+                <p class="text-gray-300 mb-2 text-center">
+                  Număr client: 
+                  <span class="font-bold">#{{ clientNumber }}</span>
+                </p>
+              </div>
+              <p class="text-gray-300 text-center">
+                Puncte acumulate: 
+                <span class="font-bold" :style="{ color: 'var(--price-color)' }">
+                  {{ clientPoints.toFixed(2) }}
+                </span>
+              </p>
+            </div>
+          </section>
+
+          <!-- TAB: Comenzile Tale -->
+          <section v-else-if="activeTab === 'comenzileTale'">
+            <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
+            <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
+              Nu ai nicio comandă finalizată încă.
+            </div>
+            <div v-else class="space-y-4">
+              <div 
+                v-for="(order, idx) in myOrders" 
+                :key="order.orderId" 
+                class="bg-black p-4 rounded border border-[var(--border-color)] scratches"
+              >
+                <h3 class="text-lg font-semibold mb-2">
+                  Comanda #{{ idx + 1 }}
+                </h3>
+                <ul class="list-disc list-inside text-gray-300">
+                  <li 
+                    v-for="(prod, pidx) in order.items" 
+                    :key="pidx"
+                  >
+                    {{ prod.name }} x {{ prod.quantity }} – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
+                  </li>
+                </ul>
+                <div class="mt-2 font-bold" :style="{ color: 'var(--price-color)' }">
+                  Total: {{ order.total }} Lei
+                </div>
+                <div class="text-sm text-gray-400">
+                  ID comandă: {{ order.orderId }} | Cod Ospătar: {{ order.sessionCode }}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- TAB: Social (mesaje tip “WhatsApp”) -->
+          <section v-else-if="activeTab === 'social'">
+            <!-- Dacă utilizatorul nu și-a setat numele încă -->
+            <div v-if="!usernameSet" class="text-center">
+              <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
+              <p class="mb-4 text-gray-300 max-w-md mx-auto">
+                Bun venit în zona de socializare!  
+                Te rugăm să îți introduci numele și să alegi un avatar înainte de a vedea conversația sau a trimite mesaje.
+              </p>
+              <!-- Introducere nume și selecție avatar -->
+              <div class="flex flex-col items-center max-w-sm mx-auto">
+                <input 
+                  type="text" 
+                  v-model="usernameInput" 
+                  placeholder="Introduceți numele..." 
+                  class="bg-black text-gray-200 border border-[var(--border-color)] 
+                         rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] 
+                         w-full mb-4"
+                />
+                <!-- Selecție avatar -->
+                <div class="flex flex-wrap gap-4 justify-center mb-4">
+                  <div 
+                    v-for="(av, i) in availableAvatars" 
+                    :key="i" 
+                    class="w-14 h-14 rounded-full border-2 border-gray-500 cursor-pointer overflow-hidden"
+                    :class="{'border-green-400': selectedAvatar === av}"
+                    @click="selectedAvatar = av"
+                  >
+                    <img 
+                      :src="av" 
+                      alt="avatar" 
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+                <button class="btn-orange rounded-full" @click="setUsername">
+                  Continuă
+                </button>
+              </div>
+            </div>
+            <!-- Dacă utilizatorul și-a setat deja numele => chat -->
+            <div v-else>
+              <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
+              
+              <!-- Chat global (mesajele din ultimele 10 minute) -->
+              <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto">
+                <div
+                  v-for="message in chatMessages"
+                  :key="message.id"
+                  class="mb-3 flex items-center"
+                  :class="message.name === usernameInput ? 'justify-end' : 'justify-start'"
+                >
+                  <!-- Container pentru avatar + bulă -->
+                  <!-- 'flex-row-reverse' pentru user curent, normal pentru ceilalți -->
+                  <div 
+                    class="relative flex items-start" 
+                    :class="message.name === usernameInput ? 'flex-row-reverse' : 'flex-row'"
+                  >
+                    <!-- Avatar (stânga la ceilalți, dreapta la user) -->
+                    <img 
+                      :src="message.avatar || 'https://via.placeholder.com/40'" 
+                      alt="Avatar" 
+                      class="w-10 h-10 rounded-full object-cover m-2"
+                    />
+                    
+                    <!-- Bula de mesaj (mai lată, mai îngustă) -->
+                    <div 
+                      class="leading-tight py-1 px-4 rounded-3xl" 
+                      style="max-width: 400px;" 
+                      :class="[
+                        message.name === usernameInput 
+                          ? 'bg-green-600 text-right mr-2' 
+                          : 'bg-gray-700 text-left ml-2'
+                      ]"
+                    >
+                      <!-- Nume / Masa (opțional) -->
+                      <div class="font-bold" :style="{ color: 'var(--price-color)' }">
+                        (masa {{ message.tableNumber }}) {{ message.name }}
+                      </div>
+                      <!-- Textul mesajului -->
+                      <div class="text-gray-100">
+                        {{ message.text }}
+                      </div>
+                      <!-- Reacții sub fiecare mesaj -->
+                      <div class="flex gap-2 mt-2 text-sm">
+                        <button @click="reactToMessage(message.id, '❤️')">
+                          ❤️ 
+                          <span v-if="message.reactions && message.reactions['❤️']">
+                            ({{ message.reactions['❤️'] }})
+                          </span>
+                        </button>
+                        <button @click="reactToMessage(message.id, '😂')">
+                          😂 
+                          <span v-if="message.reactions && message.reactions['😂']">
+                            ({{ message.reactions['😂'] }})
+                          </span>
+                        </button>
+                        <button @click="reactToMessage(message.id, '👍')">
+                          👍 
+                          <span v-if="message.reactions && message.reactions['👍']">
+                            ({{ message.reactions['👍'] }})
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Formular pentru mesaj nou -->
+              <div class="flex gap-2 max-w-xl mx-auto">
+                <input 
+                  v-model="newMessage" 
+                  class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 
+                         outline-none focus:ring-2 focus:ring-[var(--border-color)] flex-1" 
+                  placeholder="Scrie un mesaj..." 
+                />
+                <button class="btn-orange rounded-full" @click="postMessage">
+                  Trimite
+                </button>
+              </div>
+
+              <!-- Cele 12 mese, 4 pe rând, evidențiem mesele care au mesaje -->
+              <div class="table-zone">
+                <div 
+                  v-for="tableNum in 12" 
+                  :key="tableNum" 
+                  class="table-circle"
+                  :style="tableStyle(tableNum)"
+                >
+                  Masa {{ tableNum }}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- TAB: DESIGN (cu 10 opțiuni de culoare) -->
+          <section v-else-if="activeTab === 'design'">
+            <h2 class="text-2xl font-bold mb-4 text-center">Tema de Design</h2>
+            <p class="text-gray-300 text-center mb-4">Alege o temă de culori pentru aplicație:</p>
+            <div class="flex flex-wrap gap-4 justify-center">
+              <!-- 1) Portocaliu (implicit) -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="orange" v-model="selectedTheme" />
+                <span>Portocaliu</span>
+              </label>
+              <!-- 2) Roșu -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="red" v-model="selectedTheme" />
+                <span>Roșu</span>
+              </label>
+              <!-- 3) Albastru -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="blue" v-model="selectedTheme" />
+                <span>Albastru</span>
+              </label>
+              <!-- 4) Verde -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="green" v-model="selectedTheme" />
+                <span>Verde</span>
+              </label>
+              <!-- 5) Mov -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="purple" v-model="selectedTheme" />
+                <span>Mov</span>
+              </label>
+              <!-- 6) Roz -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="pink" v-model="selectedTheme" />
+                <span>Roz</span>
+              </label>
+              <!-- 7) Gri -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="grey" v-model="selectedTheme" />
+                <span>Gri</span>
+              </label>
+              <!-- 8) Maro -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="brown" v-model="selectedTheme" />
+                <span>Maro</span>
+              </label>
+              <!-- 9) Teal -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="teal" v-model="selectedTheme" />
+                <span>Teal</span>
+              </label>
+              <!-- 10) Verde-lămâie -->
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" value="lime" v-model="selectedTheme" />
+                <span>Verde Lămâie</span>
+              </label>
+            </div>
+          </section>
+        </main>
+
+        <!-- Buton Coș (dacă avem produse în coș) -->
+        <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
+          <button 
+            @click="toggleOrderBar" 
+            class="btn-orange flex items-center relative rounded-full" 
+            :class="{'animate-shake': isShaking}"
+          >
+            <span class="material-icons mr-2 text-white">shopping_cart</span>
+            <span class="text-white">Coș ({{ orders.length }})</span>
           </button>
         </div>
+
+        <!-- Bara laterală a Coșului (slide-up de jos) -->
+        <transition name="slide-cart">
+          <aside 
+            v-show="isOrderOpen && orders.length > 0" 
+            class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[var(--border-color)] p-4 overflow-y-auto scrollbar" 
+            style="max-height: 100vh;"
+          >
+            <div class="relative flex flex-col">
+              <button 
+                class="absolute top-2 right-2 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
+                @click="toggleOrderBar"
+              >
+                &times;
+              </button>
+              <h3 class="text-xl font-bold mb-4 text-center">Comanda Ta</h3>
+              <div 
+                v-for="(order, index) in orders" 
+                :key="index" 
+                class="flex justify-between items-center bg-black border border-[var(--border-color)] p-4 rounded-lg mb-2 scratches"
+              >
+                <div class="flex flex-col">
+                  <span class="font-bold">{{ order.name }}</span>
+                  <div class="flex items-center gap-2 mt-1">
+                    <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
+                    <span class="text-gray-400">x{{ order.quantity }}</span>
+                    <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
+                    <button 
+                      class="bg-red-600 hover:bg-red-800 text-white px-2 py-1 rounded-full" 
+                      @click="removeItem(index)"
+                    >
+                      <span class="material-icons text-sm">delete</span>
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <span class="font-bold" :style="{ color: 'var(--price-color)' }">
+                    {{ (order.price * order.quantity).toFixed(2) }} Lei
+                  </span>
+                </div>
+              </div>
+              <div class="mt-4">
+                <div class="flex justify-between items-center">
+                  <span class="text-lg font-semibold">Total:</span>
+                  <span class="text-xl font-bold" :style="{ color: 'var(--price-color)' }">
+                    {{ total }}
+                  </span>
+                </div>
+                <button class="btn-orange mt-4 rounded-full self-end" @click="checkout">
+                  Finalizează Comanda
+                </button>
+              </div>
+            </div>
+          </aside>
+        </transition>
       </div>
     </div>
-    <div v-else class="text-gray-400 mb-4">
-      Nu există mese cu status="occupied".
+
+    <!-- Buton "Sus" (Back to top) -->
+    <div 
+      v-if="showBackToTop" 
+      class="back-to-top" 
+      @click="scrollTop"
+    >
+      <span class="material-icons">keyboard_arrow_up</span>
     </div>
 
-    <hr class="my-4 border-gray-700"/>
-
-    <!-- Afișăm comenzile mesei curente (dacă e deblocată) -->
-    <div v-if="currentTableId" class="table-box">
-      <h2 class="text-xl font-bold mb-2">
-        Masă: {{ currentTableId }} (status = {{ currentStatus }})
-      </h2>
-      <div v-if="orders.length === 0" class="italic mt-2">
-        Nu există comenzi salvate (closed / open) pentru această masă.
-      </div>
-      <div v-else>
-        <div
-          v-for="(ord, idx) in orders"
-          :key="ord.docId"
-          class="order-box"
+    <!-- Animatie reacție (overlay) -->
+    <transition name="pop">
+      <div 
+        v-if="reactionAnimation" 
+        class="fixed inset-0 flex items-center justify-center pointer-events-none z-50"
+      >
+        <div 
+          v-if="reactionAnimation === '❤️'" 
+          class="text-red-500 text-7xl animate-bounce"
         >
-          <div class="font-bold">
-            Comanda #{{ ord.docId }} (Client #{{ ord.clientNumber }}) - <em>{{ ord.status }}</em>
-          </div>
-          <ul class="order-item">
-            <li
-              v-for="(item, iidx) in ord.items"
-              :key="iidx"
-            >
-              {{ item.name }} x {{ item.quantity }} – {{ (item.price * item.quantity).toFixed(2) }} Lei
-            </li>
-          </ul>
-          <div class="font-bold mt-1 text-[#f49032]">
-            Subtotal: {{ ord.total.toFixed(2) }} Lei
-          </div>
+          ❤️
+        </div>
+        <div 
+          v-else-if="reactionAnimation === '😂'" 
+          class="text-white text-7xl animate-bounce"
+        >
+          😂
+        </div>
+        <div 
+          v-else-if="reactionAnimation === '👍'" 
+          class="text-white text-7xl animate-bounce"
+        >
+          👍
         </div>
       </div>
-    </div>
+    </transition>
   </div>
 
-  <!-- Firebase + Vue (ES module) -->
+  <!-- SCRIPTUL PRINCIPAL -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import {
       getFirestore,
-      collection,
       doc,
       getDoc,
       setDoc,
-      updateDoc,
+      collection,
+      addDoc,
       getDocs,
       query,
-      where
+      where,
+      serverTimestamp,
+      onSnapshot,
+      orderBy
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-    import { createApp } from "https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js";
 
+    /* -- Config Firebase (înlocuiește cu datele tale) -- */
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWq",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
       projectId: "restaurantapp-d0256",
       storageBucket: "restaurantapp-d0256.firebasestorage.app",
@@ -136,89 +1111,799 @@
       appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
       measurementId: "G-F44TB27G17"
     };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
 
-    const waiterApp = createApp({
+    const firebaseApp = initializeApp(firebaseConfig);
+    const db = getFirestore(firebaseApp);
+
+    /* Elimină diacritice (pentru căutare) */
+    function removeDiacritics(str) {
+      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    /* Generează un cod de ospătar (4 cifre) */
+    function generateSessionCode() {
+      return Math.floor(1000 + Math.random() * 9000).toString();
+    }
+
+    /* Obține sau creează codul de sesiune pentru masa dată */
+    async function getOrCreateSessionCode(tableId) {
+      if (!tableId) {
+        throw new Error("Nu există parametru pentru masă în URL.");
+      }
+      const docRef = doc(db, "sessions", tableId);
+      try {
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data.sessionCode && data.status === "active") {
+            return data.sessionCode;
+          } else {
+            const newSessionCode = generateSessionCode();
+            await setDoc(docRef, { sessionCode: newSessionCode, status: "active" }, { merge: true });
+            return newSessionCode;
+          }
+        } else {
+          const newSessionCode = generateSessionCode();
+          await setDoc(docRef, { sessionCode: newSessionCode, status: "active" });
+          return newSessionCode;
+        }
+      } catch (error) {
+        console.error(`Eroare la obținerea/crearea session code pentru ${tableId}:`, error);
+        throw new Error("A apărut o eroare la obținerea/crearea session code-ului.");
+      }
+    }
+
+    const app = Vue.createApp({
       data() {
         return {
-          occupiedTables: [],      // Mese cu status="occupied"
-          currentTableId: "",
-          currentSessionCode: "",
-          currentStatus: "",
-          orders: []
+          /* Interfață */
+          isSidebarVisible: false,
+          isOrderOpen: false,
+          isShaking: false,
+          showBackToTop: false,
+          isGrid: true,
+
+          /* Control temă */
+          selectedTheme: 'orange',
+
+          /* Pagini / tab-uri */
+          activeTab: "meniu",
+          view: "categorii",
+
+          /* Definim categoriile și produsele */
+          categories: [
+            { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
+            { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
+            { name: "pasta",   image: "https://i.giphy.com/dZRlFW1sbFEpG.webp" },
+            { name: "main",    image: "https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp" },
+            { name: "desserts",image: "https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp" },
+            { name: "drinks",  image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp" },
+            { name: "garnish", image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp" }
+          ],
+          products: {
+            brunch: [
+              {
+                title: "Toast cu avocado",
+                description: "Avocado, toast, ouă poșate, roșii cherry.",
+                price: 25,
+                image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp",
+                ingredients: ["Avocado", "Toast", "Ouă", "Roșii cherry"]
+              },
+              {
+                title: "Ouă Benedict",
+                description: "Ouă poșate, sos hollandaise, șuncă.",
+                price: 30,
+                image: "https://i.giphy.com/X3E37CTy55jNK.webp",
+                ingredients: ["Ouă", "Hollandaise", "Șuncă"]
+              },
+              {
+                title: "Clătite",
+                description: "Clătite, sirop de arțar, fructe proaspete.",
+                price: 20,
+                image: "https://i.giphy.com/5zu5JovduWFBS.webp",
+                ingredients: ["Făină", "Ouă", "Sirop de arțar", "Fructe"]
+              }
+            ],
+            soups: [
+              {
+                title: "Ciorbă de burtă",
+                description: "Tradițională, smântână, ardei iute (350/50g).",
+                price: 18,
+                image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg",
+                ingredients: ["Burtă", "Smântână", "Ardei iute"]
+              },
+              {
+                title: "Supă cremă de roșii",
+                description: "Roșii proaspete, crutoane, busuioc (350g).",
+                price: 15,
+                image: "https://www.lalena.ro/images/uploaded/600x_Supa-crema-de-rosii-108.jpg",
+                ingredients: ["Roșii", "Crutoane", "Busuioc"]
+              },
+              {
+                title: "Ciorbă de legume",
+                description: "Legume proaspete, zeamă de lămâie (400g).",
+                price: 12,
+                image: "https://www.prestij.ro/uploads/produse/1440/94--ciorba-taraneasca-de-legume.jpg",
+                ingredients: ["Morcovi", "Cartofi", "Ceapă", "Apio"]
+              },
+              {
+                title: "Ciorbă de văcuță",
+                description: "360/40g. O ciorbă aromată, cu carne fragedă de vită și legume.",
+                price: 19,
+                image: "https://www.anytacooking.ro/static/i/imagini-blog/ciorb-de-v-cu-anyta-cooking-1727155724.jpg",
+                ingredients: ["Carne de vită", "Legume", "Condimente"]
+              },
+              {
+                title: "Ciorbă de perișoare",
+                description: "400/100g. Perișoare pufoase din carne, în zeamă bogată de legume.",
+                price: 17,
+                image: "https://i.ytimg.com/vi/SEVbryAQlm8/maxresdefault.jpg",
+                ingredients: ["Carne tocată", "Legume", "Orez"]
+              },
+              {
+                title: "Ciorbă de pui a la grec",
+                description: "360/40g. Delicată și cremoasă, cu carne de pui și lămâie.",
+                price: 17,
+                image: "https://adygio.com/wp-content/uploads/2017/01/Ciorba-de-pui-a-la-grec-adygio-kitchen.jpg",
+                ingredients: ["Pui", "Orez", "Lămâie", "Smântână"]
+              },
+              {
+                title: "Ciorbă de coaste de porc afumate",
+                description: "330/70g. Gust intens, cu coaste de porc afumate și legume.",
+                price: 20,
+                image: "https://cumsa.ro/wp-content/uploads/2023/05/cum-sa-faci-ciorba-de-costita-afumata-reteta-si-lista-cu-ingrediente.jpg",
+                ingredients: ["Coaste porc afumate", "Legume", "Condimente"]
+              },
+              {
+                title: "Ciorbă de pui",
+                description: "360/40g. Ușoară și sănătoasă, ideală pentru un prânz rapid.",
+                price: 15,
+                image: "https://img-global.cpcdn.com/recipes/a681d87a3edc0a14/680x482cq70/ciorba-de-cartofi-cu-pui-fotografie-re%C8%9Beta.jpg",
+                ingredients: ["Carne de pui", "Legume", "Zeamă clară"]
+              },
+              {
+                title: "Ciorbă de porc țărănească",
+                description: "360/40g. Adevărată rețetă țărănească, cu carne de porc și zarzavaturi.",
+                price: 18,
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSchTsD7L1tXHyZu2aTJoSHnDEFpPaguWP4fw&s",
+                ingredients: ["Porc", "Legume", "Borș"]
+              },
+              {
+                title: "Ciorbă de fasole",
+                description: "400g. Fasole boabe și zarzavaturi, perfectă cu ardei iute.",
+                price: 15,
+                image: "https://thumbor.unica.ro/unsafe/1200x800/smart/filters:format(webp):contrast(8):quality(75)/https://retete.unica.ro/wp-content/uploads/2010/06/ciorba-de-fasole-1-e1505228989189.jpg",
+                ingredients: ["Fasole boabe", "Legume", "Condimente"]
+              },
+              {
+                title: "Ciorbă de porc a la grec",
+                description: "360/40g. Cu carne de porc, ușor acrișoară, foarte gustoasă.",
+                price: 18,
+                image: "https://www.zebracateringcluj.ro/wp-content/uploads/2019/09/ciorba-a-la-grec-temp-scaled.jpg",
+                ingredients: ["Porc", "Zeamă de lămâie", "Smântână"]
+              },
+              {
+                title: "Ciorbă de coaste afumate",
+                description: "360/40g. Similară cu cea de porc afumat, dar cu o notă suplimentară de fum.",
+                price: 21,
+                image: "https://zdvi.cname.ro/_/101485-reteta-zilei-ciorba-de-cartofi-cu-afumatura.html/mediaPool/Reteta_09_378917885.jpg",
+                ingredients: ["Coaste afumate", "Legume", "Condimente"]
+              }
+            ],
+            pasta: [
+              {
+                title: "Spaghete Carbonara",
+                description: "Spaghetti, bacon, parmezan, ouă.",
+                price: 28,
+                image: "https://i.giphy.com/dZRlFW1sbFEpG.webp",
+                ingredients: ["Spaghetti", "Bacon", "Parmezan", "Ouă"]
+              },
+              {
+                title: "Penne Arrabbiata",
+                description: "Penne, sos de roșii picant, usturoi.",
+                price: 25,
+                image: "https://i.giphy.com/f0N7csaAc6t60OmXkm.webp",
+                ingredients: ["Penne", "Roșii", "Usturoi", "Ardei iute"]
+              },
+              {
+                title: "Tagliatelle Alfredo",
+                description: "Tagliatelle, sos Alfredo, pui.",
+                price: 30,
+                image: "https://i.giphy.com/xOML6s8aBmAtlLwujM.webp",
+                ingredients: ["Tagliatelle", "Pui", "Parmezan", "Smântână"]
+              }
+            ],
+            main: [
+              {
+                title: "Mușchiuleț de porc",
+                description: "Mușchiuleț, cartofi copți, mozzarella, bacon.",
+                price: 45,
+                image: "https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp",
+                ingredients: ["Porc", "Cartofi", "Mozzarella", "Bacon"]
+              },
+              {
+                title: "Tomahawk porc",
+                description: "Carne de porc, cartofi, sos brun.",
+                price: 41,
+                image: "https://i.giphy.com/KDskfOILt91T2.webp",
+                ingredients: ["Tomahawk", "Cartofi", "Sos brun"]
+              },
+              {
+                title: "Ceafă sfărâmată",
+                description: "Ceafă, piure de cartofi, ardei copți.",
+                price: 36,
+                image: "https://i.giphy.com/l378puWI9Fpi4OApO.webp",
+                ingredients: ["Ceafă porc", "Piure", "Ardei copți"]
+              },
+              {
+                title: "Copanele la cuptor",
+                description: "110g. Copanele fragede, rumenite la cuptor.",
+                price: 25,
+                image: "https://www.cosmincondimente.ro/wp-content/uploads/2020/05/Reteta-friptura-de-pui-la-cuptor-condimente-cosmin-2.jpg",
+                ingredients: ["Pui", "Condimente", "Ulei"]
+              },
+              {
+                title: "Șnițel din piept de pui",
+                description: "100g/120g. Șnițel crocant, din piept de pui proaspăt.",
+                price: 20,
+                image: "https://www.lauralaurentiu.ro/wp-content/uploads/2017/11/snitel-din-piept-de-pui-reteta-pas-cu-pas-cum-se-face-snitel-de-pui-snitel-de-pui-in-pesmet-reteta-cu-poze.jpg",
+                ingredients: ["Piept de pui", "Pesmet", "Ou"]
+              },
+              {
+                title: "Cotlet de porc la grătar",
+                description: "110/200g. Cotlet suculent, fript la grătar.",
+                price: 27,
+                image: "https://ro.santokuknives.co.uk/cdn/shop/articles/grilled-pork-chops_small-image-456638.jpg?v=1675378527",
+                ingredients: ["Cotlet de porc", "Condimente"]
+              },
+              {
+                title: "Pulpă de pui la grătar",
+                description: "200g. Marinată ușor, apoi friptă perfect la grătar.",
+                price: 24,
+                image: "https://savoriurbane.com/wp-content/uploads/2019/05/Pulpe-de-pui-la-gr%C4%83tar-marinate-cu-usturoi-%C8%99i-ierburi-aromatice-reteta-savori-urbane.jpg",
+                ingredients: ["Pulpă pui", "Condimente"]
+              },
+              {
+                title: "Pulpă de pui la tavă",
+                description: "200g. Fragedă și suculentă, gătită la foc mediu.",
+                price: 24,
+                image: "https://cdn.hellotaste.ro/wp-content/uploads/2023/11/cele-mai-bune-pulpe-de-pui-la-cuptor.png",
+                ingredients: ["Pulpă pui", "Condimente"]
+              },
+              {
+                title: "Tochitură cu mămăliguță",
+                description: "150/150g. Bucăți de carne de porc, cârnați și sos savuros.",
+                price: 35,
+                image: "https://mediaflux.ro/wp-content/uploads/strawberry/2022/07/Reteta-tochitura-de-porc-c-1200x675.webp",
+                ingredients: ["Carne porc", "Mămăligă", "Brânză (opțional)"]
+              },
+              {
+                title: "Ceafă de porc la grătar",
+                description: "116g. Ceafă fragedă și gustoasă.",
+                price: 28,
+                image: "https://amadalivrare.ro/wp-content/uploads/2020/05/amada-CEAFA-DE-PORC-LA-GRATAR-1200x1200-1.jpg",
+                ingredients: ["Ceafă porc", "Condimente"]
+              },
+              {
+                title: "Varză călită cu Kaiseri",
+                description: "300/160g. Varză călită lent, amestecată cu kaizer.",
+                price: 22,
+                image: "https://www.andreearaicu.ro/wp-content/uploads/2019/09/shutterstock_759372946.jpg",
+                ingredients: ["Varză", "Kaiser", "Condimente"]
+              },
+              {
+                title: "Sarmale cu mămăliguță",
+                description: "180/150g. Rețetă tradițională, servită cu mămăliguță caldă.",
+                price: 30,
+                image: "https://restaurantprovenceiancului.ro/wp-content/uploads/2022/09/Sarmale-cu-mamaliguta.jpg",
+                ingredients: ["Carne tocată", "Varză murată", "Mămăligă"]
+              },
+              {
+                title: "Pulpă de vită la tavă",
+                description: "70g. Bucată mică, dar delicioasă, frăgezită la cuptor.",
+                price: 32,
+                image: "https://cdn.hellotaste.ro/wp-content/uploads/2022/07/friptura-de-vita-la-cuptor-1200x800.jpg",
+                ingredients: ["Pulpă vită", "Condimente"]
+              },
+              {
+                title: "Chiftele din pulpă de porc",
+                description: "150g. Chiftele rumenite, consistente.",
+                price: 18,
+                image: "https://www.fanatik.ro/wp-content/thumbnails/tKqCIE13hYeAT7XrV3wu3kKlm6o=/1200x0/smart/filters:contrast(5):format(jpeg):quality(80)/wp-content/uploads/2022/01/maxresdefault-2.jpg",
+                ingredients: ["Carne de porc", "Pesmet", "Condimente"]
+              },
+              {
+                title: "Iahnie de fasole cu kaizer",
+                description: "300/150g. Fasole gustoasă, combinată cu kaizer aromat.",
+                price: 20,
+                image: "https://www.bucatareselevesele.ro/wp-content/uploads/2015/01/fasole-cu-kaizer-22-e1424981098407.jpg",
+                ingredients: ["Fasole boabe", "Kaiser", "Ceapă"]
+              },
+              {
+                title: "Piept de pui la grătar",
+                description: "110g. Ușor și gustos, perfect pentru diete.",
+                price: 19,
+                image: "https://gratar.ro/wp-content/uploads/2023/07/piept-de-pui-la-gratar-scaled.jpg",
+                ingredients: ["Piept pui", "Condimente"]
+              },
+              {
+                title: "Pulpă de pui dezosată",
+                description: "100g. Pulpă fără os, gătită rapid și uniform.",
+                price: 21,
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCEAb5iLbW6UMw-CbrX2kTUCYJKgRhBZ6iqQ&s",
+                ingredients: ["Pulpă pui dezosată", "Condimente"]
+              },
+              {
+                title: "Cotlet de porc la tavă",
+                description: "100/50g. Fraged, copt lent în tavă cu mirodenii.",
+                price: 26,
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7BJ2Hks0y3Mh3Id1LBLTOxQnaj1ZDo6Ykxw&s",
+                ingredients: ["Cotlet porc", "Condimente"]
+              },
+              {
+                title: "Chiftele din pulpă de porc (2 buc)",
+                description: "150g. Două chiftele mari, prăjite până devin aurii.",
+                price: 18,
+                image: "https://bucatesavuroase.ro/wp-content/uploads/2024/01/chiftele-de-porc.jpg",
+                ingredients: ["Carne porc", "Pesmet", "Ou"]
+              }
+            ],
+            desserts: [
+              {
+                title: "Tiramisu",
+                description: "Prăjitură italiană cu cafea, mascarpone.",
+                price: 20,
+                image: "https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp",
+                ingredients: ["Cafea", "Mascarpone", "Pișcoturi"]
+              },
+              {
+                title: "Pavlova",
+                description: "Bezea, frișcă, fructe de pădure.",
+                price: 18,
+                image: "https://i.giphy.com/iiwu9bTOZ1HiM.webp",
+                ingredients: ["Bezea", "Frișcă", "Fructe de pădure"]
+              },
+              {
+                title: "Cheesecake",
+                description: "Cheesecake cu dulceață de căpșuni.",
+                price: 22,
+                image: "https://i.giphy.com/Xi2UAW7kTQvHa.webp",
+                ingredients: ["Brânză", "Biscuiți", "Căpșuni"]
+              }
+            ],
+            drinks: [
+              {
+                title: "Cocktail",
+                description: "Băutură răcoritoare cu fructe proaspete și alcool fin.",
+                price: 28,
+                image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp",
+                ingredients: ["Rom", "Fructe", "Gheață"]
+              },
+              {
+                title: "Ciocolată caldă",
+                description: "Cremă fierbinte de ciocolată cu topping de frișcă.",
+                price: 15,
+                image: "https://i.giphy.com/hPFKu8dKRRNgQ.webp",
+                ingredients: ["Ciocolată", "Lapte", "Frișcă"]
+              },
+              {
+                title: "Bere",
+                description: "Bere artizanală rece și spumoasă.",
+                price: 10,
+                image: "https://i.giphy.com/RkhJPJQJ2GPn02GMy6.webp",
+                ingredients: ["Malț", "Hamei", "Apă"]
+              }
+            ],
+            garnish: [
+              {
+                title: "Piure de cartofi",
+                description: "200g. Cremă fină de cartofi, bătută cu lapte și unt.",
+                price: 10,
+                image: "https://i.giphy.com/l0MYu3mmRtjxX28tq.webp",
+                ingredients: ["Cartofi", "Unt", "Lapte"]
+              },
+              {
+                title: "Pilaf de orez",
+                description: "100g/150g/200g. Orez aromat, fiert cu legume și condimente.",
+                price: 8,
+                image: "https://www.maggi.ro/sites/default/files/styles/image_744_x_419/public/srh_recipes/c624334e6943435f7246741f1db4d20f.png?h=c6980913&itok=Cwv50cS_",
+                ingredients: ["Orez", "Legume", "Condimente"]
+              },
+              {
+                title: "Cartofi prăjiți",
+                description: "100g. Cartofi crocanți, prăjiți în ulei încins.",
+                price: 10,
+                image: "https://lasafi.ro/wp-content/uploads/2023/02/Cartofi-Prajiti-scaled.jpg",
+                ingredients: ["Cartofi", "Ulei", "Sare"]
+              },
+              {
+                title: "Salată de varză",
+                description: "100g. Varză proaspătă, feliată subțire.",
+                price: 7,
+                image: "https://pofta-buna.com/wp-content/uploads/2023/12/Salata-coleslaw-de-varza-cu-iaurt-maioneza-morcov-vinegreta-reteta-originala-gina-bradea-6.jpg",
+                ingredients: ["Varză", "Sare", "Oțet"]
+              },
+              {
+                title: "Castraveți murați",
+                description: "50g. Castraveți acri, tăiați rondele.",
+                price: 5,
+                image: "https://fru-leg.ro/wp-content/uploads/2018/12/castraveti.jpg",
+                ingredients: ["Castraveți murați"]
+              }
+            ]
+          },
+
+          /* Produs curent / căutare */
+          currentProducts: [],
+          currentProduct: null,
+          searchQuery: "",
+
+          /* Client / comenzi */
+          clientNumber: 0,
+          clientPoints: 0,
+          isFirstOrder: true,
+          tableId: "",
+          sessionCode: "",
+          orders: [],
+          myOrders: [],
+
+          /* SOCIAL */
+          usernameInput: "",
+          usernameSet: false,
+          newMessage: "",
+          chatMessages: [],
+
+          /* Avatare disponibile */
+          availableAvatars: [
+            "https://i.giphy.com/NlGLQ1FU9mVDsMjeIU.webp",
+            "https://i.giphy.com/17A0SmzhN6a4AGSrQ9.webp",
+            "https://i.giphy.com/uK1v8dVSrc7yp7Ciqn.webp",
+            "https://i.giphy.com/1vh1PXneQqN1e.webp",
+            "https://i.giphy.com/XEOdmFHVznCerkI6CI.webp",
+            "https://i.giphy.com/hPTZgtzfRIB5Nfb5rL.webp",
+            "https://i.giphy.com/11uoNyauChZR16.webp",
+            "https://i.giphy.com/Wb0TGxvE50Xew.webp"
+          ],
+          selectedAvatar: "",
+
+          /* Pentru animația reacției */
+          reactionAnimation: ""
         };
       },
-      methods: {
-        // Afișăm mesele care au status="occupied"
-        async fetchOccupiedTables() {
-          try {
-            const cRef = collection(db, "sessions");
-            const qRef = query(cRef, where("status", "==", "occupied"));
-            const snap = await getDocs(qRef);
-
-            this.occupiedTables = [];
-            snap.forEach(docSnap => {
-              const data = docSnap.data();
-              this.occupiedTables.push({
-                tableId: docSnap.id,
-                sessionCode: data.sessionCode
-              });
-            });
-          } catch (e) {
-            console.error("Eroare la fetchOccupiedTables:", e);
-            alert("Eroare la încărcarea meselor!");
+      computed: {
+        // Afișăm produsele filtrate (caută global) sau doar produsele dintr-o categorie
+        displayedProducts() {
+          const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
+          if (!q) {
+            return this.view === "produse" ? this.currentProducts : [];
           }
-        },
-
-        // Ospătarul introduce codul => dacă e corect, setăm masa la "active"
-        async askForCode(tableId, realCode) {
-          const userInput = prompt(`Introdu codul de sesiune pentru ${tableId}:`);
-          if (!userInput) return;
-
-          if (userInput.trim() === realCode) {
-            // Deblocăm masa
-            try {
-              const docRef_ = doc(db, "sessions", tableId);
-              await updateDoc(docRef_, { status: "active" }); // devine active
-              alert(`Masa ${tableId} a fost deblocată!`);
-              this.currentTableId = tableId;
-              this.currentSessionCode = realCode;
-              this.currentStatus = "active";
-
-              // Încarcă comenzile aferente (indiferent că sunt "closed" sau "open")
-              await this.loadOrdersBySession(realCode);
-            } catch (err) {
-              console.error("Eroare la deblocare masă:", err);
-              alert("Nu s-a putut debloca masa!");
+          const results = [];
+          for (const catKey in this.products) {
+            for (const prod of this.products[catKey]) {
+              const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
+              const descNoDiac = removeDiacritics(prod.description.toLowerCase());
+              if (titleNoDiac.includes(q) || descNoDiac.includes(q)) {
+                results.push(prod);
+              }
             }
+          }
+          return results;
+        },
+        // Total coș
+        total() {
+          return this.orders
+            .reduce((sum, o) => sum + (o.price * o.quantity), 0)
+            .toFixed(2);
+        }
+      },
+      methods: {
+        handleWindowScroll() {
+          this.showBackToTop = (window.scrollY > 200);
+        },
+        scrollTop() {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        toggleLayout() {
+          this.isGrid = !this.isGrid;
+        },
+        renameCategory(cat) {
+          const dict = {};
+          return dict[cat] || cat;
+        },
+        enterCategory(categoryName) {
+          this.currentProducts = this.products[categoryName] || [];
+          this.view = "produse";
+          this.searchQuery = "";
+          window.scrollTo(0, 0);
+        },
+        backToCategories() {
+          this.view = "categorii";
+          this.currentProduct = null;
+          this.searchQuery = "";
+          window.scrollTo(0, 0);
+        },
+        showProductDetails(product) {
+          this.currentProduct = product;
+        },
+        addToOrder(product) {
+          const existing = this.orders.find(o => o.name === product.title);
+          if (existing) {
+            existing.quantity++;
           } else {
-            alert("Cod de sesiune greșit!");
+            this.orders.push({
+              name: product.title,
+              price: product.price,
+              quantity: 1
+            });
+          }
+          this.currentProduct = null;
+          // Animație scurtă la coș
+          this.isShaking = true;
+          setTimeout(() => this.isShaking = false, 500);
+        },
+        removeItem(index) {
+          this.orders.splice(index, 1);
+        },
+        incrementQuantity(index) {
+          this.orders[index].quantity++;
+        },
+        decrementQuantity(index) {
+          if (this.orders[index].quantity > 1) {
+            this.orders[index].quantity--;
           }
         },
-
-        async loadOrdersBySession(sCode) {
-          this.orders = [];
+        toggleOrderBar() {
+          this.isOrderOpen = !this.isOrderOpen;
+        },
+        // Finalizează comanda => adaugă în Firebase + redirect la confirm
+        async checkout() {
           try {
-            const cRef = collection(db, "orders");
-            // Comenzile pot fi "closed" sau "open". Aici le luăm pe toate
-            const qRef = query(cRef, where("sessionCode", "==", sCode));
-            const snap = await getDocs(qRef);
+            const userId = localStorage.getItem("userId") || Date.now().toString();
+            localStorage.setItem("userId", userId);
 
+            this.sessionCode = await getOrCreateSessionCode(this.tableId);
+            let pointsToAdd = 0;
+            for (const item of this.orders) {
+              pointsToAdd += item.price * item.quantity * 0.05;
+            }
+            this.clientPoints += pointsToAdd;
+
+            const orderData = {
+              userId,
+              tableId: this.tableId,
+              sessionCode: this.sessionCode,
+              clientNumber: this.clientNumber,
+              items: this.orders,
+              total: parseFloat(this.total),
+              status: "open",
+              timestamp: serverTimestamp()
+            };
+            await addDoc(collection(db, "orders"), orderData);
+
+            this.orders = [];
+            this.isOrderOpen = false;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const masaParam = urlParams.get("masa");
+            const baseUrl = window.location.origin;
+            window.location.href = `${baseUrl}/confirm.html?sessionCode=${this.sessionCode}&masa=${masaParam || ""}`;
+          } catch (err) {
+            console.error("Eroare la salvarea comenzii:", err);
+            alert("Eroare la salvarea comenzii. Încearcă din nou!");
+          }
+        },
+        async fetchOrders() {
+          try {
+            if (this.clientNumber === 0) {
+              this.myOrders = [];
+              return;
+            }
+            const qRef = query(collection(db, "orders"), where("clientNumber", "==", this.clientNumber));
+            const snap = await getDocs(qRef);
+            this.myOrders = [];
             snap.forEach(docSnap => {
               const data = docSnap.data();
-              data.docId = docSnap.id;
-              this.orders.push(data);
+              data.orderId = docSnap.id;
+              this.myOrders.push(data);
             });
           } catch (e) {
-            console.error("Eroare la loadOrdersBySession:", e);
-            alert("Eroare la încărcarea comenzilor!");
+            console.error("Eroare la preluarea comenzilor:", e);
           }
+        },
+        setUsername() {
+          if (!this.usernameInput.trim()) return;
+          localStorage.setItem("username", this.usernameInput.trim());
+          localStorage.setItem("selectedAvatar", this.selectedAvatar || "");
+          this.usernameSet = true;
+        },
+        loadMessages() {
+          const qRef = query(collection(db, "chatMessages"), orderBy("timestamp", "asc"));
+          onSnapshot(qRef, (snapshot) => {
+            const now = new Date();
+            const TEN_MIN_MS = 10 * 60 * 1000;
+            const finalMsgs = [];
+            snapshot.forEach(docItem => {
+              const data = docItem.data();
+              if (!data.timestamp) return;
+              const docTime = data.timestamp.toDate();
+              // doar mesajele din ultimele 10 minute
+              if ((now - docTime) < TEN_MIN_MS) {
+                finalMsgs.push({ id: docItem.id, ...data });
+              }
+            });
+            this.chatMessages = finalMsgs;
+          });
+        },
+        async postMessage() {
+          if (!this.newMessage.trim()) return;
+          try {
+            const userName = localStorage.getItem("username");
+            const userAvatar = localStorage.getItem("selectedAvatar") || "";
+            if (!userName) return;
+
+            const masaParam = new URLSearchParams(window.location.search).get("masa") || "0";
+            const tableNumber = parseInt(masaParam) || 0; 
+
+            const docData = {
+              name: userName,
+              text: this.newMessage.trim(),
+              tableNumber,
+              timestamp: serverTimestamp(),
+              avatar: userAvatar
+            };
+            await addDoc(collection(db, "chatMessages"), docData);
+            this.newMessage = "";
+          } catch (err) {
+            console.error("Eroare la trimiterea mesajului:", err);
+          }
+        },
+        reactToMessage(messageId, reaction) {
+          const messageRef = doc(db, "chatMessages", messageId);
+          getDoc(messageRef).then((docSnap) => {
+            if (docSnap.exists()) {
+              const currentReactions = docSnap.data().reactions || {};
+              currentReactions[reaction] = (currentReactions[reaction] || 0) + 1;
+              setDoc(messageRef, { reactions: currentReactions }, { merge: true });
+            }
+          }).catch((err) => console.error("Eroare la reacționare:", err));
+          
+          // declanșăm animația timp de 2 secunde
+          this.reactionAnimation = reaction;
+          setTimeout(() => {
+            this.reactionAnimation = "";
+          }, 2000);
+        },
+        tableStyle(tableNum) {
+          // evidențiem mesele care au mesaje
+          const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
+          if (hasMessages) {
+            return {
+              background: `linear-gradient(to right, var(--btn-start), var(--btn-end))`,
+              color: '#000',
+              boxShadow: 'none'
+            };
+          }
+          return {
+            background: '#666',
+            color: '#fff',
+            boxShadow: `0 0 0 4px var(--btn-shadow-color1)`
+          };
+        },
+        handleOutsideClick(e) {
+          if (this.isSidebarVisible) {
+            const mobileAside = this.$refs.mobileSidebar;
+            const toggleBtn = this.$refs.mobileToggle;
+            if (
+              mobileAside && 
+              !mobileAside.contains(e.target) && 
+              toggleBtn && 
+              !toggleBtn.contains(e.target)
+            ) {
+              this.isSidebarVisible = false;
+            }
+          }
+        },
+        applyThemeClass(themeName) {
+          const allThemes = [
+            'theme-red','theme-blue','theme-green','theme-purple',
+            'theme-pink','theme-grey','theme-brown','theme-teal','theme-lime'
+          ];
+          allThemes.forEach(t => document.body.classList.remove(t));
+          if (themeName !== 'orange') {
+            document.body.classList.add(`theme-${themeName}`);
+          }
+        }
+      },
+      mounted() {
+        window.addEventListener("scroll", this.handleWindowScroll);
+        document.addEventListener("click", this.handleOutsideClick);
+
+        // 1) Tema
+        const storedTheme = localStorage.getItem('selectedTheme');
+        if (storedTheme) {
+          this.selectedTheme = storedTheme;
+        }
+        this.applyThemeClass(this.selectedTheme);
+
+        // 2) Parametru masă
+        const urlParams = new URLSearchParams(window.location.search);
+        const masaParam = urlParams.get("masa");
+        if (masaParam) {
+          this.tableId = `Masa numărul ${masaParam}`;
+        } else {
+          this.tableId = "Masa numărul 1";
+        }
+
+        // 3) Client number
+        const storedNumber = localStorage.getItem("clientNumber");
+        if (storedNumber) {
+          this.clientNumber = parseInt(storedNumber);
+          if (this.clientNumber > 0) {
+            this.isFirstOrder = false;
+          }
+        } else {
+          const randomNum = Math.floor(Math.random() * 90000) + 10000;
+          this.clientNumber = randomNum;
+          localStorage.setItem("clientNumber", randomNum);
+          this.isFirstOrder = false;
+        }
+
+        // 4) Puncte, comenzi
+        const storedPoints = localStorage.getItem("clientPoints");
+        if (storedPoints) {
+          this.clientPoints = parseFloat(storedPoints);
+        }
+        const storedMyOrders = localStorage.getItem("myOrders");
+        if (storedMyOrders) {
+          this.myOrders = JSON.parse(storedMyOrders);
+        }
+        this.fetchOrders();
+
+        // 5) Username / avatar
+        const storedUsername = localStorage.getItem("username");
+        if (storedUsername) {
+          this.usernameSet = true;
+          this.usernameInput = storedUsername;
+        }
+        const storedAvatar = localStorage.getItem("selectedAvatar");
+        if (storedAvatar) {
+          this.selectedAvatar = storedAvatar;
+        }
+
+        // 6) Dacă avem username => încărcăm direct mesajele
+        if (this.usernameSet) {
+          this.loadMessages();
+        }
+      },
+      unmounted() {
+        window.removeEventListener("scroll", this.handleWindowScroll);
+        document.removeEventListener("click", this.handleOutsideClick);
+      },
+      watch: {
+        usernameSet(newVal) {
+          if (newVal) {
+            this.loadMessages();
+          }
+        },
+        clientPoints(newVal) {
+          localStorage.setItem("clientPoints", newVal);
+        },
+        clientNumber(newVal) {
+          localStorage.setItem("clientNumber", newVal);
+        },
+        myOrders(newVal) {
+          localStorage.setItem("myOrders", JSON.stringify(newVal));
+        },
+        selectedTheme(newVal) {
+          localStorage.setItem('selectedTheme', newVal);
+          this.applyThemeClass(newVal);
+          // Comutăm la tab-ul Meniu
+          this.activeTab = 'meniu';
         }
       }
     });
 
-    waiterApp.mount('#app');
+    app.mount("#app");
   </script>
 </body>
 </html>
