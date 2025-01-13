@@ -51,7 +51,7 @@
       <button class="btn" @click="fetchOccupiedTables">Vezi Mesele Ocupate</button>
     </div>
 
-    <!-- Lista meselor occupied -->
+    <!-- Lista meselor cu status="occupied" -->
     <div v-if="occupiedTables.length > 0">
       <h2 class="text-xl font-bold mb-2">Mese Ocupate:</h2>
       <div
@@ -65,7 +65,7 @@
             <br/>
             <em>Cod sesiune: {{ tbl.sessionCode }}</em>
           </div>
-          <!-- Ospătarul introduce codul => deblochează masa -->
+          <!-- Ospătarul introduce codul -->
           <button class="btn" @click="askForCode(tbl.tableId, tbl.sessionCode)">
             Deblochează Masa
           </button>
@@ -78,7 +78,7 @@
 
     <hr class="my-4 border-gray-700"/>
 
-    <!-- Afișăm comenzile mesei curente (dacă e deblocată) -->
+    <!-- Comenzile mesei curente (dacă e "active") -->
     <div v-if="currentTableId" class="table-box">
       <h2 class="text-xl font-bold mb-2">
         Masă: {{ currentTableId }} (status = {{ currentStatus }})
@@ -93,7 +93,6 @@
           class="order-box"
         >
           <div class="font-bold mb-2">
-            <!-- Afișăm ID comenzii aici doar pentru ospătar (intern) -->
             Comanda #{{ ord.docId }}  
             (Client #{{ ord.clientNumber }}) - <em>{{ ord.status }}</em>
           </div>
@@ -108,7 +107,7 @@
           <div class="font-bold mt-1 text-[#f49032]">
             Subtotal: {{ ord.total.toFixed(2) }} Lei
           </div>
-          <!-- Butonul Comanda Plasată apare doar dacă ord.status = 'open' și placedByWaiter = false -->
+          <!-- Buton "Comanda Plasată" doar pentru status="open" && placedByWaiter=false -->
           <div class="mt-2">
             <button
               v-if="ord.status === 'open' && !ord.placedByWaiter"
@@ -130,8 +129,6 @@
       getFirestore,
       collection,
       doc,
-      getDoc,
-      setDoc,
       updateDoc,
       getDocs,
       query,
@@ -154,7 +151,7 @@
     const waiterApp = createApp({
       data() {
         return {
-          occupiedTables: [],      // Mese cu status="occupied"
+          occupiedTables: [], // Mese cu status="occupied"
           currentTableId: "",
           currentSessionCode: "",
           currentStatus: "",
@@ -162,7 +159,7 @@
         };
       },
       methods: {
-        // Afișăm mesele care au status="occupied"
+        // Preluăm mesele care au status="occupied"
         async fetchOccupiedTables() {
           try {
             const cRef = collection(db, "sessions");
@@ -173,7 +170,7 @@
             snap.forEach(docSnap => {
               const data = docSnap.data();
               this.occupiedTables.push({
-                tableId: docSnap.id,
+                tableId: docSnap.id,        // ex. "Masa-1"
                 sessionCode: data.sessionCode
               });
             });
@@ -183,22 +180,23 @@
           }
         },
 
-        // Ospătarul introduce codul => dacă e corect, setăm masa la "active"
+        // Ospătarul introduce codul => devine "active"
         async askForCode(tableId, realCode) {
           const userInput = prompt(`Introdu codul de sesiune pentru ${tableId}:`);
           if (!userInput) return;
 
           if (userInput.trim() === realCode) {
-            // Deblocăm masa
             try {
+              // Deblocăm masa
               const docRef_ = doc(db, "sessions", tableId);
-              await updateDoc(docRef_, { status: "active" }); // devine active
+              await updateDoc(docRef_, { status: "active" }); 
               alert(`Masa ${tableId} a fost deblocată!`);
+
               this.currentTableId = tableId;
               this.currentSessionCode = realCode;
               this.currentStatus = "active";
 
-              // Încarcă comenzile aferente (indiferent că sunt "closed" sau "open")
+              // Încărcăm comenzile "open" sau "closed" care au același sessionCode
               await this.loadOrdersBySession(realCode);
             } catch (err) {
               console.error("Eroare la deblocare masă:", err);
@@ -213,7 +211,6 @@
           this.orders = [];
           try {
             const cRef = collection(db, "orders");
-            // Comenzile pot fi "closed" sau "open". Aici le luăm pe toate
             const qRef = query(cRef, where("sessionCode", "==", sCode));
             const snap = await getDocs(qRef);
 
@@ -228,12 +225,11 @@
           }
         },
 
-        // Marchează comanda ca plasată, adică placedByWaiter = true
+        // Marchează comanda ca plasată
         async markOrderAsPlaced(orderId) {
           try {
             const docRef_ = doc(db, "orders", orderId);
             await updateDoc(docRef_, { placedByWaiter: true });
-            // Actualizăm local array-ul orders
             const orderIndex = this.orders.findIndex(o => o.docId === orderId);
             if (orderIndex !== -1) {
               this.orders[orderIndex].placedByWaiter = true;
@@ -241,7 +237,7 @@
             alert("Comanda a fost marcată ca plasată!");
           } catch (err) {
             console.error("Eroare la markOrderAsPlaced:", err);
-            alert("Nu s-a putut marca această comandă ca plasată!");
+            alert("Nu s-a putut marca această comandă!");
           }
         }
       }
