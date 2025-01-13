@@ -1096,6 +1096,7 @@
       doc,
       getDoc,
       setDoc,
+      updateDoc,
       collection,
       addDoc,
       getDocs,
@@ -1660,7 +1661,7 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
-        // Finalizează comanda => adaugă în Firebase + redirect la confirm
+        // Finalizează comanda => adaugă în Firebase + setăm status occupied + redirect la confirm
         async checkout() {
           try {
             const userId = localStorage.getItem("userId") || Date.now().toString();
@@ -1684,11 +1685,19 @@
               placedByWaiter: false, // inițial ospătarul nu a plasat comanda
               timestamp: serverTimestamp()
             };
+
+            // 1) Adăugăm comanda în "orders"
             await addDoc(collection(db, "orders"), orderData);
 
+            // 2) Setăm "status" = "occupied" pentru masa respectivă
+            const tableRef = doc(db, "sessions", this.tableId);
+            await setDoc(tableRef, { status: "occupied" }, { merge: true });
+
+            // 3) Golește coșul
             this.orders = [];
             this.isOrderOpen = false;
 
+            // 4) Redirect la confirm
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
