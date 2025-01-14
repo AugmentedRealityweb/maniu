@@ -163,6 +163,15 @@
                 – {{ (it.price * it.quantity).toFixed(2) }} Lei
               </li>
             </ul>
+
+            <!-- Buton "Comanda Plasată" doar dacă placed = false -->
+            <button 
+              class="btn mt-2 ml-2"
+              v-if="!ord.placed"
+              @click="markAsPlaced(ord.orderId)"
+            >
+              Comanda Plasată
+            </button>
           </div>
         </div>
         <div class="mt-2 font-bold text-[#f49032] text-lg">
@@ -189,7 +198,7 @@
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
     import { createApp } from "https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js";
 
-    /* Configurarea Firebase (înlocuiește cu datele tale) */
+    /* Configurarea Firebase */
     const firebaseConfig = {
       apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWq",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -402,6 +411,7 @@
                 data.isNew = false;
               }
 
+              data.orderId = ordId; // stocăm ID-ul
               this.orders.push(data);
             });
 
@@ -461,6 +471,24 @@
           }
         },
 
+        // Marcare "comanda plasată"
+        async markAsPlaced(orderId) {
+          try {
+            this.resetActivityTimer();
+            // Setăm placed = true în doc
+            const ordRef = doc(db, "orders", orderId);
+            await updateDoc(ordRef, { placed: true });
+
+            // Reîncarc comenzi => butonul dispare
+            this.loadOrdersBySession(this.currentSessionCode);
+
+            alert("Comanda a fost marcată ca plasată!");
+          } catch (e) {
+            console.error("Eroare la markAsPlaced:", e);
+            alert("Eroare la plasarea comenzii!");
+          }
+        },
+
         // Actualizăm localStorage și Map-ul local
         updateSessionCache(tableId, code) {
           this.sessionCodeCache.set(tableId, code);
@@ -485,9 +513,7 @@
         checkInactivity() {
           if (!this.lastActivityTime) return;
           const diff = Date.now() - this.lastActivityTime;
-          // 10s = 10000 ms
           if (diff > 10000) {
-            // Nimeni nu a mișcat 10 sec, auto refresh
             location.reload();
           }
         },
