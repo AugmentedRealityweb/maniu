@@ -19,7 +19,7 @@
 
   <style>
     /* ------------------------------------------------
-       1. TEMA IMPLICITĂ
+       1) TEMA IMPLICITĂ - PORTOCALIU
        ------------------------------------------------ */
     :root {
       --gradient-start: #000000;
@@ -43,7 +43,7 @@
     }
 
     /* ------------------------------------------------
-       2. TEMELE SUPLIMENTARE (roșu, albastru etc.)
+       2) TEMELE SUPLIMENTARE (roșu, albastru etc.)
        ------------------------------------------------ */
     .theme-red {
       --gradient-end: #8B0000;
@@ -164,7 +164,7 @@
     }
 
     /* ------------------------------------------------
-       3. STILURI DE BAZĂ
+       3) STILURI DE BAZĂ
        ------------------------------------------------ */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     body {
@@ -728,14 +728,11 @@
                 <div class="mt-2 font-bold" :style="{ color: 'var(--price-color)' }">
                   Total: {{ order.total }} Lei
                 </div>
-                <div class="text-sm text-gray-400">
-                  ID comandă: {{ order.orderId }} | Cod Ospătar: {{ order.sessionCode }}
-                </div>
-                <!-- Afișăm statusul (placed vs pending) -->
-                <div v-if="order.orderStatus === 'placed'" class="text-green-500 font-bold">
+                <!-- Afișăm statusul (placed vs pending), dar AM SCOS ID COMANDĂ & COD OSPĂTAR -->
+                <div v-if="order.orderStatus === 'placed'" class="text-green-500 font-bold mt-1">
                   Comanda a fost plasată
                 </div>
-                <div v-else class="text-red-500 font-bold">
+                <div v-else class="text-red-500 font-bold mt-1">
                   Comanda în așteptare
                 </div>
               </div>
@@ -1486,6 +1483,8 @@
           tableId: "",
           sessionCode: "",
           orders: [],
+
+          // În locul arrays cu myOrders + fetch, folosim un array reacționat prin onSnapshot
           myOrders: [],
 
           // Zona Social
@@ -1508,14 +1507,13 @@
         };
       },
       computed: {
-        // Produse filtrate
+        // Filtrare produse
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
             return this.view === "produse" ? this.currentProducts : [];
           }
           const results = [];
-          // Căutăm în toate categoriile
           for (const catKey in this.products) {
             for (const prod of this.products[catKey]) {
               const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
@@ -1545,8 +1543,7 @@
           this.isGrid = !this.isGrid;
         },
         renameCategory(cat) {
-          // Poți personaliza numele categoriilor aici, de ex. "brunch" -> "Mic Dejun"
-          return cat;
+          return cat; // personalizare
         },
         enterCategory(categoryName) {
           this.currentProducts = this.products[categoryName] || [];
@@ -1575,7 +1572,7 @@
             });
           }
           this.currentProduct = null;
-          // Efect "shake"
+          // Efect "shake" pe coș
           this.isShaking = true;
           setTimeout(() => this.isShaking = false, 500);
         },
@@ -1593,6 +1590,7 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
+        // Salvează comanda (orderStatus = 'pending') și ne trimite la confirm.html
         async checkout() {
           try {
             const userId = localStorage.getItem("userId") || Date.now().toString();
@@ -1606,7 +1604,7 @@
             }
             this.clientPoints += pointsToAdd;
 
-            // Marcăm comanda ca "pending" (nu "placed")
+            // "pending", "open"
             const orderData = {
               userId,
               tableId: this.tableId,
@@ -1626,31 +1624,34 @@
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
-            // Redirecționăm către confirm.html (poți pune ce vrei)
             window.location.href = `${baseUrl}/confirm.html?sessionCode=${this.sessionCode}&masa=${masaParam || ""}`;
           } catch (err) {
             console.error("Eroare la salvarea comenzii:", err);
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
-        async fetchOrders() {
-          try {
-            if (this.clientNumber === 0) {
-              this.myOrders = [];
-              return;
-            }
-            const qRef = query(collection(db, "orders"), where("clientNumber", "==", this.clientNumber));
-            const snap = await getDocs(qRef);
-            this.myOrders = [];
-            snap.forEach(docSnap => {
+
+        // Înlocuim fetchOrders cu onSnapshot
+        listenMyOrders() {
+          // Dacă clientNumber e 0, nu facem nimic
+          if (!this.clientNumber) return;
+          const cRef = collection(db, "orders");
+          const qRef = query(cRef, where("clientNumber", "==", this.clientNumber));
+
+          onSnapshot(qRef, (snapshot) => {
+            const updatedOrders = [];
+            snapshot.forEach(docSnap => {
               const data = docSnap.data();
               data.orderId = docSnap.id;
-              this.myOrders.push(data);
+              updatedOrders.push(data);
             });
-          } catch (e) {
-            console.error("Eroare la preluarea comenzilor:", e);
-          }
+            this.myOrders = updatedOrders;
+            localStorage.setItem("myOrders", JSON.stringify(updatedOrders));
+          }, (err) => {
+            console.error("Eroare la onSnapshot myOrders:", err);
+          });
         },
+
         setUsername() {
           if (!this.usernameInput.trim()) return;
           localStorage.setItem("username", this.usernameInput.trim());
@@ -1667,7 +1668,6 @@
               const data = docItem.data();
               if (!data.timestamp) return;
               const docTime = data.timestamp.toDate();
-              // doar ultimile 10 minute
               if ((now - docTime) < TEN_MIN_MS) {
                 finalMsgs.push({ id: docItem.id, ...data });
               }
@@ -1708,14 +1708,13 @@
             }
           }).catch((err) => console.error("Eroare la reacționare:", err));
 
-          // animație scurtă
+          // Animație scurtă
           this.reactionAnimation = reaction;
           setTimeout(() => {
             this.reactionAnimation = "";
           }, 2000);
         },
         tableStyle(tableNum) {
-          // Evidențiere mese cu mesaje
           const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
           if (hasMessages) {
             return {
@@ -1731,7 +1730,6 @@
           };
         },
         handleOutsideClick(e) {
-          // Închide sidebar mobil dacă se face click în afara lui
           if (this.isSidebarVisible) {
             const mobileAside = this.$refs.mobileSidebar;
             const toggleBtn = this.$refs.mobileToggle;
@@ -1746,7 +1744,6 @@
           }
         },
         applyThemeClass(themeName) {
-          // Eliminăm toate temele
           const allThemes = [
             'theme-red','theme-blue','theme-green','theme-purple',
             'theme-pink','theme-grey','theme-brown','theme-teal','theme-lime'
@@ -1791,18 +1788,21 @@
           this.isFirstOrder = false;
         }
 
-        // 4) puncte, comenzi
+        // 4) puncte
         const storedPoints = localStorage.getItem("clientPoints");
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
         }
+
+        // 5) myOrders
         const storedMyOrders = localStorage.getItem("myOrders");
         if (storedMyOrders) {
           this.myOrders = JSON.parse(storedMyOrders);
         }
-        this.fetchOrders();
+        // Lansăm onSnapshot - pentru a vedea actualizări în timp real
+        this.listenMyOrders();
 
-        // 5) Username / avatar
+        // 6) Username / avatar
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
           this.usernameSet = true;
@@ -1813,7 +1813,7 @@
           this.selectedAvatar = storedAvatar;
         }
 
-        // 6) Dacă username e setat, încărcăm direct mesajele
+        // 7) Dacă username e setat, încărcăm direct mesajele
         if (this.usernameSet) {
           this.loadMessages();
         }
@@ -1840,7 +1840,6 @@
         selectedTheme(newVal) {
           localStorage.setItem('selectedTheme', newVal);
           this.applyThemeClass(newVal);
-          // revenim la meniu
           this.activeTab = 'meniu';
         }
       }
