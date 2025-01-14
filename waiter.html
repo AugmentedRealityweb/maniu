@@ -30,7 +30,7 @@
       background-color: #d35400;
     }
 
-    /* Grid: 12 mese, 3 pe rând */
+    /* Grid pentru 12 mese, 3 pe rând */
     .grid-tables {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -135,7 +135,9 @@
           :key="cIdx"
           class="mb-3"
         >
-          <div class="client-title">Client #{{ cIdx + 1 }}</div>
+          <div class="client-title">
+            Client #{{ cIdx + 1 }}
+          </div>
 
           <div
             v-for="(ord, oIdx) in clientData.orders"
@@ -147,13 +149,13 @@
               – status: <strong>{{ ord.orderStatus }}</strong>
               – isNew: <strong>{{ ord.isNew }}</strong>
 
-              <!-- Butonul apare DOAR dacă e pending -->
+              <!-- Butonul apare mereu, doar textul se schimbă -->
               <button
                 class="btn ml-2"
-                v-if="ord.orderStatus === 'pending'"
-                @click="placeOrder(ord.orderId)"
+                @click="changeOrderStatus(ord)"
               >
-                Comandă Plasată
+                <!-- Dacă e 'placed', afișăm "Comandă Plasată", altfel "Plasează Comanda" -->
+                {{ ord.orderStatus === 'placed' ? 'Comandă Plasată' : 'Plasează Comanda' }}
               </button>
             </div>
             <ul
@@ -239,13 +241,13 @@
         };
       },
       computed: {
-        // Buton toggle
+        // Label buton toggle
         toggleButtonLabel() {
           return this.showOccupiedOnly
             ? "Vezi Toate Mesele"
             : "Vezi Mesele Deschise";
         },
-        // Care mese să afișăm
+        // Mese de afișat
         displayedTables() {
           if (this.showOccupiedOnly) {
             return this.twelveTables.filter(t => t.isOccupied);
@@ -268,7 +270,7 @@
           }
           return result;
         },
-        // Total masa
+        // Total masă
         totalTable() {
           let sum = 0;
           for (const ord of this.orders) {
@@ -303,9 +305,7 @@
               const idx = this.twelveTables.findIndex(t => t.tableId === tableId);
               if (idx !== -1) {
                 this.twelveTables[idx].isOccupied = true;
-                if (!this.twelveTables[idx].sessionCode) {
-                  this.twelveTables[idx].sessionCode = data.sessionCode || "";
-                }
+                this.twelveTables[idx].sessionCode = data.sessionCode || "";
 
                 // Verificăm comenzi noi
                 if (data.sessionCode) {
@@ -387,8 +387,6 @@
                 data.isNew = false;
               }
 
-              // NOTĂ: Am eliminat logica automată care punea comanda "pending" -> "placed".
-
               data.orderId = ordId;
               this.orders.push(data);
             }
@@ -407,21 +405,27 @@
             alert("Nu s-au putut încărca comenzile!");
           }
         },
-        // Metoda pentru a plasa manual comanda ("pending" -> "placed")
-        async placeOrder(orderId) {
+
+        /**
+         * Metodă care schimbă statusul comenzii dacă nu e deja 'placed'.
+         * Dacă ord.orderStatus === 'placed', butonul rămâne "Comandă Plasată".
+         * Dacă era 'pending', atunci la click devine 'placed'.
+         */
+        async changeOrderStatus(ord) {
           this.resetActivityTimer();
+          // Dacă e deja "placed", nu mai facem nimic
+          if (ord.orderStatus === 'placed') {
+            return;
+          }
           try {
-            await updateDoc(doc(db, "orders", orderId), { orderStatus: "placed" });
-            // Actualizăm statusul și în array-ul local
-            const idx = this.orders.findIndex(o => o.orderId === orderId);
-            if (idx !== -1) {
-              this.orders[idx].orderStatus = "placed";
-            }
+            await updateDoc(doc(db, "orders", ord.orderId), { orderStatus: "placed" });
+            ord.orderStatus = "placed";
           } catch (err) {
-            console.error("Eroare la placeOrder:", err);
-            alert("Nu s-a putut schimba statusul comenzii!");
+            console.error("Eroare la changeOrderStatus:", err);
+            alert("Nu s-a putut actualiza statusul comenzii!");
           }
         },
+
         async finalizeTable(tableId) {
           this.resetActivityTimer();
           if (!confirm(`Ești sigur că vrei să finalizezi masa ${tableId}?`)) {
