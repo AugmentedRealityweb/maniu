@@ -357,8 +357,8 @@
                 data.isNew = false;
               }
               // Asigurăm placed e boolean
-              if (typeof data.placed === "undefined") data.placed = false;
-              if (data.placed === "false") data.placed = false;
+              if (typeof data.placed === "undefined") data.placed = true;
+              if (data.placed === "true") data.placed = true;
 
               data.orderId = ordId;
               this.orders.push(data);
