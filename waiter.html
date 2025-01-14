@@ -144,15 +144,22 @@
           :key="cIdx"
           class="mb-3"
         >
-          <div class="client-title">Client #{{ cIdx + 1 }}</div>
+          <div class="client-title">
+            Client #{{ cIdx + 1 }}
+          </div>
+
           <div
             v-for="(ord, oIdx) in clientData.orders"
             :key="oIdx"
             class="ml-4 mt-1"
           >
             <div class="text-sm text-gray-400 mb-1">
-              Comanda #{{ oIdx + 1 }}
+              <!-- Afișăm debug: ID + placed + isNew -->
+              <strong>Comanda #{{ oIdx + 1 }} ({{ ord.orderId }})</strong>  
+              - placed: <strong>{{ ord.placed }}</strong>  
+              - isNew: <strong>{{ ord.isNew }}</strong>
             </div>
+
             <!-- Highlight doar la primele vizualizări (o singură dată) -->
             <ul :class="['ml-2', 'list-disc', { 'highlight': newOrderHighlight && ord.isNew }]">
               <li
@@ -164,16 +171,17 @@
               </li>
             </ul>
 
-            <!-- Buton "Comanda Plasată" doar dacă placed = false -->
+            <!-- Buton "Comanda Plasată" doar dacă placed = false (boolean!) -->
             <button 
               class="btn mt-2 ml-2"
-              v-if="!ord.placed"
+              v-if="ord.placed === false"
               @click="markAsPlaced(ord.orderId)"
             >
               Comanda Plasată
             </button>
           </div>
         </div>
+
         <div class="mt-2 font-bold text-[#f49032] text-lg">
           Total Masă: {{ totalTable }} Lei
         </div>
@@ -198,9 +206,9 @@
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
     import { createApp } from "https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js";
 
-    /* Configurarea Firebase */
+    /* Configurarea Firebase (pune fix datele tale) */
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWq",
+      apiKey: "AIzaSy....",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
       projectId: "restaurantapp-d0256",
       storageBucket: "restaurantapp-d0256.firebasestorage.app",
@@ -411,8 +419,18 @@
                 data.isNew = false;
               }
 
+              // Dublu-check: dacă e `placed` lipsă, setăm default false
+              if (typeof data.placed === "undefined") {
+                data.placed = false;
+              }
+              // Dacă e un string "false" => transformăm în boolean false
+              if (data.placed === "false") {
+                data.placed = false;
+              }
+
               data.orderId = ordId; // stocăm ID-ul
               this.orders.push(data);
+              console.log("DEBUG >> found order", ordId, data);
             });
 
             // Salvăm setul de comenzi văzute
@@ -513,6 +531,7 @@
         checkInactivity() {
           if (!this.lastActivityTime) return;
           const diff = Date.now() - this.lastActivityTime;
+          // 10s = 10000 ms
           if (diff > 10000) {
             location.reload();
           }
