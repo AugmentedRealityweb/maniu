@@ -1090,7 +1090,7 @@
       const timeElapsed = now - lastActivity;
 
       // 20 de minute = 1200000 ms
-      if (timeElapsed > 20 * 60 * 1000) {
+      if (timeElapsed > 2 * 60 * 1000) {
         // Masa e activă, dar a trecut timpul de inactivitate
         return { status: "expired", sessionCode: data.sessionCode };
       }
