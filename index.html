@@ -773,6 +773,13 @@
                 <div class="text-sm text-gray-400">
                   ID comandă: {{ order.orderId }} | Cod Ospătar: {{ order.sessionCode }}
                 </div>
+                <!-- Afișăm statusul plasării comenzii -->
+                <div v-if="order.placed" class="text-green-500 font-bold mt-1">
+                  Comanda a fost plasată
+                </div>
+                <div v-else class="text-red-500 font-bold mt-1">
+                  Comanda în așteptare
+                </div>
               </div>
             </div>
           </section>
@@ -842,7 +849,7 @@
                       class="w-10 h-10 rounded-full object-cover m-2"
                     />
                     
-                    <!-- Bula de mesaj (mai lată, mai îngustă) -->
+                    <!-- Bula de mesaj -->
                     <div 
                       class="leading-tight py-1 px-4 rounded-3xl" 
                       style="max-width: 400px;" 
@@ -1098,7 +1105,7 @@
 
     /* -- Config Firebase (înlocuiește cu datele tale) -- */
     const firebaseConfig = {
-      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWqQ",
+      apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWq",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
       projectId: "restaurantapp-d0256",
       storageBucket: "restaurantapp-d0256.firebasestorage.app",
@@ -1165,7 +1172,7 @@
           activeTab: "meniu",
           view: "categorii",
 
-          /* Definim categoriile și produsele exact cum ai menționat */
+          /* Definim categoriile și produsele */
           categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
@@ -1603,6 +1610,7 @@
         },
         renameCategory(cat) {
           const dict = {};
+          // Poți pune un map, dar aici am lăsat direct numele original
           return dict[cat] || cat;
         },
         enterCategory(categoryName) {
@@ -1663,6 +1671,7 @@
             }
             this.clientPoints += pointsToAdd;
 
+            // AICI adăugăm "placed: false" (comanda încă nu e plasată de ospătar)
             const orderData = {
               userId,
               tableId: this.tableId,
@@ -1671,6 +1680,7 @@
               items: this.orders,
               total: parseFloat(this.total),
               status: "open",
+              placed: false,  // <--- setăm placed cu false
               timestamp: serverTimestamp()
             };
             await addDoc(collection(db, "orders"), orderData);
