@@ -9,14 +9,16 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
+    /* ============== STILURI DE BAZĂ ============== */
     body {
       background-color: #111827;
       color: #fff;
       font-family: Arial, sans-serif;
-      margin: 0; 
+      margin: 0;
       padding: 1rem;
-      min-height: 100vh;
+      min-height: 100vh; /* să ne asigurăm că umple ecranul */
     }
+
     .btn {
       background-color: #f49032;
       padding: 8px 16px;
@@ -30,14 +32,14 @@
       background-color: #d35400;
     }
 
-    /* Grid – max 12 mese, 3 pe rând */
+    /* -- Grid de 12 mese (3 pe rând) -- */
     .grid-tables {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
-      justify-items: center; 
+      justify-items: center;
       max-width: 800px;
-      margin: 0 auto; /* centrare orizontală */
+      margin: 0 auto;
     }
     .table-bubble {
       width: 100px;
@@ -58,13 +60,14 @@
       transform: scale(1.05);
     }
 
-    /* Culoare gradient portocaliu pentru mesele ocupate */
+    /* -- Mese ocupate: gradient portocaliu -- */
     .occupied {
       background: linear-gradient(to bottom right, #f49032, #d35400);
-      color: #111827; /* text mai închis pe gradient */
+      color: #111827;
       border-color: #f49032;
     }
-    /* Shake (custom) */
+
+    /* -- Animație shake pentru "hasNewOrder" -- */
     .animate-shake {
       animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both infinite;
     }
@@ -75,7 +78,7 @@
       40%, 60% { transform: translateX(4px); }
     }
 
-    /* Boxul cu comenzi */
+    /* -- Box-ul cu comenzi la masă -- */
     .order-box {
       border: 1px solid #e78c00;
       padding: 0.5rem;
@@ -88,7 +91,8 @@
       color: #f49032;
       font-weight: bold;
     }
-    /* Highlight 2 secunde -> folosim o clasă scurtă cu background portocaliu deschis */
+
+    /* -- Highlight scurt la comenzi noi -- */
     .highlight {
       background-color: rgba(244,144,50,0.3);
       transition: background-color 2s ease;
@@ -98,20 +102,23 @@
 <body>
   <h1 class="text-2xl font-bold mb-4 text-center">Aplicație Ospătar - Gestionare Mese</h1>
 
+  <!-- APLICAȚIE VUE -->
   <div id="app" class="max-w-4xl mx-auto">
-    <!-- Buton toggle: dacă showOccupiedOnly = true -> "Vezi Toate Mesele"
-         altfel -> "Vezi Mesele Deschise" -->
+    <!-- Buton: Vezi numai mesele ocupate / vezi toate -->
     <div class="mb-4 text-center">
-      <button class="btn" @click="toggleShow">{{ toggleButtonLabel }}</button>
+      <button class="btn" @click="toggleShow">
+        {{ toggleButtonLabel }}
+      </button>
     </div>
 
-    <!-- Grid cu mese (max 12). Afișăm fie toate, fie doar ocupate, în funcție de showOccupiedOnly -->
+    <!-- Grid cu mesele (12). Filtrăm în funcție de showOccupiedOnly -->
     <div v-if="displayedTables.length" class="grid-tables">
       <div
         v-for="(tbl, idx) in displayedTables"
         :key="tbl.tableId"
-        :class="[ 'table-bubble', 
-          { 'occupied': tbl.isOccupied, 'animate-shake': tbl.hasNewOrder } 
+        :class="[
+          'table-bubble',
+          { 'occupied': tbl.isOccupied, 'animate-shake': tbl.hasNewOrder }
         ]"
         @click="bubbleClick(tbl)"
       >
@@ -126,33 +133,45 @@
 
     <hr class="my-4 border-gray-700"/>
 
-    <!-- Comenzi pentru masa selectată -->
+    <!-- Afișăm comenzi pentru masa selectată -->
     <div v-if="currentTableId" class="order-box">
-      <h2 class="text-xl font-bold mb-2">{{ currentTableId }}</h2>
+      <h2 class="text-xl font-bold mb-2">
+        {{ currentTableId }}
+      </h2>
       <p v-if="currentSessionCode" class="text-gray-300 mb-2">
         Codul Comenzii: <strong>{{ currentSessionCode }}</strong>
       </p>
 
-      <!-- Nicio comandă -->
+      <!-- Dacă nu există nicio comandă open -->
       <div v-if="orders.length === 0" class="italic mt-2">
         Nicio comandă deschisă găsită pentru această masă.
       </div>
-      <!-- Avem comenzi? -->
       <div v-else>
-        <!-- Grupăm pe clientNumber -->
-        <div v-for="(clientData, cIdx) in clientsList" :key="cIdx" class="mb-3">
-          <div class="client-title">Client #{{ cIdx + 1 }}</div>
+        <!-- Grupăm comenzile pe clientNumber -->
+        <div 
+          v-for="(clientData, cIdx) in clientsList" 
+          :key="cIdx" 
+          class="mb-3"
+        >
+          <div class="client-title">
+            Client #{{ cIdx + 1 }}
+          </div>
 
-          <div v-for="(ord, oIdx) in clientData.orders" :key="oIdx" class="ml-4 mt-1">
-            <!-- Info: debug -->
+          <!-- Fiecare comandă a clientului curent -->
+          <div 
+            v-for="(ord, oIdx) in clientData.orders" 
+            :key="oIdx" 
+            class="ml-4 mt-1"
+          >
             <div class="text-sm text-gray-400 mb-1">
               <strong>Comanda #{{ oIdx + 1 }} ({{ ord.orderId }})</strong>
               - placed: <strong>{{ ord.placed }}</strong>
               - isNew: <strong>{{ ord.isNew }}</strong>
             </div>
 
+            <!-- Highligh la primele vizualizări (2s) -->
             <ul :class="['ml-2', 'list-disc', { 'highlight': newOrderHighlight && ord.isNew }]">
-              <li
+              <li 
                 v-for="(item, iIdx) in ord.items"
                 :key="iIdx"
               >
@@ -161,10 +180,10 @@
               </li>
             </ul>
 
-            <!-- Buton: Apare de la început, dispare dacă placed===true -->
+            <!-- Buton: Apare dacă placed === false -->
             <button
               class="btn mt-2 ml-2"
-              v-if="!ord.placed"  <!-- Afișăm DOAR dacă e false -->
+              v-if="ord.placed === false"
               @click="markAsPlaced(ord.orderId)"
             >
               Comanda Plasată
@@ -175,15 +194,17 @@
         <div class="mt-2 font-bold text-[#f49032] text-lg">
           Total Masă: {{ totalTable }} Lei
         </div>
-        <button class="btn mt-4" @click="finalizeTable(currentTableId)">Finalizează Masa</button>
+        <button class="btn mt-4" @click="finalizeTable(currentTableId)">
+          Finalizează Masa
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Firebase + Vue -->
+  <!-- SCRIPTUL PRINCIPAL: VUE + FIREBASE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { 
+    import {
       getFirestore,
       collection,
       doc,
@@ -196,7 +217,7 @@
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
     import { createApp } from "https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js";
 
-    // Config Firebase
+    /* ============== CONFIGURARE FIREBASE ============== */
     const firebaseConfig = {
       apiKey: "AIzaSyBahkhy2GgUW2wM5dxghoVt2bv0-6ZyWq",
       authDomain: "restaurantapp-d0256.firebaseapp.com",
@@ -206,116 +227,148 @@
       appId: "1:275208346650:web:f262b8ec49242d4b9945a3",
       measurementId: "G-F44TB27G17"
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    /* ============== APLICAȚIE VUE ============== */
     const waiterApp = createApp({
       data() {
         return {
-          // Mese
+          // 12 mese default
           twelveTables: Array.from({ length: 12 }, (_, i) => ({
             tableId: `Masa numărul ${i + 1}`,
             isOccupied: false,
             hasNewOrder: false,
             sessionCode: ""
           })),
+          // Filtru: doar ocupate?
           showOccupiedOnly: false,
 
           currentTableId: "",
           currentSessionCode: "",
           orders: [],
           newOrderHighlight: false, 
+
+          // Timer inactivitate
           inactivityTimer: null,
           lastActivityTime: null,
 
-          // Cache session codes
+          // Cache: session code + ID comenzi deja văzute
           sessionCodeCache: new Map(),
           ordersSeen: new Set()
         };
       },
       computed: {
+        // Buton toggle
         toggleButtonLabel() {
           return this.showOccupiedOnly 
             ? "Vezi Toate Mesele"
             : "Vezi Mesele Deschise";
         },
+        // Mese de afișat
         displayedTables() {
-          return this.showOccupiedOnly
-            ? this.twelveTables.filter(t => t.isOccupied)
-            : this.twelveTables;
+          if (this.showOccupiedOnly) {
+            return this.twelveTables.filter(t => t.isOccupied);
+          } 
+          return this.twelveTables;
         },
+        // Grupăm comenzile după clientNumber
         clientsList() {
-          const byClient = {};
+          const grouped = {};
           for (const ord of this.orders) {
-            const cNum = ord.clientNumber; 
-            if (!byClient[cNum]) {
-              byClient[cNum] = [];
+            const cNum = ord.clientNumber;
+            if (!grouped[cNum]) {
+              grouped[cNum] = [];
             }
-            byClient[cNum].push(ord);
+            grouped[cNum].push(ord);
           }
-          return Object.keys(byClient).map(k => ({ clientNumber: k, orders: byClient[k] }));
+          // Transformăm într-un array de { clientNumber, orders }
+          return Object.keys(grouped).map(k => ({
+            clientNumber: k,
+            orders: grouped[k]
+          }));
         },
+        // Total masă
         totalTable() {
-          return this.orders.reduce((sum, ord) => sum + ord.total, 0).toFixed(2);
+          let sum = 0;
+          for (const ord of this.orders) {
+            sum += ord.total;
+          }
+          return sum.toFixed(2);
         }
       },
       methods: {
+        /* ---------- Toggle Show ---------- */
         toggleShow() {
           this.showOccupiedOnly = !this.showOccupiedOnly;
           this.fetchOpenTables();
         },
+
+        /* ---------- fetchOpenTables ---------- */
         async fetchOpenTables() {
           this.resetActivityTimer();
           try {
-            // Citim "sessions" cu status=active
-            const snap = await getDocs(query(collection(db, "sessions"), where("status", "==", "active")));
-            // Reset
+            const cRef = collection(db, "sessions");
+            const qRef = query(cRef, where("status", "==", "active"));
+            const snap = await getDocs(qRef);
+
+            // Resetăm starea
             this.twelveTables.forEach(t => {
               t.isOccupied = false;
               t.hasNewOrder = false;
             });
-            // Marcare
+
+            // Marcare mese active
             for (const docSnap of snap.docs) {
               const data = docSnap.data();
-              const tableId = docSnap.id; // ex "Masa numărul 2"
-              const index = this.twelveTables.findIndex(t => t.tableId === tableId);
-              if (index !== -1) {
-                this.twelveTables[index].isOccupied = true;
-                if (!this.twelveTables[index].sessionCode) {
-                  this.twelveTables[index].sessionCode = data.sessionCode || "";
+              const tblId = docSnap.id; // ex "Masa numărul 2"
+              const idx = this.twelveTables.findIndex(t => t.tableId === tblId);
+              if (idx !== -1) {
+                this.twelveTables[idx].isOccupied = true;
+
+                if (!this.twelveTables[idx].sessionCode) {
+                  this.twelveTables[idx].sessionCode = data.sessionCode || "";
                 }
-                // Verificăm comenzi
+                // Verific comenzi noi
                 if (data.sessionCode) {
-                  const snapOrders = await getDocs(query(
-                    collection(db, "orders"),
+                  const cRefOrders = collection(db, "orders");
+                  const qRefOrders = query(
+                    cRefOrders,
                     where("sessionCode", "==", data.sessionCode),
                     where("status", "==", "open")
-                  ));
+                  );
+                  const snapOrders = await getDocs(qRefOrders);
+
                   let newOrderFound = false;
-                  snapOrders.forEach(oDoc => {
-                    if (!this.ordersSeen.has(oDoc.id)) {
+                  snapOrders.forEach(oDocSnap => {
+                    if (!this.ordersSeen.has(oDocSnap.id)) {
                       newOrderFound = true;
                     }
                   });
-                  this.twelveTables[index].hasNewOrder = newOrderFound;
+
+                  this.twelveTables[idx].hasNewOrder = newOrderFound;
                 }
               }
             }
           } catch (err) {
-            console.error("Eroare fetchOpenTables:", err);
+            console.error("Eroare la fetchOpenTables:", err);
+            alert("Eroare la încărcarea meselor active!");
           }
         },
+
+        /* ---------- bubbleClick (pe bulă) ---------- */
         async bubbleClick(tbl) {
           this.resetActivityTimer();
           if (!tbl.isOccupied) {
-            alert("Această masă nu are sesiune activă!");
+            alert("Această masă este goală (nu are sesiune activă)!");
             return;
           }
           const storedCode = this.sessionCodeCache.get(tbl.tableId);
+          // Avem deja cod corect?
           if (storedCode && storedCode.toUpperCase() === tbl.sessionCode.toUpperCase()) {
             this.openTable(tbl.tableId, tbl.sessionCode);
           } else {
+            // Cerem codul
             const code = prompt(`Introduceți codul sesiunii pentru ${tbl.tableId}:`);
             if (!code) return;
             if (code.trim().toUpperCase() !== tbl.sessionCode.toUpperCase()) {
@@ -326,29 +379,35 @@
             tbl.sessionCode = code.trim();
             this.openTable(tbl.tableId, code.trim());
           }
+          // Oprim "shake"
           const idx = this.twelveTables.findIndex(t => t.tableId === tbl.tableId);
           if (idx !== -1) {
             this.twelveTables[idx].hasNewOrder = false;
           }
         },
+
+        /* ---------- openTable ---------- */
         openTable(tableId, sessionCode) {
           this.currentTableId = tableId;
           this.currentSessionCode = sessionCode;
           this.loadOrdersBySession(sessionCode);
         },
+
+        /* ---------- loadOrdersBySession ---------- */
         async loadOrdersBySession(sCode) {
           this.resetActivityTimer();
           this.orders = [];
           try {
-            const snap = await getDocs(query(
-              collection(db, "orders"),
-              where("sessionCode", "==", sCode),
-              where("status", "==", "open")
-            ));
+            const cRef = collection(db, "orders");
+            const qRef = query(cRef, where("sessionCode", "==", sCode), where("status", "==", "open"));
+            const snap = await getDocs(qRef);
+
             let foundNew = false;
             snap.forEach(docSnap => {
               const data = docSnap.data();
               const ordId = docSnap.id;
+
+              // E nouă?
               if (!this.ordersSeen.has(ordId)) {
                 data.isNew = true;
                 foundNew = true;
@@ -356,87 +415,122 @@
               } else {
                 data.isNew = false;
               }
-              // Asigurăm placed e boolean
-              if (typeof data.placed === "undefined") data.placed = true;
-              if (data.placed === "true") data.placed = true;
+
+              // Mare workaround: forțăm placed==false dacă nu e true
+              if (data.placed !== true) {
+                data.placed = false;
+              }
 
               data.orderId = ordId;
               this.orders.push(data);
             });
-            this.saveOrdersSeen();
+
+            // Salvăm ID-urile "văzute"
+            localStorage.setItem('ordersSeen', JSON.stringify(Array.from(this.ordersSeen)));
+
             if (foundNew) {
               this.newOrderHighlight = true;
-              setTimeout(() => {
-                this.newOrderHighlight = false;
-              }, 2000);
+              setTimeout(() => { this.newOrderHighlight = false; }, 2000);
             }
           } catch (err) {
-            console.error("Eroare loadOrdersBySession:", err);
+            console.error("Eroare la încărcarea comenzilor:", err);
+            alert("Eroare la încărcarea comenzilor!");
           }
         },
+
+        /* ---------- finalizeTable ---------- */
         async finalizeTable(tableId) {
           this.resetActivityTimer();
-          if (!confirm(`Finalizezi masa ${tableId}?`)) return;
+          if (!confirm(`Ești sigur că vrei să finalizezi masa ${tableId}?`)) return;
           try {
-            await updateDoc(doc(db, "sessions", tableId), { sessionCode: null, status: "closed" });
-            // Comenzi => closed
+            // Sesiune -> closed
+            const docRef = doc(db, "sessions", tableId);
+            await updateDoc(docRef, { sessionCode: null, status: "closed" });
+
+            // Comenzi -> status closed
             if (this.currentSessionCode) {
-              const snap = await getDocs(query(
-                collection(db, "orders"),
-                where("sessionCode", "==", this.currentSessionCode),
-                where("status", "==", "open")
-              ));
-              for (const d of snap.docs) {
-                await updateDoc(doc(db, "orders", d.id), { status: "closed" });
+              const cRef = collection(db, "orders");
+              const qRef = query(cRef, where("sessionCode", "==", this.currentSessionCode), where("status", "==", "open"));
+              const snap = await getDocs(qRef);
+
+              for (const docSnap of snap.docs) {
+                const ordRef = doc(db, "orders", docSnap.id);
+                await updateDoc(ordRef, { status: "closed" });
               }
             }
-            alert(`${tableId} a fost închisă!`);
+
+            alert(`Masa ${tableId} a fost închisă!`);
+            // Ștergem codul
             this.sessionCodeCache.delete(tableId);
-            localStorage.setItem('sessionCodeCache', JSON.stringify(Array.from(this.sessionCodeCache.entries())));
+            localStorage.setItem(
+              'sessionCodeCache', 
+              JSON.stringify(Array.from(this.sessionCodeCache.entries()))
+            );
+            // Reset
             this.resetCurrent();
             this.fetchOpenTables();
           } catch (err) {
-            console.error("Eroare finalizeTable:", err);
+            console.error("Eroare la finalizeTable:", err);
+            alert("Eroare la finalizarea mesei!");
           }
         },
-        // Buton "Comanda Plasată"
+
+        /* ---------- markAsPlaced ---------- */
         async markAsPlaced(orderId) {
+          this.resetActivityTimer();
           try {
-            this.resetActivityTimer();
-            await updateDoc(doc(db, "orders", orderId), { placed: true });
+            const ordRef = doc(db, "orders", orderId);
+            // Setăm placed=true
+            await updateDoc(ordRef, { placed: true });
+
+            // Reîncărcăm
             this.loadOrdersBySession(this.currentSessionCode);
             alert("Comanda a fost marcată ca plasată!");
           } catch (err) {
-            console.error("Eroare markAsPlaced:", err);
+            console.error("Eroare la plasarea comenzii:", err);
+            alert("Eroare la plasarea comenzii!");
           }
         },
+
+        /* ---------- updateSessionCache ---------- */
         updateSessionCache(tableId, code) {
           this.sessionCodeCache.set(tableId, code);
-          localStorage.setItem('sessionCodeCache', JSON.stringify(Array.from(this.sessionCodeCache.entries())));
+          localStorage.setItem(
+            'sessionCodeCache',
+            JSON.stringify(Array.from(this.sessionCodeCache.entries()))
+          );
         },
+
+        /* ---------- resetCurrent ---------- */
         resetCurrent() {
           this.currentTableId = "";
           this.currentSessionCode = "";
           this.orders = [];
           this.newOrderHighlight = false;
         },
+
+        /* ---------- Timer de inactivitate ---------- */
         resetActivityTimer() {
           this.lastActivityTime = Date.now();
         },
         checkInactivity() {
           if (!this.lastActivityTime) return;
-          if (Date.now() - this.lastActivityTime > 10000) {
+          const diff = Date.now() - this.lastActivityTime;
+          // De ex. 10 sec
+          if (diff > 10000) {
             location.reload();
           }
         },
+
+        /* ---------- loaded, citim cache ---------- */
         loadSessionCodeCache() {
           const saved = localStorage.getItem('sessionCodeCache');
           if (saved) {
             try {
               const arr = JSON.parse(saved);
               this.sessionCodeCache = new Map(arr);
-            } catch (err) {
-              console.warn("Nu s-a putut parsa sessionCodeCache:", err);
+            } catch (e) {
+              console.warn("Nu s-a putut parsa sessionCodeCache:", e);
             }
           }
         },
@@ -446,22 +540,24 @@
             try {
               const arr = JSON.parse(saved);
               this.ordersSeen = new Set(arr);
-            } catch (err) {
-              console.warn("Nu s-a putut parsa ordersSeen:", err);
+            } catch (e) {
+              console.warn("Nu s-a putut parsa ordersSeen:", e);
             }
           }
-        },
-        saveOrdersSeen() {
-          localStorage.setItem('ordersSeen', JSON.stringify(Array.from(this.ordersSeen)));
         }
       },
       mounted() {
+        // Reîncarcă codurile + ID-urile
         this.loadSessionCodeCache();
         this.loadOrdersSeen();
+
+        // Afișăm mesele
         this.fetchOpenTables();
 
+        // Verific inactivitatea la fiecare 1s
         setInterval(this.checkInactivity, 1000);
 
+        // Ascultă evenimente
         window.addEventListener("mousemove", this.resetActivityTimer);
         window.addEventListener("keydown", this.resetActivityTimer);
         window.addEventListener("touchstart", this.resetActivityTimer);
