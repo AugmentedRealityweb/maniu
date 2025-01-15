@@ -1021,7 +1021,6 @@
       setDoc,
       collection,
       addDoc,
-      getDocs,
       updateDoc,
       query,
       where,
@@ -1043,68 +1042,66 @@
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    // Funcție utilitară: elimină diacritice (pentru căutare)
+    // 20 minute în ms
+    const TWENTY_MINUTES = 20 * 60 * 1000;
+    // 12 ore în ms
+    const TWELVE_HOURS = 12 * 60 * 60 * 1000;
+
+    // Elimină diacritice (pentru căutare)
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
-    // Generează un cod aleator (4 cifre)
+    // Generează un cod de sesiune (4 cifre)
     function generateSessionCode() {
       return Math.floor(1000 + Math.random() * 9000).toString();
     }
 
-    // Creează (sau înlocuiește) un cod de sesiune nou pentru masă
+    // Creează un cod nou pt masă (startTime = serverTimestamp)
     async function createNewSessionCode(tableId) {
       const newSessionCode = generateSessionCode();
       await setDoc(doc(db, "sessions", tableId), {
         sessionCode: newSessionCode,
         status: "active",
-        lastActivity: serverTimestamp()
+        sessionStartedAt: serverTimestamp() // ora exactă când a fost creată
       });
       return newSessionCode;
     }
 
-    // Închide masa (ospătar)
+    // Închide masa (dacă e cazul)
     async function closeTable(tableId) {
       await updateDoc(doc(db, "sessions", tableId), {
         status: "closed",
         sessionCode: null,
-        lastActivity: null
+        sessionStartedAt: null
       });
       alert("Masa a fost închisă de ospătar!");
     }
 
-    // Verifică starea mesei (active/inactive + timp scurs)
+    // Verifică dacă masa e open / expirată etc. (bazat pe sessionStartedAt)
     async function checkTableStatus(tableId) {
       const docRef = doc(db, "sessions", tableId);
       const snap = await getDoc(docRef);
-
       if (!snap.exists() || snap.data().status === "closed") {
-        // Masa este închisă sau nu există încă
         return { status: "closed" };
       }
-
       const data = snap.data();
       const now = new Date();
-      const lastActivity = data.lastActivity?.toDate();
-      const timeElapsed = now - lastActivity;
+      const startTime = data.sessionStartedAt?.toDate();
+      const timeElapsed = now - startTime;
 
-      // 20 de minute = 1200000 ms
-      if (timeElapsed > 2 * 60 * 1000) {
-        // Masa e activă, dar a trecut timpul de inactivitate
+      if (timeElapsed > TWENTY_MINUTES) {
+        // E activă, dar trecute 20 minute de la start
         return { status: "expired", sessionCode: data.sessionCode };
       }
-
+      // Altfel e încă valid (mai puțin de 20 minute)
       return { status: "active", sessionCode: data.sessionCode };
     }
 
-    // Deschide sesiunea existentă (fără prompt) - actualizăm lastActivity
-    async function openSession(tableId, sessionCode) {
-      await updateDoc(doc(db, "sessions", tableId), {
-        lastActivity: serverTimestamp()
-      });
-      // Nimic special aici, e doar un "semn" că avem sesiune
-      console.log("Sesiune deschisă pe masă:", tableId, "Cod:", sessionCode);
+    // Doar informăm că folosim aceeași sesiune (nu actualizăm nimic, 
+    // pentru că se dorește 20min stric de la start).
+    function continueSession(tableId, sessionCode) {
+      console.log("Continuăm sesiunea pe masa:", tableId, "cod:", sessionCode);
     }
 
     const app = Vue.createApp({
@@ -1495,7 +1492,10 @@
           clientPoints: 0,
           isFirstOrder: true,
           tableId: "",
+          sessionCode: "",
+
           orders: [],
+          // Istoric
           myOrders: [],
 
           // Zona Social
@@ -1518,7 +1518,7 @@
         };
       },
       computed: {
-        // Filtrare produse
+        // Filtrare produse după search
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
@@ -1554,7 +1554,7 @@
           this.isGrid = !this.isGrid;
         },
         renameCategory(cat) {
-          return cat; // personalizare, dacă e cazul
+          return cat; 
         },
         enterCategory(categoryName) {
           this.currentProducts = this.products[categoryName] || [];
@@ -1601,16 +1601,11 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
-        // Salvează comanda (orderStatus = 'pending') și redirecționează spre confirm
+        // La plasare - salvăm comanda și mergem la confirm
         async checkout() {
           try {
             const userId = localStorage.getItem("userId") || Date.now().toString();
             localStorage.setItem("userId", userId);
-
-            // Actualizăm ultima activitate
-            await updateDoc(doc(db, "sessions", this.tableId), {
-              lastActivity: serverTimestamp()
-            });
 
             let pointsToAdd = 0;
             for (const item of this.orders) {
@@ -1644,10 +1639,12 @@
           }
         },
 
+        // Ascultă istoricul comenzilor curente (ordinea plasării)
         listenMyOrders() {
           if (!this.clientNumber) return;
           const cRef = collection(db, "orders");
-          const qRef = query(cRef, where("clientNumber", "==", this.clientNumber));
+          // Sortăm crescător după 'timestamp', pentru a menține ordinea
+          const qRef = query(cRef, where("clientNumber", "==", this.clientNumber), orderBy("timestamp", "asc"));
 
           onSnapshot(qRef, (snapshot) => {
             const updatedOrders = [];
@@ -1657,10 +1654,32 @@
               updatedOrders.push(data);
             });
             this.myOrders = updatedOrders;
+
+            // Salvăm cu un timestamp
+            const now = Date.now();
             localStorage.setItem("myOrders", JSON.stringify(updatedOrders));
+            localStorage.setItem("myOrdersTimestamp", now.toString());
           }, (err) => {
             console.error("Eroare la onSnapshot myOrders:", err);
           });
+        },
+        // Verificăm expirarea localStorage (myOrders) după 12 ore
+        checkMyOrdersExpiry() {
+          const storedMyOrders = localStorage.getItem("myOrders");
+          const storedTS = localStorage.getItem("myOrdersTimestamp");
+          if (storedMyOrders && storedTS) {
+            const now = Date.now();
+            const oldTS = parseInt(storedTS);
+            if ((now - oldTS) > TWELVE_HOURS) {
+              // Gata, ștergem
+              localStorage.removeItem("myOrders");
+              localStorage.removeItem("myOrdersTimestamp");
+              this.myOrders = [];
+            } else {
+              // Rămâne valabil
+              this.myOrders = JSON.parse(storedMyOrders);
+            }
+          }
         },
 
         setUsername() {
@@ -1719,6 +1738,7 @@
             }
           }).catch((err) => console.error("Eroare la reacționare:", err));
 
+          // Animație scurtă pe ecran
           this.reactionAnimation = reaction;
           setTimeout(() => {
             this.reactionAnimation = "";
@@ -1754,36 +1774,34 @@
           }
         },
 
-        // Verificăm dacă masa e deschisă / expirată, cerem cod etc.
+        // Funcție principală de "acces" la masă (check/open)
         async handleTableAccess(tableId) {
           const tableStatus = await checkTableStatus(tableId);
           if (tableStatus.status === "closed") {
-            // Masa e închisă => generăm un cod nou
+            // Masa e închisă => generăm cod nou
             const newCode = await createNewSessionCode(tableId);
             this.sessionCode = newCode;
             this.tableId = tableId;
-            console.log("Masa era închisă, am creat cod nou:", newCode);
             return;
           }
           if (tableStatus.status === "expired") {
-            // Masa e activă, dar timpul a expirat => cere cod
+            // Trecut 20min => cerem cod
             const userCode = prompt("Cere ospătarului codul de acces:");
             if (userCode && userCode === tableStatus.sessionCode) {
               this.sessionCode = tableStatus.sessionCode;
               this.tableId = tableId;
               alert("Cod corect! Continuăm sesiunea existentă.");
-              await openSession(tableId, tableStatus.sessionCode);
+              continueSession(tableId, tableStatus.sessionCode);
               return;
             } else {
-              alert("Cod incorect! Ospătarul trebuie să închidă masa înainte să începeți o nouă comandă.");
-              // Nu generăm automat sesiune nouă; e nevoie de ospătar
+              alert("Cod incorect! Masa trebuie închisă de ospătar înainte de o nouă comandă.");
               return;
             }
           }
-          // Altfel, masa e activă și sub 20 de minute => continuăm
+          // E "active" (sub 20min)
           this.sessionCode = tableStatus.sessionCode;
           this.tableId = tableId;
-          await openSession(tableId, tableStatus.sessionCode);
+          continueSession(tableId, tableStatus.sessionCode);
         },
 
         applyThemeClass(themeName) {
@@ -1812,7 +1830,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
         if (masaParam) {
-          // Ex: Masa numărul 3
           const tableId = `Masa numărul ${masaParam}`;
           this.handleTableAccess(tableId);
         } else {
@@ -1841,14 +1858,13 @@
           this.clientPoints = parseFloat(storedPoints);
         }
 
-        // 5) myOrders
-        const storedMyOrders = localStorage.getItem("myOrders");
-        if (storedMyOrders) {
-          this.myOrders = JSON.parse(storedMyOrders);
-        }
+        // 5) Verificăm expirare comenzi stocate
+        this.checkMyOrdersExpiry();
+
+        // 6) Lansăm onSnapshot pt istoricul comenzilor
         this.listenMyOrders();
 
-        // 6) Username / avatar
+        // 7) Username / avatar
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
           this.usernameSet = true;
@@ -1858,8 +1874,7 @@
         if (storedAvatar) {
           this.selectedAvatar = storedAvatar;
         }
-
-        // 7) Dacă username e setat, încărcăm direct mesajele
+        // 8) Dacă e setat, încărcăm direct chatul
         if (this.usernameSet) {
           this.loadMessages();
         }
@@ -1879,9 +1894,6 @@
         },
         clientNumber(newVal) {
           localStorage.setItem("clientNumber", newVal);
-        },
-        myOrders(newVal) {
-          localStorage.setItem("myOrders", JSON.stringify(newVal));
         },
         selectedTheme(newVal) {
           localStorage.setItem('selectedTheme', newVal);
