@@ -1114,14 +1114,28 @@
       try {
         const snap = await getDoc(docRef);
         if (snap.exists()) {
-          return snap.data(); // datele existente
+          const data = snap.data();
+          // Dacă masa e "active", return data
+          if (data.status === "active") {
+            return data;
+          } 
+          // Dacă e "closed", generăm un nou sessionCode și setăm status la "active"
+          else {
+            const newCode = generateSessionCode();
+            const updateData = {
+              sessionCode: newCode,
+              status: "active",
+              sessionStart: serverTimestamp()
+            };
+            await setDoc(docRef, updateData, { merge: true });
+            return updateData;
+          }
         } else {
-          // Creăm sesiune nouă
+          // Documentul nu există, creăm sesiune nouă
           const newSessionCode = generateSessionCode();
           const dataToSet = {
             sessionCode: newSessionCode,
             status: "active",
-            // Salvează momentul deschiderii
             sessionStart: serverTimestamp()
           };
           await setDoc(docRef, dataToSet);
@@ -1150,7 +1164,7 @@
           activeTab: 'meniu',
           view: 'categorii',
 
-          // Categorii placeholder
+          // Categorii (placeholder)
           categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
@@ -1160,6 +1174,7 @@
             { name: "drinks",  image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp" },
             { name: "garnish", image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp" }
           ],
+
           products: {
             brunch: [
               {
@@ -1551,7 +1566,7 @@
           inputSessionCode: "",
           sessionBlocked: false,
 
-          // Pentru a nu-i cere codul celor care au intrat deja
+          // Afiș cod doar pentru noii utilizatori
           hasJoinedSession: false
         };
       },
@@ -1827,7 +1842,7 @@
           }
         },
 
-        // Verifică dacă masa are peste 20min
+        // Verifică dacă masa e >20min
         async checkSessionTime() {
           if (!this.sessionInfo) return;
           // Dacă userul a mai intrat în sesiunea asta, nu-i mai cerem cod
