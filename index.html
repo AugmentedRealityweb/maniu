@@ -453,125 +453,106 @@
 
       <!-- CONȚINUT PRINCIPAL -->
       <div class="flex-1 flex flex-col p-2">
-        <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
-          <!-- BARĂ mobilă -->
-          <div class="flex items-center mb-4 md:hidden">
-            <button 
-              ref="mobileToggle"
-              class="bg-black border-2 border-[var(--border-color)] hover:bg-[var(--border-color)] hover:text-black 
-                     text-white p-2 rounded-full mr-2"
-              @click="isSidebarVisible = !isSidebarVisible"
-            >
-              <span class="material-icons">menu</span>
-            </button>
-            <div class="handwriting-title text-2xl font-bold fade-in-left text-center flex-1">
-              Meniu Restaurant
-            </div>
-          </div>
-
-          <!-- SIDEBAR mobil (afișat doar pe click) -->
-          <transition name="slide-fade">
-            <aside 
-              v-if="isSidebarVisible" 
-              ref="mobileSidebar"
-              class="absolute top-0 left-0 w-48 p-4 z-50 rounded-tr-lg rounded-br-lg sidebar scratches"
-            >
-              <button class="text-white mb-2" @click="isSidebarVisible = false">
-                <span class="material-icons">close</span>
-              </button>
-              <nav class="flex flex-col space-y-2">
-                <button 
-                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                  @click="activeTab='meniu'; isSidebarVisible=false"
-                >
-                  <span class="material-icons">restaurant_menu</span>Meniu
-                </button>
-                <button 
-                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                  @click="activeTab='puncte'; isSidebarVisible=false"
-                >
-                  <span class="material-icons">star</span>Puncte
-                </button>
-                <button 
-                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                  @click="activeTab='comenzileTale'; isSidebarVisible=false"
-                >
-                  <span class="material-icons">receipt</span>Comenzile Tale
-                </button>
-                <button 
-                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                  @click="activeTab='social'; isSidebarVisible=false"
-                >
-                  <span class="material-icons">group</span>Social
-                </button>
-                <button 
-                  class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
-                  @click="activeTab='design'; isSidebarVisible=false"
-                >
-                  <span class="material-icons">palette</span>Design
-                </button>
-              </nav>
-            </aside>
-          </transition>
-
-          <!-- TAB: MENIU -->
-          <section v-if="activeTab === 'meniu'">
-            <!-- Căutare -->
-            <div class="flex items-center gap-4 mb-4">
-              <input 
-                type="text" 
-                placeholder="Caută produse..." 
-                v-model="searchQuery" 
-                class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] w-full md:w-1/2"
-              />
-            </div>
-            <!-- Rezultate căutare -->
-            <div v-if="searchQuery.trim()">
-              <h2 class="text-xl font-semibold mb-4 text-center">
-                Rezultate pentru: "{{ searchQuery }}"
-              </h2>
-              <div class="flex justify-center mb-4">
-                <button 
-                  class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
-                  @click="toggleLayout"
-                >
-                  <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
-                  <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
-                </button>
-              </div>
-              <!-- Produse filtrate -->
-              <div 
-                v-if="displayedProducts.length > 0" 
-                :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
+        <!-- Daca e blocat, afisam ecran inchis. Altfel, tot layout-ul normal. -->
+        <template v-if="!sessionBlocked">
+          <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
+            <!-- BARĂ mobilă -->
+            <div class="flex items-center mb-4 md:hidden">
+              <button 
+                ref="mobileToggle"
+                class="bg-black border-2 border-[var(--border-color)] hover:bg-[var(--border-color)] hover:text-black 
+                       text-white p-2 rounded-full mr-2"
+                @click="isSidebarVisible = !isSidebarVisible"
               >
-                <div 
-                  v-for="product in displayedProducts" 
-                  :key="product.title" 
-                  class="card-container cursor-pointer"
-                  @click="showProductDetails(product)"
-                >
-                  <img 
-                    :class="isGrid ? 'card-img-square' : 'card-img-rect'"
-                    :src="product.image" 
-                    :alt="product.title" 
-                  />
-                  <div class="card-details">
-                    <h3>{{ product.title }}</h3>
-                    <p>{{ product.price }} Lei</p>
-                  </div>
+                <span class="material-icons">menu</span>
+              </button>
+              <div class="handwriting-title text-2xl font-bold fade-in-left text-center flex-1">
+                Meniu Restaurant
+              </div>
+            </div>
+
+            <!-- SIDEBAR mobil (afișat doar pe click) -->
+            <transition name="slide-fade">
+              <aside 
+                v-if="isSidebarVisible" 
+                ref="mobileSidebar"
+                class="absolute top-0 left-0 w-48 p-4 z-50 rounded-tr-lg rounded-br-lg sidebar scratches"
+              >
+                <button class="text-white mb-2" @click="isSidebarVisible = false">
+                  <span class="material-icons">close</span>
+                </button>
+                <nav class="flex flex-col space-y-2">
+                  <button 
+                    class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                    @click="activeTab='meniu'; isSidebarVisible=false"
+                  >
+                    <span class="material-icons">restaurant_menu</span>Meniu
+                  </button>
+                  <button 
+                    class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                    @click="activeTab='puncte'; isSidebarVisible=false"
+                  >
+                    <span class="material-icons">star</span>Puncte
+                  </button>
+                  <button 
+                    class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                    @click="activeTab='comenzileTale'; isSidebarVisible=false"
+                  >
+                    <span class="material-icons">receipt</span>Comenzile Tale
+                  </button>
+                  <button 
+                    class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                    @click="activeTab='social'; isSidebarVisible=false"
+                  >
+                    <span class="material-icons">group</span>Social
+                  </button>
+                  <button 
+                    class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                    @click="activeTab='design'; isSidebarVisible=false"
+                  >
+                    <span class="material-icons">palette</span>Design
+                  </button>
+                </nav>
+              </aside>
+            </transition>
+
+            <!-- Daca userul e obligat sa introduca codul mesei (dupa 20min) -->
+            <div v-if="showSessionPrompt" class="fixed inset-0 z-50 bg-black bg-opacity-80 flex items-center justify-center p-4">
+              <div class="bg-black border border-[var(--border-color)] p-4 rounded scratches max-w-xs w-full">
+                <p class="mb-4 text-center text-gray-200">
+                  Masa este deschisă de peste 20 de minute. 
+                  <br/>
+                  Vă rugăm introduceți codul sesiunii sau chemați ospătarul pentru a continua.
+                </p>
+                <input
+                  v-model="inputSessionCode"
+                  type="text"
+                  placeholder="Cod masă..."
+                  class="w-full mb-4 bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 focus:ring-2 focus:ring-[var(--border-color)]"
+                />
+                <div class="flex justify-center">
+                  <button class="btn-orange rounded-full" @click="verifySessionCode">
+                    Continuă
+                  </button>
                 </div>
               </div>
-              <div v-else>
-                <p class="text-center">
-                  Nu a fost găsit niciun produs care să corespundă căutării.
-                </p>
-              </div>
             </div>
-            <!-- Categorii / Produse (fără căutare) -->
-            <div v-else>
-              <div v-if="view === 'categorii'">
+
+            <!-- TAB: MENIU -->
+            <section v-if="activeTab === 'meniu' && !showSessionPrompt">
+              <!-- Căutare -->
+              <div class="flex items-center gap-4 mb-4">
+                <input 
+                  type="text" 
+                  placeholder="Caută produse..." 
+                  v-model="searchQuery" 
+                  class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] w-full md:w-1/2"
+                />
+              </div>
+              <!-- Rezultate căutare -->
+              <div v-if="searchQuery.trim()">
                 <h2 class="text-xl font-semibold mb-4 text-center">
-                  Alege Categoria
+                  Rezultate pentru: "{{ searchQuery }}"
                 </h2>
                 <div class="flex justify-center mb-4">
                   <button 
@@ -582,51 +563,21 @@
                     <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
                   </button>
                 </div>
-                <div :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'">
+                <!-- Produse filtrate -->
+                <div 
+                  v-if="displayedProducts.length > 0" 
+                  :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
+                >
                   <div 
-                    v-for="category in categories" 
-                    :key="category.name" 
-                    class="card-container cursor-pointer"
-                    @click="enterCategory(category.name)"
-                  >
-                    <img 
-                      :class="isGrid ? 'card-img-square' : 'card-img-rect'"
-                      :src="category.image" 
-                      :alt="category.name" 
-                    />
-                    <div class="card-details">
-                      <h3>{{ renameCategory(category.name) }}</h3>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div v-else-if="view === 'produse'">
-                <div class="flex items-center justify-between mb-4">
-                  <button class="btn-orange rounded-full" @click="backToCategories">
-                    Înapoi la Categorii
-                  </button>
-                  <button 
-                    class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
-                    @click="toggleLayout"
-                  >
-                    <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
-                    <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
-                  </button>
-                </div>
-                <h2 class="text-xl font-semibold mb-4 text-center">
-                  Produse ({{ currentProducts.length }})
-                </h2>
-                <div :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'">
-                  <div 
-                    v-for="product in currentProducts" 
+                    v-for="product in displayedProducts" 
                     :key="product.title" 
-                    class="card-container cursor-pointer" 
+                    class="card-container cursor-pointer"
                     @click="showProductDetails(product)"
                   >
                     <img 
                       :class="isGrid ? 'card-img-square' : 'card-img-rect'"
                       :src="product.image" 
-                      :alt="product.title"
+                      :alt="product.title" 
                     />
                     <div class="card-details">
                       <h3>{{ product.title }}</h3>
@@ -634,356 +585,442 @@
                     </div>
                   </div>
                 </div>
+                <div v-else>
+                  <p class="text-center">
+                    Nu a fost găsit niciun produs care să corespundă căutării.
+                  </p>
+                </div>
               </div>
-            </div>
-
-            <!-- Modal cu detalii produs -->
-            <div 
-              v-if="currentProduct" 
-              class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
-            >
-              <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
-                <button 
-                  class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
-                  @click="currentProduct = null"
-                >
-                  &times;
-                </button>
-                <img 
-                  :src="currentProduct.image" 
-                  :alt="currentProduct.title" 
-                  class="w-full h-64 object-cover mb-4 rounded-lg"
-                />
-                <h2 class="text-xl font-bold mb-2 handwriting-title">
-                  {{ currentProduct.title }}
-                </h2>
-                <p class="font-bold text-lg mb-4" :style="{ color: 'var(--price-color)' }">
-                  {{ currentProduct.price }} Lei
-                </p>
-                <p class="text-gray-400 mb-4">
-                  {{ currentProduct.description }}
-                </p>
-                <ul class="text-gray-300 mb-4">
-                  <li 
-                    v-for="ingredient in currentProduct.ingredients" 
-                    :key="ingredient" 
-                    class="list-disc ml-5"
-                  >
-                    {{ ingredient }}
-                  </li>
-                </ul>
-                <button class="btn-orange rounded-full" @click="addToOrder(currentProduct)">
-                  Adaugă în coș
-                </button>
-              </div>
-            </div>
-          </section>
-
-          <!-- TAB: Puncte -->
-          <section v-else-if="activeTab === 'puncte'">
-            <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
-            <div class="bg-black p-4 rounded border border-[var(--border-color)] shadow max-w-md scratches mx-auto">
-              <div v-if="clientNumber === 0" class="mb-4">
-                <p class="text-gray-300 text-center">
-                  Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
-                </p>
-              </div>
+              <!-- Categorii / Produse (fără căutare) -->
               <div v-else>
-                <p class="text-gray-300 mb-2 text-center">
-                  Număr client: <span class="font-bold">#{{ clientNumber }}</span>
-                </p>
-              </div>
-              <p class="text-gray-300 text-center">
-                Puncte acumulate:
-                <span class="font-bold" :style="{ color: 'var(--price-color)' }">
-                  {{ clientPoints.toFixed(2) }}
-                </span>
-              </p>
-            </div>
-          </section>
-
-          <!-- TAB: Comenzile Tale -->
-          <section v-else-if="activeTab === 'comenzileTale'">
-            <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
-            <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
-              Nu ai nicio comandă finalizată încă.
-            </div>
-            <div v-else class="space-y-4">
-              <div 
-                v-for="(order, idx) in myOrders" 
-                :key="order.orderId" 
-                class="bg-black p-4 rounded border border-[var(--border-color)] scratches"
-              >
-                <h3 class="text-lg font-semibold mb-2">
-                  Comanda #{{ idx + 1 }}
-                </h3>
-                <ul class="list-disc list-inside text-gray-300">
-                  <li 
-                    v-for="(prod, pidx) in order.items" 
-                    :key="pidx"
-                  >
-                    {{ prod.name }} x {{ prod.quantity }} – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
-                  </li>
-                </ul>
-                <div class="mt-2 font-bold" :style="{ color: 'var(--price-color)' }">
-                  Total: {{ order.total }} Lei
-                </div>
-                <!-- Afișăm statusul (placed vs pending), dar AM SCOS ID COMANDĂ & COD OSPĂTAR -->
-                <div v-if="order.orderStatus === 'placed'" class="text-green-500 font-bold mt-1">
-                  Comanda a fost plasată
-                </div>
-                <div v-else class="text-red-500 font-bold mt-1">
-                  Comanda în așteptare
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <!-- TAB: Social -->
-          <section v-else-if="activeTab === 'social'">
-            <!-- Dacă nu are username încă -->
-            <div v-if="!usernameSet" class="text-center">
-              <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
-              <p class="mb-4 text-gray-300 max-w-md mx-auto">
-                Bun venit în zona de socializare!
-                Te rugăm să îți introduci numele și să alegi un avatar...
-              </p>
-              <div class="flex flex-col items-center max-w-sm mx-auto">
-                <input 
-                  type="text" 
-                  v-model="usernameInput" 
-                  placeholder="Introduceți numele..." 
-                  class="bg-black text-gray-200 border border-[var(--border-color)] 
-                         rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] 
-                         w-full mb-4"
-                />
-                <div class="flex flex-wrap gap-4 justify-center mb-4">
-                  <div 
-                    v-for="(av, i) in availableAvatars" 
-                    :key="i" 
-                    class="w-14 h-14 rounded-full border-2 border-gray-500 cursor-pointer overflow-hidden"
-                    :class="{'border-green-400': selectedAvatar === av}"
-                    @click="selectedAvatar = av"
-                  >
-                    <img 
-                      :src="av" 
-                      alt="avatar" 
-                      class="w-full h-full object-cover"
-                    />
+                <div v-if="view === 'categorii'">
+                  <h2 class="text-xl font-semibold mb-4 text-center">
+                    Alege Categoria
+                  </h2>
+                  <div class="flex justify-center mb-4">
+                    <button 
+                      class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                      @click="toggleLayout"
+                    >
+                      <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                      <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+                    </button>
+                  </div>
+                  <div :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'">
+                    <div 
+                      v-for="category in categories" 
+                      :key="category.name" 
+                      class="card-container cursor-pointer"
+                      @click="enterCategory(category.name)"
+                    >
+                      <img 
+                        :class="isGrid ? 'card-img-square' : 'card-img-rect'"
+                        :src="category.image" 
+                        :alt="category.name" 
+                      />
+                      <div class="card-details">
+                        <h3>{{ renameCategory(category.name) }}</h3>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <button class="btn-orange rounded-full" @click="setUsername">
-                  Continuă
-                </button>
-              </div>
-            </div>
-            <!-- Dacă are username -> chat -->
-            <div v-else>
-              <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
-              <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto">
-                <div
-                  v-for="message in chatMessages"
-                  :key="message.id"
-                  class="mb-3 flex items-center"
-                  :class="message.name === usernameInput ? 'justify-end' : 'justify-start'"
-                >
-                  <div 
-                    class="relative flex items-start" 
-                    :class="message.name === usernameInput ? 'flex-row-reverse' : 'flex-row'"
-                  >
-                    <img 
-                      :src="message.avatar || 'https://via.placeholder.com/40'" 
-                      alt="Avatar" 
-                      class="w-10 h-10 rounded-full object-cover m-2"
-                    />
-                    <div 
-                      class="leading-tight py-1 px-4 rounded-3xl" 
-                      style="max-width: 400px;" 
-                      :class="[
-                        message.name === usernameInput 
-                          ? 'bg-green-600 text-right mr-2' 
-                          : 'bg-gray-700 text-left ml-2'
-                      ]"
+                <div v-else-if="view === 'produse'">
+                  <div class="flex items-center justify-between mb-4">
+                    <button class="btn-orange rounded-full" @click="backToCategories">
+                      Înapoi la Categorii
+                    </button>
+                    <button 
+                      class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                      @click="toggleLayout"
                     >
-                      <div class="font-bold" :style="{ color: 'var(--price-color)' }">
-                        (masa {{ message.tableNumber }}) {{ message.name }}
-                      </div>
-                      <div class="text-gray-100">
-                        {{ message.text }}
-                      </div>
-                      <div class="flex gap-2 mt-2 text-sm">
-                        <button @click="reactToMessage(message.id, '❤️')">
-                          ❤️
-                          <span v-if="message.reactions && message.reactions['❤️']">
-                            ({{ message.reactions['❤️'] }})
-                          </span>
-                        </button>
-                        <button @click="reactToMessage(message.id, '😂')">
-                          😂
-                          <span v-if="message.reactions && message.reactions['😂']">
-                            ({{ message.reactions['😂'] }})
-                          </span>
-                        </button>
-                        <button @click="reactToMessage(message.id, '👍')">
-                          👍
-                          <span v-if="message.reactions && message.reactions['👍']">
-                            ({{ message.reactions['👍'] }})
-                          </span>
-                        </button>
+                      <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                      <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+                    </button>
+                  </div>
+                  <h2 class="text-xl font-semibold mb-4 text-center">
+                    Produse ({{ currentProducts.length }})
+                  </h2>
+                  <div :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'">
+                    <div 
+                      v-for="product in currentProducts" 
+                      :key="product.title" 
+                      class="card-container cursor-pointer" 
+                      @click="showProductDetails(product)"
+                    >
+                      <img 
+                        :class="isGrid ? 'card-img-square' : 'card-img-rect'"
+                        :src="product.image" 
+                        :alt="product.title"
+                      />
+                      <div class="card-details">
+                        <h3>{{ product.title }}</h3>
+                        <p>{{ product.price }} Lei</p>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="flex gap-2 max-w-xl mx-auto">
-                <input 
-                  v-model="newMessage" 
-                  class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 
-                         outline-none focus:ring-2 focus:ring-[var(--border-color)] flex-1" 
-                  placeholder="Scrie un mesaj..." 
-                />
-                <button class="btn-orange rounded-full" @click="postMessage">
-                  Trimite
-                </button>
-              </div>
-              <div class="table-zone">
-                <div 
-                  v-for="tableNum in 12" 
-                  :key="tableNum" 
-                  class="table-circle"
-                  :style="tableStyle(tableNum)"
-                >
-                  Masa {{ tableNum }}
+
+              <!-- Modal cu detalii produs -->
+              <div 
+                v-if="currentProduct" 
+                class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+              >
+                <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
+                  <button 
+                    class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
+                    @click="currentProduct = null"
+                  >
+                    &times;
+                  </button>
+                  <img 
+                    :src="currentProduct.image" 
+                    :alt="currentProduct.title" 
+                    class="w-full h-64 object-cover mb-4 rounded-lg"
+                  />
+                  <h2 class="text-xl font-bold mb-2 handwriting-title">
+                    {{ currentProduct.title }}
+                  </h2>
+                  <p class="font-bold text-lg mb-4" :style="{ color: 'var(--price-color)' }">
+                    {{ currentProduct.price }} Lei
+                  </p>
+                  <p class="text-gray-400 mb-4">
+                    {{ currentProduct.description }}
+                  </p>
+                  <ul class="text-gray-300 mb-4">
+                    <li 
+                      v-for="ingredient in currentProduct.ingredients" 
+                      :key="ingredient" 
+                      class="list-disc ml-5"
+                    >
+                      {{ ingredient }}
+                    </li>
+                  </ul>
+                  <button class="btn-orange rounded-full" @click="addToOrder(currentProduct)">
+                    Adaugă în coș
+                  </button>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          <!-- TAB: DESIGN -->
-          <section v-else-if="activeTab === 'design'">
-            <h2 class="text-2xl font-bold mb-4 text-center">Tema de Design</h2>
-            <p class="text-gray-300 text-center mb-4">Alege o temă de culori pentru aplicație:</p>
-            <div class="flex flex-wrap gap-4 justify-center">
-              <!-- 1) Portocaliu (implicit) -->
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" value="orange" v-model="selectedTheme" />
-                <span>Portocaliu</span>
-              </label>
-              <!-- 2) Roșu -->
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" value="red" v-model="selectedTheme" />
-                <span>Roșu</span>
-              </label>
-              <!-- 3) Albastru -->
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" value="blue" v-model="selectedTheme" />
-                <span>Albastru</span>
-              </label>
-              <!-- 4) Verde -->
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" value="green" v-model="selectedTheme" />
-                <span>Verde</span>
-              </label>
-              <!-- 5) Mov -->
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" value="purple" v-model="selectedTheme" />
-                <span>Mov</span>
-              </label>
-              <!-- 6) Roz -->
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" value="pink" v-model="selectedTheme" />
-                <span>Roz</span>
-              </label>
-              <!-- 7) Gri -->
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" value="grey" v-model="selectedTheme" />
-                <span>Gri</span>
-              </label>
-              <!-- 8) Maro -->
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" value="brown" v-model="selectedTheme" />
-                <span>Maro</span>
-              </label>
-              <!-- 9) Teal -->
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" value="teal" v-model="selectedTheme" />
-                <span>Teal</span>
-              </label>
-              <!-- 10) Verde-lămâie -->
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" value="lime" v-model="selectedTheme" />
-                <span>Verde Lămâie</span>
-              </label>
-            </div>
-          </section>
-        </main>
+            <!-- TAB: Puncte -->
+            <section v-else-if="activeTab === 'puncte' && !showSessionPrompt">
+              <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
+              <div class="bg-black p-4 rounded border border-[var(--border-color)] shadow max-w-md scratches mx-auto">
+                <div v-if="clientNumber === 0" class="mb-4">
+                  <p class="text-gray-300 text-center">
+                    Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
+                  </p>
+                </div>
+                <div v-else>
+                  <p class="text-gray-300 mb-2 text-center">
+                    Număr client: <span class="font-bold">#{{ clientNumber }}</span>
+                  </p>
+                </div>
+                <p class="text-gray-300 text-center">
+                  Puncte acumulate:
+                  <span class="font-bold" :style="{ color: 'var(--price-color)' }">
+                    {{ clientPoints.toFixed(2) }}
+                  </span>
+                </p>
+              </div>
+            </section>
 
-        <!-- Buton Coș (apare dacă ai produse) -->
-        <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
-          <button 
-            @click="toggleOrderBar" 
-            class="btn-orange flex items-center relative rounded-full" 
-            :class="{'animate-shake': isShaking}"
-          >
-            <span class="material-icons mr-2 text-white">shopping_cart</span>
-            <span class="text-white">Coș ({{ orders.length }})</span>
-          </button>
-        </div>
-
-        <!-- Bara laterală a Coșului (slide-up) -->
-        <transition name="slide-cart">
-          <aside 
-            v-show="isOrderOpen && orders.length > 0" 
-            class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[var(--border-color)] p-4 overflow-y-auto scrollbar" 
-            style="max-height: 100vh;"
-          >
-            <div class="relative flex flex-col">
-              <button 
-                class="absolute top-2 right-2 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
-                @click="toggleOrderBar"
-              >
-                &times;
-              </button>
-              <h3 class="text-xl font-bold mb-4 text-center">Comanda Ta</h3>
-              <div 
-                v-for="(order, index) in orders" 
-                :key="index" 
-                class="flex justify-between items-center bg-black border border-[var(--border-color)] p-4 rounded-lg mb-2 scratches"
-              >
-                <div class="flex flex-col">
-                  <span class="font-bold">{{ order.name }}</span>
-                  <div class="flex items-center gap-2 mt-1">
-                    <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
-                    <span class="text-gray-400">x{{ order.quantity }}</span>
-                    <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
-                    <button 
-                      class="bg-red-600 hover:bg-red-800 text-white px-2 py-1 rounded-full" 
-                      @click="removeItem(index)"
+            <!-- TAB: Comenzile Tale -->
+            <section v-else-if="activeTab === 'comenzileTale' && !showSessionPrompt">
+              <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
+              <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
+                Nu ai nicio comandă finalizată încă.
+              </div>
+              <div v-else class="space-y-4">
+                <div 
+                  v-for="(order, idx) in myOrders" 
+                  :key="order.orderId" 
+                  class="bg-black p-4 rounded border border-[var(--border-color)] scratches"
+                >
+                  <h3 class="text-lg font-semibold mb-2">
+                    Comanda #{{ idx + 1 }}
+                  </h3>
+                  <ul class="list-disc list-inside text-gray-300">
+                    <li 
+                      v-for="(prod, pidx) in order.items" 
+                      :key="pidx"
                     >
-                      <span class="material-icons text-sm">delete</span>
-                    </button>
+                      {{ prod.name }} x {{ prod.quantity }} – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
+                    </li>
+                  </ul>
+                  <div class="mt-2 font-bold" :style="{ color: 'var(--price-color)' }">
+                    Total: {{ order.total }} Lei
+                  </div>
+                  <!-- Afișăm statusul (placed vs pending), dar AM SCOS ID COMANDĂ & COD OSPĂTAR -->
+                  <div v-if="order.orderStatus === 'placed'" class="text-green-500 font-bold mt-1">
+                    Comanda a fost plasată
+                  </div>
+                  <div v-else class="text-red-500 font-bold mt-1">
+                    Comanda în așteptare
                   </div>
                 </div>
-                <div>
-                  <span class="font-bold" :style="{ color: 'var(--price-color)' }">
-                    {{ (order.price * order.quantity).toFixed(2) }} Lei
-                  </span>
+              </div>
+            </section>
+
+            <!-- TAB: Social -->
+            <section v-else-if="activeTab === 'social' && !showSessionPrompt">
+              <!-- Dacă nu are username încă -->
+              <div v-if="!usernameSet" class="text-center">
+                <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
+                <p class="mb-4 text-gray-300 max-w-md mx-auto">
+                  Bun venit în zona de socializare!
+                  Te rugăm să îți introduci numele și să alegi un avatar...
+                </p>
+                <div class="flex flex-col items-center max-w-sm mx-auto">
+                  <input 
+                    type="text" 
+                    v-model="usernameInput" 
+                    placeholder="Introduceți numele..." 
+                    class="bg-black text-gray-200 border border-[var(--border-color)] 
+                           rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] 
+                           w-full mb-4"
+                  />
+                  <div class="flex flex-wrap gap-4 justify-center mb-4">
+                    <div 
+                      v-for="(av, i) in availableAvatars" 
+                      :key="i" 
+                      class="w-14 h-14 rounded-full border-2 border-gray-500 cursor-pointer overflow-hidden"
+                      :class="{'border-green-400': selectedAvatar === av}"
+                      @click="selectedAvatar = av"
+                    >
+                      <img 
+                        :src="av" 
+                        alt="avatar" 
+                        class="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <button class="btn-orange rounded-full" @click="setUsername">
+                    Continuă
+                  </button>
                 </div>
               </div>
-              <div class="mt-4">
-                <div class="flex justify-between items-center">
-                  <span class="text-lg font-semibold">Total:</span>
-                  <span class="text-xl font-bold" :style="{ color: 'var(--price-color)' }">
-                    {{ total }}
-                  </span>
+              <!-- Dacă are username -> chat -->
+              <div v-else>
+                <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
+                <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto">
+                  <div
+                    v-for="message in chatMessages"
+                    :key="message.id"
+                    class="mb-3 flex items-center"
+                    :class="message.name === usernameInput ? 'justify-end' : 'justify-start'"
+                  >
+                    <div 
+                      class="relative flex items-start" 
+                      :class="message.name === usernameInput ? 'flex-row-reverse' : 'flex-row'"
+                    >
+                      <img 
+                        :src="message.avatar || 'https://via.placeholder.com/40'" 
+                        alt="Avatar" 
+                        class="w-10 h-10 rounded-full object-cover m-2"
+                      />
+                      <div 
+                        class="leading-tight py-1 px-4 rounded-3xl" 
+                        style="max-width: 400px;" 
+                        :class="[
+                          message.name === usernameInput 
+                            ? 'bg-green-600 text-right mr-2' 
+                            : 'bg-gray-700 text-left ml-2'
+                        ]"
+                      >
+                        <div class="font-bold" :style="{ color: 'var(--price-color)' }">
+                          (masa {{ message.tableNumber }}) {{ message.name }}
+                        </div>
+                        <div class="text-gray-100">
+                          {{ message.text }}
+                        </div>
+                        <div class="flex gap-2 mt-2 text-sm">
+                          <button @click="reactToMessage(message.id, '❤️')">
+                            ❤️
+                            <span v-if="message.reactions && message.reactions['❤️']">
+                              ({{ message.reactions['❤️'] }})
+                            </span>
+                          </button>
+                          <button @click="reactToMessage(message.id, '😂')">
+                            😂
+                            <span v-if="message.reactions && message.reactions['😂']">
+                              ({{ message.reactions['😂'] }})
+                            </span>
+                          </button>
+                          <button @click="reactToMessage(message.id, '👍')">
+                            👍
+                            <span v-if="message.reactions && message.reactions['👍']">
+                              ({{ message.reactions['👍'] }})
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <button class="btn-orange mt-4 rounded-full self-end" @click="checkout">
-                  Finalizează Comanda
+                <div class="flex gap-2 max-w-xl mx-auto">
+                  <input 
+                    v-model="newMessage" 
+                    class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 
+                           outline-none focus:ring-2 focus:ring-[var(--border-color)] flex-1" 
+                    placeholder="Scrie un mesaj..." 
+                  />
+                  <button class="btn-orange rounded-full" @click="postMessage">
+                    Trimite
+                  </button>
+                </div>
+                <div class="table-zone">
+                  <div 
+                    v-for="tableNum in 12" 
+                    :key="tableNum" 
+                    class="table-circle"
+                    :style="tableStyle(tableNum)"
+                  >
+                    Masa {{ tableNum }}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- TAB: DESIGN -->
+            <section v-else-if="activeTab === 'design' && !showSessionPrompt">
+              <h2 class="text-2xl font-bold mb-4 text-center">Tema de Design</h2>
+              <p class="text-gray-300 text-center mb-4">Alege o temă de culori pentru aplicație:</p>
+              <div class="flex flex-wrap gap-4 justify-center">
+                <!-- 1) Portocaliu (implicit) -->
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" value="orange" v-model="selectedTheme" />
+                  <span>Portocaliu</span>
+                </label>
+                <!-- 2) Roșu -->
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" value="red" v-model="selectedTheme" />
+                  <span>Roșu</span>
+                </label>
+                <!-- 3) Albastru -->
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" value="blue" v-model="selectedTheme" />
+                  <span>Albastru</span>
+                </label>
+                <!-- 4) Verde -->
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" value="green" v-model="selectedTheme" />
+                  <span>Verde</span>
+                </label>
+                <!-- 5) Mov -->
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" value="purple" v-model="selectedTheme" />
+                  <span>Mov</span>
+                </label>
+                <!-- 6) Roz -->
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" value="pink" v-model="selectedTheme" />
+                  <span>Roz</span>
+                </label>
+                <!-- 7) Gri -->
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" value="grey" v-model="selectedTheme" />
+                  <span>Gri</span>
+                </label>
+                <!-- 8) Maro -->
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" value="brown" v-model="selectedTheme" />
+                  <span>Maro</span>
+                </label>
+                <!-- 9) Teal -->
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" value="teal" v-model="selectedTheme" />
+                  <span>Teal</span>
+                </label>
+                <!-- 10) Verde-lămâie -->
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" value="lime" v-model="selectedTheme" />
+                  <span>Verde Lămâie</span>
+                </label>
+              </div>
+            </section>
+          </main>
+
+          <!-- Buton Coș (apare dacă ai produse) -->
+          <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
+            <button 
+              @click="toggleOrderBar" 
+              class="btn-orange flex items-center relative rounded-full" 
+              :class="{'animate-shake': isShaking}"
+            >
+              <span class="material-icons mr-2 text-white">shopping_cart</span>
+              <span class="text-white">Coș ({{ orders.length }})</span>
+            </button>
+          </div>
+
+          <!-- Bara laterală a Coșului (slide-up) -->
+          <transition name="slide-cart">
+            <aside 
+              v-show="isOrderOpen && orders.length > 0" 
+              class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[var(--border-color)] p-4 overflow-y-auto scrollbar" 
+              style="max-height: 100vh;"
+            >
+              <div class="relative flex flex-col">
+                <button 
+                  class="absolute top-2 right-2 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
+                  @click="toggleOrderBar"
+                >
+                  &times;
                 </button>
+                <h3 class="text-xl font-bold mb-4 text-center">Comanda Ta</h3>
+                <div 
+                  v-for="(order, index) in orders" 
+                  :key="index" 
+                  class="flex justify-between items-center bg-black border border-[var(--border-color)] p-4 rounded-lg mb-2 scratches"
+                >
+                  <div class="flex flex-col">
+                    <span class="font-bold">{{ order.name }}</span>
+                    <div class="flex items-center gap-2 mt-1">
+                      <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
+                      <span class="text-gray-400">x{{ order.quantity }}</span>
+                      <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
+                      <button 
+                        class="bg-red-600 hover:bg-red-800 text-white px-2 py-1 rounded-full" 
+                        @click="removeItem(index)"
+                      >
+                        <span class="material-icons text-sm">delete</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="font-bold" :style="{ color: 'var(--price-color)' }">
+                      {{ (order.price * order.quantity).toFixed(2) }} Lei
+                    </span>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <div class="flex justify-between items-center">
+                    <span class="text-lg font-semibold">Total:</span>
+                    <span class="text-xl font-bold" :style="{ color: 'var(--price-color)' }">
+                      {{ total }}
+                    </span>
+                  </div>
+                  <button class="btn-orange mt-4 rounded-full self-end" @click="checkout">
+                    Finalizează Comanda
+                  </button>
+                </div>
               </div>
+            </aside>
+          </transition>
+        </template>
+
+        <!-- Ecran blocat (cod greșit) -->
+        <template v-else>
+          <div class="flex-1 flex items-center justify-center text-center p-4">
+            <div>
+              <h2 class="text-2xl font-bold">Acces blocat!</h2>
+              <p class="mt-4 text-gray-300">
+                Ați introdus un cod greșit. Contactați ospătarul sau reîncercați mai târziu.
+              </p>
             </div>
-          </aside>
-        </transition>
+          </div>
+        </template>
       </div>
     </div>
 
@@ -1065,8 +1102,8 @@
       return Math.floor(1000 + Math.random() * 9000).toString();
     }
 
-    // Creează sau obține codul de sesiune pentru o masă
-    async function getOrCreateSessionCode(tableId) {
+    // Creează sau obține doc-ul de sesiune pentru masa respectivă
+    async function getOrCreateSessionDoc(tableId) {
       if (!tableId) {
         throw new Error("Nu există parametru pentru masă în URL.");
       }
@@ -1074,21 +1111,21 @@
       try {
         const snap = await getDoc(docRef);
         if (snap.exists()) {
-          const data = snap.data();
-          if (data.sessionCode && data.status === "active") {
-            return data.sessionCode;
-          } else {
-            const newSessionCode = generateSessionCode();
-            await setDoc(docRef, { sessionCode: newSessionCode, status: "active" }, { merge: true });
-            return newSessionCode;
-          }
+          return snap.data(); // datele existente
         } else {
+          // Creăm sesiune nouă
           const newSessionCode = generateSessionCode();
-          await setDoc(docRef, { sessionCode: newSessionCode, status: "active" });
-          return newSessionCode;
+          const dataToSet = {
+            sessionCode: newSessionCode,
+            status: "active",
+            // Salvează momentul deschiderii
+            sessionStart: serverTimestamp()
+          };
+          await setDoc(docRef, dataToSet);
+          return dataToSet;
         }
       } catch (error) {
-        console.error(`Eroare la getOrCreateSessionCode pentru ${tableId}:`, error);
+        console.error(`Eroare la getOrCreateSessionDoc pentru ${tableId}:`, error);
         throw new Error("Eroare la obținerea/crearea session code-ului.");
       }
     }
@@ -1110,7 +1147,7 @@
           activeTab: 'meniu',
           view: 'categorii',
 
-          // Categorii & produse (exemplu)
+          // Placeholder categorii
           categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
@@ -1120,6 +1157,13 @@
             { name: "drinks",  image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp" },
             { name: "garnish", image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp" }
           ],
+
+          /* 
+            ------------------------------------------
+            Aici adaugi produsele la categoriile tale.
+            În loc de "..." pui obiectele cu title,description,price,image,ingredients etc.
+            ------------------------------------------
+          */
           products: {
             brunch: [
               {
@@ -1472,6 +1516,7 @@
               }
             ]
           },
+
           currentProducts: [],
           currentProduct: null,
           searchQuery: "",
@@ -1481,10 +1526,10 @@
           clientPoints: 0,
           isFirstOrder: true,
           tableId: "",
-          sessionCode: "",
+          sessionInfo: null,
           orders: [],
 
-          // În locul arrays cu myOrders + fetch, folosim un array reacționat prin onSnapshot
+          // „Comenzile Tale” (actualizări prin onSnapshot)
           myOrders: [],
 
           // Zona Social
@@ -1503,7 +1548,12 @@
             "https://i.giphy.com/Wb0TGxvE50Xew.webp"
           ],
           selectedAvatar: "",
-          reactionAnimation: ""
+          reactionAnimation: "",
+
+          // Sesiune - after 20min lock
+          showSessionPrompt: false,
+          inputSessionCode: "",
+          sessionBlocked: false
         };
       },
       computed: {
@@ -1543,7 +1593,7 @@
           this.isGrid = !this.isGrid;
         },
         renameCategory(cat) {
-          return cat; // personalizare
+          return cat; // Poti personaliza daca vrei
         },
         enterCategory(categoryName) {
           this.currentProducts = this.products[categoryName] || [];
@@ -1590,14 +1640,14 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
+
         // Salvează comanda (orderStatus = 'pending') și ne trimite la confirm.html
         async checkout() {
           try {
             const userId = localStorage.getItem("userId") || Date.now().toString();
             localStorage.setItem("userId", userId);
 
-            this.sessionCode = await getOrCreateSessionCode(this.tableId);
-
+            // Adăugăm puncte
             let pointsToAdd = 0;
             for (const item of this.orders) {
               pointsToAdd += item.price * item.quantity * 0.05;
@@ -1608,7 +1658,7 @@
             const orderData = {
               userId,
               tableId: this.tableId,
-              sessionCode: this.sessionCode,
+              sessionCode: this.sessionInfo.sessionCode,
               clientNumber: this.clientNumber,
               items: this.orders,
               total: parseFloat(this.total),
@@ -1624,26 +1674,33 @@
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
-            window.location.href = `${baseUrl}/confirm.html?sessionCode=${this.sessionCode}&masa=${masaParam || ""}`;
+            window.location.href = `${baseUrl}/confirm.html?sessionCode=${this.sessionInfo.sessionCode}&masa=${masaParam || ""}`;
           } catch (err) {
             console.error("Eroare la salvarea comenzii:", err);
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
 
-        // Înlocuim fetchOrders cu onSnapshot
+        // onSnapshot pentru comenzi (le filtrăm la max 12 ore vechime)
         listenMyOrders() {
-          // Dacă clientNumber e 0, nu facem nimic
           if (!this.clientNumber) return;
           const cRef = collection(db, "orders");
           const qRef = query(cRef, where("clientNumber", "==", this.clientNumber));
 
           onSnapshot(qRef, (snapshot) => {
             const updatedOrders = [];
+            const now = new Date();
+            const MS_12H = 12 * 60 * 60 * 1000; // 12 ore in ms
+
             snapshot.forEach(docSnap => {
               const data = docSnap.data();
               data.orderId = docSnap.id;
-              updatedOrders.push(data);
+              if (data.timestamp) {
+                const docTime = data.timestamp.toDate();
+                if (now - docTime <= MS_12H) {
+                  updatedOrders.push(data);
+                }
+              }
             });
             this.myOrders = updatedOrders;
             localStorage.setItem("myOrders", JSON.stringify(updatedOrders));
@@ -1743,6 +1800,21 @@
             }
           }
         },
+
+        // Verifică codul introdus de client, compară cu sessionCode
+        async verifySessionCode() {
+          if (!this.inputSessionCode || !this.sessionInfo) return;
+          if (this.inputSessionCode.trim() === this.sessionInfo.sessionCode) {
+            // Corect, deblocăm
+            this.showSessionPrompt = false;
+            this.sessionBlocked = false;
+          } else {
+            // Greșit => blocam userul
+            this.sessionBlocked = true;
+            this.showSessionPrompt = false;
+          }
+        },
+
         applyThemeClass(themeName) {
           const allThemes = [
             'theme-red','theme-blue','theme-green','theme-purple',
@@ -1752,9 +1824,29 @@
           if (themeName !== 'orange') {
             document.body.classList.add(`theme-${themeName}`);
           }
+        },
+
+        // Verifică dacă e nevoie de cod (dacă au trecut 20min)
+        async checkSessionTime() {
+          if (!this.sessionInfo) return;
+          // Luăm timestamp-ul mesă (sessionStart)
+          const docRef = doc(db, "sessions", this.tableId);
+          const snap = await getDoc(docRef);
+          if (!snap.exists()) return;
+          const data = snap.data();
+          if (!data.sessionStart || data.status !== "active") return;
+
+          const startTime = data.sessionStart.toDate(); 
+          const now = new Date();
+          const MS_20MIN = 20 * 60 * 1000;
+          // Dacă a trecut >=20min
+          if (now - startTime >= MS_20MIN) {
+            // Afișăm promptul
+            this.showSessionPrompt = true;
+          }
         }
       },
-      mounted() {
+      async mounted() {
         window.addEventListener("scroll", this.handleWindowScroll);
         document.addEventListener("click", this.handleOutsideClick);
 
@@ -1774,7 +1866,14 @@
           this.tableId = "Masa numărul 1";
         }
 
-        // 3) clientNumber
+        // 3) Creăm/Obținem doc-ul de sesiune
+        try {
+          this.sessionInfo = await getOrCreateSessionDoc(this.tableId);
+        } catch (err) {
+          console.error(err);
+        }
+
+        // 4) clientNumber
         const storedNumber = localStorage.getItem("clientNumber");
         if (storedNumber) {
           this.clientNumber = parseInt(storedNumber);
@@ -1788,13 +1887,13 @@
           this.isFirstOrder = false;
         }
 
-        // 4) puncte
+        // 5) puncte
         const storedPoints = localStorage.getItem("clientPoints");
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
         }
 
-        // 5) myOrders
+        // 6) myOrders
         const storedMyOrders = localStorage.getItem("myOrders");
         if (storedMyOrders) {
           this.myOrders = JSON.parse(storedMyOrders);
@@ -1802,7 +1901,7 @@
         // Lansăm onSnapshot - pentru a vedea actualizări în timp real
         this.listenMyOrders();
 
-        // 6) Username / avatar
+        // 7) Username / avatar
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
           this.usernameSet = true;
@@ -1813,10 +1912,13 @@
           this.selectedAvatar = storedAvatar;
         }
 
-        // 7) Dacă username e setat, încărcăm direct mesajele
+        // 8) Dacă username e setat, încărcăm direct mesajele
         if (this.usernameSet) {
           this.loadMessages();
         }
+
+        // 9) După ce avem sessionInfo, verificăm daca au trecut 20min
+        await this.checkSessionTime();
       },
       unmounted() {
         window.removeEventListener("scroll", this.handleWindowScroll);
