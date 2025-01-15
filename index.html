@@ -516,7 +516,7 @@
               </aside>
             </transition>
 
-            <!-- Daca userul e obligat sa introduca codul mesei (dupa 20min) -->
+            <!-- Daca userul e nou si masa are >20min, cerem codul -->
             <div v-if="showSessionPrompt" class="fixed inset-0 z-50 bg-black bg-opacity-80 flex items-center justify-center p-4">
               <div class="bg-black border border-[var(--border-color)] p-4 rounded scratches max-w-xs w-full">
                 <p class="mb-4 text-center text-gray-200">
@@ -752,7 +752,10 @@
                   <div class="mt-2 font-bold" :style="{ color: 'var(--price-color)' }">
                     Total: {{ order.total }} Lei
                   </div>
-                  <!-- Afișăm statusul (placed vs pending), dar AM SCOS ID COMANDĂ & COD OSPĂTAR -->
+                  <div class="mt-1 text-yellow-300">
+                    Cod ospătar: {{ order.sessionCode }}
+                  </div>
+                  <!-- Afișăm statusul (placed vs pending) -->
                   <div v-if="order.orderStatus === 'placed'" class="text-green-500 font-bold mt-1">
                     Comanda a fost plasată
                   </div>
@@ -1147,7 +1150,7 @@
           activeTab: 'meniu',
           view: 'categorii',
 
-          // Placeholder categorii
+          // Categorii placeholder
           categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
@@ -1157,13 +1160,6 @@
             { name: "drinks",  image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp" },
             { name: "garnish", image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp" }
           ],
-
-          /* 
-            ------------------------------------------
-            Aici adaugi produsele la categoriile tale.
-            În loc de "..." pui obiectele cu title,description,price,image,ingredients etc.
-            ------------------------------------------
-          */
           products: {
             brunch: [
               {
@@ -1529,7 +1525,7 @@
           sessionInfo: null,
           orders: [],
 
-          // „Comenzile Tale” (actualizări prin onSnapshot)
+          // „Comenzile Tale”
           myOrders: [],
 
           // Zona Social
@@ -1550,10 +1546,13 @@
           selectedAvatar: "",
           reactionAnimation: "",
 
-          // Sesiune - after 20min lock
+          // Sesiune
           showSessionPrompt: false,
           inputSessionCode: "",
-          sessionBlocked: false
+          sessionBlocked: false,
+
+          // Pentru a nu-i cere codul celor care au intrat deja
+          hasJoinedSession: false
         };
       },
       computed: {
@@ -1593,7 +1592,7 @@
           this.isGrid = !this.isGrid;
         },
         renameCategory(cat) {
-          return cat; // Poti personaliza daca vrei
+          return cat;
         },
         enterCategory(categoryName) {
           this.currentProducts = this.products[categoryName] || [];
@@ -1641,7 +1640,7 @@
           this.isOrderOpen = !this.isOrderOpen;
         },
 
-        // Salvează comanda (orderStatus = 'pending') și ne trimite la confirm.html
+        // Salvăm comanda (orderStatus = 'pending') și trimitem la confirm.html
         async checkout() {
           try {
             const userId = localStorage.getItem("userId") || Date.now().toString();
@@ -1654,7 +1653,6 @@
             }
             this.clientPoints += pointsToAdd;
 
-            // "pending", "open"
             const orderData = {
               userId,
               tableId: this.tableId,
@@ -1681,7 +1679,7 @@
           }
         },
 
-        // onSnapshot pentru comenzi (le filtrăm la max 12 ore vechime)
+        // Ascultă în timp real comenzile, afișează doar cele din ultimele 12h
         listenMyOrders() {
           if (!this.clientNumber) return;
           const cRef = collection(db, "orders");
@@ -1725,6 +1723,7 @@
               const data = docItem.data();
               if (!data.timestamp) return;
               const docTime = data.timestamp.toDate();
+              // doar ultimele 10 minute
               if ((now - docTime) < TEN_MIN_MS) {
                 finalMsgs.push({ id: docItem.id, ...data });
               }
@@ -1801,13 +1800,15 @@
           }
         },
 
-        // Verifică codul introdus de client, compară cu sessionCode
+        // Verifică codul introdus
         async verifySessionCode() {
           if (!this.inputSessionCode || !this.sessionInfo) return;
           if (this.inputSessionCode.trim() === this.sessionInfo.sessionCode) {
-            // Corect, deblocăm
+            // Corect
             this.showSessionPrompt = false;
             this.sessionBlocked = false;
+            this.hasJoinedSession = true;
+            localStorage.setItem("joinedSessionCode", this.sessionInfo.sessionCode);
           } else {
             // Greșit => blocam userul
             this.sessionBlocked = true;
@@ -1826,22 +1827,39 @@
           }
         },
 
-        // Verifică dacă e nevoie de cod (dacă au trecut 20min)
+        // Verifică dacă masa are peste 20min
         async checkSessionTime() {
           if (!this.sessionInfo) return;
-          // Luăm timestamp-ul mesă (sessionStart)
+          // Dacă userul a mai intrat în sesiunea asta, nu-i mai cerem cod
+          const storedJoinedCode = localStorage.getItem("joinedSessionCode");
+          if (storedJoinedCode && storedJoinedCode === this.sessionInfo.sessionCode) {
+            this.hasJoinedSession = true;
+            return; // nu mai cerem nimic
+          }
+
+          // Dacă userul are deja o comandă -> considerăm că a intrat
+          const storedOrders = localStorage.getItem("myOrders");
+          if (storedOrders) {
+            const arr = JSON.parse(storedOrders);
+            const anyOrderForThisSession = arr.some(o => o.sessionCode === this.sessionInfo.sessionCode);
+            if (anyOrderForThisSession) {
+              this.hasJoinedSession = true;
+              return;
+            }
+          }
+
+          // Masa e activă
           const docRef = doc(db, "sessions", this.tableId);
           const snap = await getDoc(docRef);
           if (!snap.exists()) return;
           const data = snap.data();
           if (!data.sessionStart || data.status !== "active") return;
 
-          const startTime = data.sessionStart.toDate(); 
+          const startTime = data.sessionStart.toDate();
           const now = new Date();
-          const MS_20MIN = 2 * 60 * 1000;
-          // Dacă a trecut >=20min
+          const MS_20MIN = 20 * 60 * 1000;
+
           if (now - startTime >= MS_20MIN) {
-            // Afișăm promptul
             this.showSessionPrompt = true;
           }
         }
@@ -1850,7 +1868,7 @@
         window.addEventListener("scroll", this.handleWindowScroll);
         document.addEventListener("click", this.handleOutsideClick);
 
-        // 1) Tema salvată
+        // 1) Tema
         const storedTheme = localStorage.getItem('selectedTheme');
         if (storedTheme) {
           this.selectedTheme = storedTheme;
@@ -1866,7 +1884,7 @@
           this.tableId = "Masa numărul 1";
         }
 
-        // 3) Creăm/Obținem doc-ul de sesiune
+        // 3) Sesiune
         try {
           this.sessionInfo = await getOrCreateSessionDoc(this.tableId);
         } catch (err) {
@@ -1898,7 +1916,7 @@
         if (storedMyOrders) {
           this.myOrders = JSON.parse(storedMyOrders);
         }
-        // Lansăm onSnapshot - pentru a vedea actualizări în timp real
+        // lansăm onSnapshot
         this.listenMyOrders();
 
         // 7) Username / avatar
@@ -1911,13 +1929,11 @@
         if (storedAvatar) {
           this.selectedAvatar = storedAvatar;
         }
-
-        // 8) Dacă username e setat, încărcăm direct mesajele
         if (this.usernameSet) {
           this.loadMessages();
         }
 
-        // 9) După ce avem sessionInfo, verificăm daca au trecut 20min
+        // 8) Verifică dacă masa e >20min (dar doar dacă userul e complet nou)
         await this.checkSessionTime();
       },
       unmounted() {
