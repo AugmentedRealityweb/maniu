@@ -728,6 +728,7 @@
                 <div class="mt-2 font-bold" :style="{ color: 'var(--price-color)' }">
                   Total: {{ order.total }} Lei
                 </div>
+                <!-- Afișăm statusul (placed vs pending), dar AM SCOS ID COMANDĂ & COD OSPĂTAR -->
                 <div v-if="order.orderStatus === 'placed'" class="text-green-500 font-bold mt-1">
                   Comanda a fost plasată
                 </div>
@@ -740,6 +741,7 @@
 
           <!-- TAB: Social -->
           <section v-else-if="activeTab === 'social'">
+            <!-- Dacă nu are username încă -->
             <div v-if="!usernameSet" class="text-center">
               <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
               <p class="mb-4 text-gray-300 max-w-md mx-auto">
@@ -775,6 +777,7 @@
                 </button>
               </div>
             </div>
+            <!-- Dacă are username -> chat -->
             <div v-else>
               <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
               <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto">
@@ -861,42 +864,52 @@
             <h2 class="text-2xl font-bold mb-4 text-center">Tema de Design</h2>
             <p class="text-gray-300 text-center mb-4">Alege o temă de culori pentru aplicație:</p>
             <div class="flex flex-wrap gap-4 justify-center">
+              <!-- 1) Portocaliu (implicit) -->
               <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input type="radio" value="orange" v-model="selectedTheme" />
                 <span>Portocaliu</span>
               </label>
+              <!-- 2) Roșu -->
               <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input type="radio" value="red" v-model="selectedTheme" />
                 <span>Roșu</span>
               </label>
+              <!-- 3) Albastru -->
               <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input type="radio" value="blue" v-model="selectedTheme" />
                 <span>Albastru</span>
               </label>
+              <!-- 4) Verde -->
               <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input type="radio" value="green" v-model="selectedTheme" />
                 <span>Verde</span>
               </label>
+              <!-- 5) Mov -->
               <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input type="radio" value="purple" v-model="selectedTheme" />
                 <span>Mov</span>
               </label>
+              <!-- 6) Roz -->
               <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input type="radio" value="pink" v-model="selectedTheme" />
                 <span>Roz</span>
               </label>
+              <!-- 7) Gri -->
               <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input type="radio" value="grey" v-model="selectedTheme" />
                 <span>Gri</span>
               </label>
+              <!-- 8) Maro -->
               <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input type="radio" value="brown" v-model="selectedTheme" />
                 <span>Maro</span>
               </label>
+              <!-- 9) Teal -->
               <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input type="radio" value="teal" v-model="selectedTheme" />
                 <span>Teal</span>
               </label>
+              <!-- 10) Verde-lămâie -->
               <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input type="radio" value="lime" v-model="selectedTheme" />
                 <span>Verde Lămâie</span>
@@ -1021,7 +1034,7 @@
       setDoc,
       collection,
       addDoc,
-      updateDoc,
+      getDocs,
       query,
       where,
       serverTimestamp,
@@ -1042,66 +1055,42 @@
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    // 20 minute în ms
-    const TWENTY_MINUTES = 20 * 60 * 1000;
-    // 12 ore în ms
-    const TWELVE_HOURS = 12 * 60 * 60 * 1000;
-
-    // Elimină diacritice (pentru căutare)
+    // Funcție utilitară: elimină diacritice (pentru căutare)
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
-    // Generează un cod de sesiune (4 cifre)
+    // Generează un cod de ospătar (4 cifre)
     function generateSessionCode() {
       return Math.floor(1000 + Math.random() * 9000).toString();
     }
 
-    // Creează un cod nou pt masă (startTime = serverTimestamp)
-    async function createNewSessionCode(tableId) {
-      const newSessionCode = generateSessionCode();
-      await setDoc(doc(db, "sessions", tableId), {
-        sessionCode: newSessionCode,
-        status: "active",
-        sessionStartedAt: serverTimestamp() // ora exactă când a fost creată
-      });
-      return newSessionCode;
-    }
-
-    // Închide masa (dacă e cazul)
-    async function closeTable(tableId) {
-      await updateDoc(doc(db, "sessions", tableId), {
-        status: "closed",
-        sessionCode: null,
-        sessionStartedAt: null
-      });
-      alert("Masa a fost închisă de ospătar!");
-    }
-
-    // Verifică dacă masa e open / expirată etc. (bazat pe sessionStartedAt)
-    async function checkTableStatus(tableId) {
+    // Creează sau obține codul de sesiune pentru o masă
+    async function getOrCreateSessionCode(tableId) {
+      if (!tableId) {
+        throw new Error("Nu există parametru pentru masă în URL.");
+      }
       const docRef = doc(db, "sessions", tableId);
-      const snap = await getDoc(docRef);
-      if (!snap.exists() || snap.data().status === "closed") {
-        return { status: "closed" };
+      try {
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data.sessionCode && data.status === "active") {
+            return data.sessionCode;
+          } else {
+            const newSessionCode = generateSessionCode();
+            await setDoc(docRef, { sessionCode: newSessionCode, status: "active" }, { merge: true });
+            return newSessionCode;
+          }
+        } else {
+          const newSessionCode = generateSessionCode();
+          await setDoc(docRef, { sessionCode: newSessionCode, status: "active" });
+          return newSessionCode;
+        }
+      } catch (error) {
+        console.error(`Eroare la getOrCreateSessionCode pentru ${tableId}:`, error);
+        throw new Error("Eroare la obținerea/crearea session code-ului.");
       }
-      const data = snap.data();
-      const now = new Date();
-      const startTime = data.sessionStartedAt?.toDate();
-      const timeElapsed = now - startTime;
-
-      if (timeElapsed > TWENTY_MINUTES) {
-        // E activă, dar trecute 20 minute de la start
-        return { status: "expired", sessionCode: data.sessionCode };
-      }
-      // Altfel e încă valid (mai puțin de 20 minute)
-      return { status: "active", sessionCode: data.sessionCode };
-    }
-
-    // Doar informăm că folosim aceeași sesiune (nu actualizăm nimic, 
-    // pentru că se dorește 20min stric de la start).
-    function continueSession(tableId, sessionCode) {
-      console.log("Continuăm sesiunea pe masa:", tableId, "cod:", sessionCode);
     }
 
     const app = Vue.createApp({
@@ -1121,7 +1110,7 @@
           activeTab: 'meniu',
           view: 'categorii',
 
-          // Categorii & produse
+          // Categorii & produse (exemplu)
           categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
@@ -1223,7 +1212,7 @@
                 title: "Ciorbă de fasole",
                 description: "400g. Fasole boabe și zarzavaturi, perfectă cu ardei iute.",
                 price: 15,
-                image: "https://retete.unica.ro/wp-content/uploads/2010/06/ciorba-de-fasole-1-e1505228989189.jpg",
+                image: "https://thumbor.unica.ro/unsafe/1200x800/smart/filters:format(webp):contrast(8):quality(75)/https://retete.unica.ro/wp-content/uploads/2010/06/ciorba-de-fasole-1-e1505228989189.jpg",
                 ingredients: ["Fasole boabe", "Legume", "Condimente"]
               },
               {
@@ -1493,9 +1482,9 @@
           isFirstOrder: true,
           tableId: "",
           sessionCode: "",
-
           orders: [],
-          // Istoric
+
+          // În locul arrays cu myOrders + fetch, folosim un array reacționat prin onSnapshot
           myOrders: [],
 
           // Zona Social
@@ -1518,7 +1507,7 @@
         };
       },
       computed: {
-        // Filtrare produse după search
+        // Filtrare produse
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
@@ -1554,7 +1543,7 @@
           this.isGrid = !this.isGrid;
         },
         renameCategory(cat) {
-          return cat; 
+          return cat; // personalizare
         },
         enterCategory(categoryName) {
           this.currentProducts = this.products[categoryName] || [];
@@ -1601,11 +1590,13 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
-        // La plasare - salvăm comanda și mergem la confirm
+        // Salvează comanda (orderStatus = 'pending') și ne trimite la confirm.html
         async checkout() {
           try {
             const userId = localStorage.getItem("userId") || Date.now().toString();
             localStorage.setItem("userId", userId);
+
+            this.sessionCode = await getOrCreateSessionCode(this.tableId);
 
             let pointsToAdd = 0;
             for (const item of this.orders) {
@@ -1613,6 +1604,7 @@
             }
             this.clientPoints += pointsToAdd;
 
+            // "pending", "open"
             const orderData = {
               userId,
               tableId: this.tableId,
@@ -1639,12 +1631,12 @@
           }
         },
 
-        // Ascultă istoricul comenzilor curente (ordinea plasării)
+        // Înlocuim fetchOrders cu onSnapshot
         listenMyOrders() {
+          // Dacă clientNumber e 0, nu facem nimic
           if (!this.clientNumber) return;
           const cRef = collection(db, "orders");
-          // Sortăm crescător după 'timestamp', pentru a menține ordinea
-          const qRef = query(cRef, where("clientNumber", "==", this.clientNumber), orderBy("timestamp", "asc"));
+          const qRef = query(cRef, where("clientNumber", "==", this.clientNumber));
 
           onSnapshot(qRef, (snapshot) => {
             const updatedOrders = [];
@@ -1654,32 +1646,10 @@
               updatedOrders.push(data);
             });
             this.myOrders = updatedOrders;
-
-            // Salvăm cu un timestamp
-            const now = Date.now();
             localStorage.setItem("myOrders", JSON.stringify(updatedOrders));
-            localStorage.setItem("myOrdersTimestamp", now.toString());
           }, (err) => {
             console.error("Eroare la onSnapshot myOrders:", err);
           });
-        },
-        // Verificăm expirarea localStorage (myOrders) după 12 ore
-        checkMyOrdersExpiry() {
-          const storedMyOrders = localStorage.getItem("myOrders");
-          const storedTS = localStorage.getItem("myOrdersTimestamp");
-          if (storedMyOrders && storedTS) {
-            const now = Date.now();
-            const oldTS = parseInt(storedTS);
-            if ((now - oldTS) > TWELVE_HOURS) {
-              // Gata, ștergem
-              localStorage.removeItem("myOrders");
-              localStorage.removeItem("myOrdersTimestamp");
-              this.myOrders = [];
-            } else {
-              // Rămâne valabil
-              this.myOrders = JSON.parse(storedMyOrders);
-            }
-          }
         },
 
         setUsername() {
@@ -1738,7 +1708,7 @@
             }
           }).catch((err) => console.error("Eroare la reacționare:", err));
 
-          // Animație scurtă pe ecran
+          // Animație scurtă
           this.reactionAnimation = reaction;
           setTimeout(() => {
             this.reactionAnimation = "";
@@ -1773,37 +1743,6 @@
             }
           }
         },
-
-        // Funcție principală de "acces" la masă (check/open)
-        async handleTableAccess(tableId) {
-          const tableStatus = await checkTableStatus(tableId);
-          if (tableStatus.status === "closed") {
-            // Masa e închisă => generăm cod nou
-            const newCode = await createNewSessionCode(tableId);
-            this.sessionCode = newCode;
-            this.tableId = tableId;
-            return;
-          }
-          if (tableStatus.status === "expired") {
-            // Trecut 20min => cerem cod
-            const userCode = prompt("Cere ospătarului codul de acces:");
-            if (userCode && userCode === tableStatus.sessionCode) {
-              this.sessionCode = tableStatus.sessionCode;
-              this.tableId = tableId;
-              alert("Cod corect! Continuăm sesiunea existentă.");
-              continueSession(tableId, tableStatus.sessionCode);
-              return;
-            } else {
-              alert("Cod incorect! Masa trebuie închisă de ospătar înainte de o nouă comandă.");
-              return;
-            }
-          }
-          // E "active" (sub 20min)
-          this.sessionCode = tableStatus.sessionCode;
-          this.tableId = tableId;
-          continueSession(tableId, tableStatus.sessionCode);
-        },
-
         applyThemeClass(themeName) {
           const allThemes = [
             'theme-red','theme-blue','theme-green','theme-purple',
@@ -1830,12 +1769,9 @@
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
         if (masaParam) {
-          const tableId = `Masa numărul ${masaParam}`;
-          this.handleTableAccess(tableId);
+          this.tableId = `Masa numărul ${masaParam}`;
         } else {
-          // fallback: Masa 1
-          const defaultTable = `Masa numărul 1`;
-          this.handleTableAccess(defaultTable);
+          this.tableId = "Masa numărul 1";
         }
 
         // 3) clientNumber
@@ -1858,13 +1794,15 @@
           this.clientPoints = parseFloat(storedPoints);
         }
 
-        // 5) Verificăm expirare comenzi stocate
-        this.checkMyOrdersExpiry();
-
-        // 6) Lansăm onSnapshot pt istoricul comenzilor
+        // 5) myOrders
+        const storedMyOrders = localStorage.getItem("myOrders");
+        if (storedMyOrders) {
+          this.myOrders = JSON.parse(storedMyOrders);
+        }
+        // Lansăm onSnapshot - pentru a vedea actualizări în timp real
         this.listenMyOrders();
 
-        // 7) Username / avatar
+        // 6) Username / avatar
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
           this.usernameSet = true;
@@ -1874,7 +1812,8 @@
         if (storedAvatar) {
           this.selectedAvatar = storedAvatar;
         }
-        // 8) Dacă e setat, încărcăm direct chatul
+
+        // 7) Dacă username e setat, încărcăm direct mesajele
         if (this.usernameSet) {
           this.loadMessages();
         }
@@ -1894,6 +1833,9 @@
         },
         clientNumber(newVal) {
           localStorage.setItem("clientNumber", newVal);
+        },
+        myOrders(newVal) {
+          localStorage.setItem("myOrders", JSON.stringify(newVal));
         },
         selectedTheme(newVal) {
           localStorage.setItem('selectedTheme', newVal);
