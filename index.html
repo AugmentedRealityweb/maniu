@@ -516,7 +516,7 @@
               </aside>
             </transition>
 
-            <!-- Daca userul e nou si masa are >20min, cerem codul -->
+            <!-- Daca au trecut >20min, cerem codul (de fiecare data, fara sa tinem cont ca userul a mai fost) -->
             <div v-if="showSessionPrompt" class="fixed inset-0 z-50 bg-black bg-opacity-80 flex items-center justify-center p-4">
               <div class="bg-black border border-[var(--border-color)] p-4 rounded scratches max-w-xs w-full">
                 <p class="mb-4 text-center text-gray-200">
@@ -619,7 +619,7 @@
                         :alt="category.name" 
                       />
                       <div class="card-details">
-                        <h3>{{ renameCategory(category.name) }}</h3>
+                        <h3>{{ category.name }}</h3>
                       </div>
                     </div>
                   </div>
@@ -1074,7 +1074,6 @@
       setDoc,
       collection,
       addDoc,
-      getDocs,
       query,
       where,
       serverTimestamp,
@@ -1095,17 +1094,17 @@
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    // Funcție utilitară: elimină diacritice (pentru căutare)
+    // Eliminăm diacriticele pentru o căutare flexibilă
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
-    // Generează un cod de ospătar (4 cifre)
+    // Generează un cod session de 4 cifre
     function generateSessionCode() {
       return Math.floor(1000 + Math.random() * 9000).toString();
     }
 
-    // Creează sau obține doc-ul de sesiune pentru masa respectivă
+    // Creează sau obține doc-ul de sesiune
     async function getOrCreateSessionDoc(tableId) {
       if (!tableId) {
         throw new Error("Nu există parametru pentru masă în URL.");
@@ -1115,20 +1114,19 @@
         const snap = await getDoc(docRef);
         if (snap.exists()) {
           const data = snap.data();
-          // Dacă masa e "active", return data
-          if (data.status === "active") {
-            return data;
-          } 
-          // Dacă e "closed", generăm un nou sessionCode și setăm status la "active"
-          else {
+          // dacă e "closed", regenerăm cod
+          if (data.status === "closed") {
             const newCode = generateSessionCode();
-            const updateData = {
+            const newData = {
               sessionCode: newCode,
               status: "active",
               sessionStart: serverTimestamp()
             };
-            await setDoc(docRef, updateData, { merge: true });
-            return updateData;
+            await setDoc(docRef, newData, { merge: true });
+            return newData;
+          } else {
+            // e "active", return direct
+            return data;
           }
         } else {
           // Documentul nu există, creăm sesiune nouă
@@ -1142,7 +1140,7 @@
           return dataToSet;
         }
       } catch (error) {
-        console.error(`Eroare la getOrCreateSessionDoc pentru ${tableId}:`, error);
+        console.error("Eroare la getOrCreateSessionDoc:", error);
         throw new Error("Eroare la obținerea/crearea session code-ului.");
       }
     }
@@ -1164,7 +1162,7 @@
           activeTab: 'meniu',
           view: 'categorii',
 
-          // Categorii (placeholder)
+          // Categorii DEMO
           categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
@@ -1174,7 +1172,7 @@
             { name: "drinks",  image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp" },
             { name: "garnish", image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp" }
           ],
-
+          
           products: {
             brunch: [
               {
@@ -1532,7 +1530,7 @@
           currentProduct: null,
           searchQuery: "",
 
-          // Client / comenzi
+          // Date client
           clientNumber: 0,
           clientPoints: 0,
           isFirstOrder: true,
@@ -1540,10 +1538,10 @@
           sessionInfo: null,
           orders: [],
 
-          // „Comenzile Tale”
+          // Istoric comenzi (ultimele 12 ore)
           myOrders: [],
 
-          // Zona Social
+          // Zona social (nume / avatar)
           usernameInput: "",
           usernameSet: false,
           newMessage: "",
@@ -1561,17 +1559,13 @@
           selectedAvatar: "",
           reactionAnimation: "",
 
-          // Sesiune
+          // 20 min lock
           showSessionPrompt: false,
           inputSessionCode: "",
-          sessionBlocked: false,
-
-          // Afiș cod doar pentru noii utilizatori
-          hasJoinedSession: false
+          sessionBlocked: false
         };
       },
       computed: {
-        // Filtrare produse
         displayedProducts() {
           const q = removeDiacritics(this.searchQuery.toLowerCase().trim());
           if (!q) {
@@ -1589,7 +1583,6 @@
           }
           return results;
         },
-        // Total coș
         total() {
           return this.orders
             .reduce((sum, o) => sum + (o.price * o.quantity), 0)
@@ -1605,9 +1598,6 @@
         },
         toggleLayout() {
           this.isGrid = !this.isGrid;
-        },
-        renameCategory(cat) {
-          return cat;
         },
         enterCategory(categoryName) {
           this.currentProducts = this.products[categoryName] || [];
@@ -1636,7 +1626,6 @@
             });
           }
           this.currentProduct = null;
-          // Efect "shake" pe coș
           this.isShaking = true;
           setTimeout(() => this.isShaking = false, 500);
         },
@@ -1655,13 +1644,12 @@
           this.isOrderOpen = !this.isOrderOpen;
         },
 
-        // Salvăm comanda (orderStatus = 'pending') și trimitem la confirm.html
         async checkout() {
           try {
             const userId = localStorage.getItem("userId") || Date.now().toString();
             localStorage.setItem("userId", userId);
 
-            // Adăugăm puncte
+            // Calculează puncte
             let pointsToAdd = 0;
             for (const item of this.orders) {
               pointsToAdd += item.price * item.quantity * 0.05;
@@ -1671,7 +1659,7 @@
             const orderData = {
               userId,
               tableId: this.tableId,
-              sessionCode: this.sessionInfo.sessionCode,
+              sessionCode: this.sessionInfo?.sessionCode || "",
               clientNumber: this.clientNumber,
               items: this.orders,
               total: parseFloat(this.total),
@@ -1687,14 +1675,13 @@
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
-            window.location.href = `${baseUrl}/confirm.html?sessionCode=${this.sessionInfo.sessionCode}&masa=${masaParam || ""}`;
+            window.location.href = `${baseUrl}/confirm.html?sessionCode=${this.sessionInfo?.sessionCode || ""}&masa=${masaParam || ""}`;
           } catch (err) {
             console.error("Eroare la salvarea comenzii:", err);
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
 
-        // Ascultă în timp real comenzile, afișează doar cele din ultimele 12h
         listenMyOrders() {
           if (!this.clientNumber) return;
           const cRef = collection(db, "orders");
@@ -1703,7 +1690,7 @@
           onSnapshot(qRef, (snapshot) => {
             const updatedOrders = [];
             const now = new Date();
-            const MS_12H = 12 * 60 * 60 * 1000; // 12 ore in ms
+            const MS_12H = 12 * 60 * 60 * 1000;
 
             snapshot.forEach(docSnap => {
               const data = docSnap.data();
@@ -1738,7 +1725,6 @@
               const data = docItem.data();
               if (!data.timestamp) return;
               const docTime = data.timestamp.toDate();
-              // doar ultimele 10 minute
               if ((now - docTime) < TEN_MIN_MS) {
                 finalMsgs.push({ id: docItem.id, ...data });
               }
@@ -1779,11 +1765,8 @@
             }
           }).catch((err) => console.error("Eroare la reacționare:", err));
 
-          // Animație scurtă
           this.reactionAnimation = reaction;
-          setTimeout(() => {
-            this.reactionAnimation = "";
-          }, 2000);
+          setTimeout(() => { this.reactionAnimation = ""; }, 2000);
         },
         tableStyle(tableNum) {
           const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
@@ -1815,17 +1798,12 @@
           }
         },
 
-        // Verifică codul introdus
-        async verifySessionCode() {
+        verifySessionCode() {
           if (!this.inputSessionCode || !this.sessionInfo) return;
           if (this.inputSessionCode.trim() === this.sessionInfo.sessionCode) {
-            // Corect
             this.showSessionPrompt = false;
             this.sessionBlocked = false;
-            this.hasJoinedSession = true;
-            localStorage.setItem("joinedSessionCode", this.sessionInfo.sessionCode);
           } else {
-            // Greșit => blocam userul
             this.sessionBlocked = true;
             this.showSessionPrompt = false;
           }
@@ -1842,28 +1820,9 @@
           }
         },
 
-        // Verifică dacă masa e >20min
         async checkSessionTime() {
           if (!this.sessionInfo) return;
-          // Dacă userul a mai intrat în sesiunea asta, nu-i mai cerem cod
-          const storedJoinedCode = localStorage.getItem("joinedSessionCode");
-          if (storedJoinedCode && storedJoinedCode === this.sessionInfo.sessionCode) {
-            this.hasJoinedSession = true;
-            return; // nu mai cerem nimic
-          }
-
-          // Dacă userul are deja o comandă -> considerăm că a intrat
-          const storedOrders = localStorage.getItem("myOrders");
-          if (storedOrders) {
-            const arr = JSON.parse(storedOrders);
-            const anyOrderForThisSession = arr.some(o => o.sessionCode === this.sessionInfo.sessionCode);
-            if (anyOrderForThisSession) {
-              this.hasJoinedSession = true;
-              return;
-            }
-          }
-
-          // Masa e activă
+          // *** FORȚĂM: de fiecare dată când se încarcă, dacă masa e activă și au trecut >20min => cerem codul
           const docRef = doc(db, "sessions", this.tableId);
           const snap = await getDoc(docRef);
           if (!snap.exists()) return;
@@ -1899,7 +1858,7 @@
           this.tableId = "Masa numărul 1";
         }
 
-        // 3) Sesiune
+        // 3) sessionInfo
         try {
           this.sessionInfo = await getOrCreateSessionDoc(this.tableId);
         } catch (err) {
@@ -1931,10 +1890,9 @@
         if (storedMyOrders) {
           this.myOrders = JSON.parse(storedMyOrders);
         }
-        // lansăm onSnapshot
         this.listenMyOrders();
 
-        // 7) Username / avatar
+        // 7) username
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
           this.usernameSet = true;
@@ -1948,7 +1906,7 @@
           this.loadMessages();
         }
 
-        // 8) Verifică dacă masa e >20min (dar doar dacă userul e complet nou)
+        // 8) Check 20min
         await this.checkSessionTime();
       },
       unmounted() {
