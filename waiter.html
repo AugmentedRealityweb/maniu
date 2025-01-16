@@ -154,7 +154,6 @@
                 class="btn ml-2"
                 @click="changeOrderStatus(ord)"
               >
-                <!-- Dacă e 'placed', afișăm "Comandă Plasată", altfel "Plasează Comanda" -->
                 {{ ord.orderStatus === 'placed' ? 'Comandă Plasată' : 'Plasează Comanda' }}
               </button>
             </div>
@@ -406,11 +405,6 @@
           }
         },
 
-        /**
-         * Metodă care schimbă statusul comenzii dacă nu e deja 'placed'.
-         * Dacă ord.orderStatus === 'placed', butonul rămâne "Comandă Plasată".
-         * Dacă era 'pending', atunci la click devine 'placed'.
-         */
         async changeOrderStatus(ord) {
           this.resetActivityTimer();
           // Dacă e deja "placed", nu mai facem nimic
@@ -479,6 +473,7 @@
         checkInactivity() {
           if (!this.lastActivityTime) return;
           const diff = Date.now() - this.lastActivityTime;
+          // De ex, 10 sec inactiv => reload
           if (diff > 10000) {
             location.reload();
           }
