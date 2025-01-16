@@ -442,7 +442,12 @@
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale'">
             <span class="material-icons">receipt</span>Comenzile Tale
           </button>
-          <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='social'">
+          <!-- Butonul Social apare doar dacă sesiunea NU este închisă -->
+          <button 
+            class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+            @click="activeTab='social'"
+            v-if="!sessionClosed"
+          >
             <span class="material-icons">group</span>Social
           </button>
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='design'">
@@ -500,9 +505,11 @@
                   >
                     <span class="material-icons">receipt</span>Comenzile Tale
                   </button>
+                  <!-- Butonul Social apare doar dacă sesiunea NU este închisă -->
                   <button 
                     class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
                     @click="activeTab='social'; isSidebarVisible=false"
+                    v-if="!sessionClosed"
                   >
                     <span class="material-icons">group</span>Social
                   </button>
@@ -516,7 +523,7 @@
               </aside>
             </transition>
 
-            <!-- Daca au trecut >20min, cerem codul (de fiecare data, fara sa tinem cont ca userul a mai fost) -->
+            <!-- Daca au trecut >20min, cerem codul -->
             <div v-if="showSessionPrompt" class="fixed inset-0 z-50 bg-black bg-opacity-80 flex items-center justify-center p-4">
               <div class="bg-black border border-[var(--border-color)] p-4 rounded scratches max-w-xs w-full">
                 <p class="mb-4 text-center text-gray-200">
@@ -766,8 +773,8 @@
               </div>
             </section>
 
-            <!-- TAB: Social -->
-            <section v-else-if="activeTab === 'social' && !showSessionPrompt">
+            <!-- TAB: Social (disponibil doar dacă sesiunea NU e închisă) -->
+            <section v-else-if="activeTab === 'social' && !showSessionPrompt && !sessionClosed">
               <!-- Dacă nu are username încă -->
               <div v-if="!usernameSet" class="text-center">
                 <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
@@ -883,6 +890,15 @@
                     Masa {{ tableNum }}
                   </div>
                 </div>
+              </div>
+            </section>
+
+            <!-- Dacă totuși cineva ajunge pe tabul 'social' și sesiunea e închisă, nu afișăm nimic -->
+            <section v-else-if="activeTab === 'social' && sessionClosed">
+              <div class="text-center text-gray-300">
+                <h2 class="text-2xl font-bold">Zona Socială</h2>
+                <p class="mt-4">Această masă a fost deja finalizată.</p>
+                <p>Nu mai puteți accesa chatul.</p>
               </div>
             </section>
 
@@ -1078,7 +1094,8 @@
       where,
       serverTimestamp,
       onSnapshot,
-      orderBy
+      orderBy,
+      updateDoc
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
     /* -- Configurare Firebase -- */
@@ -1162,7 +1179,7 @@
           activeTab: 'meniu',
           view: 'categorii',
 
-          // Categorii DEMO
+          // Categorii DEMO (poți completa imaginile)
           categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
@@ -1172,8 +1189,8 @@
             { name: "drinks",  image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp" },
             { name: "garnish", image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp" }
           ],
-          
-          products: {
+
+         products: {
             brunch: [
               {
                 title: "Toast cu avocado",
@@ -1547,14 +1564,11 @@
           newMessage: "",
           chatMessages: [],
           availableAvatars: [
+            // Avatare exemplu
             "https://i.giphy.com/NlGLQ1FU9mVDsMjeIU.webp",
             "https://i.giphy.com/17A0SmzhN6a4AGSrQ9.webp",
             "https://i.giphy.com/uK1v8dVSrc7yp7Ciqn.webp",
-            "https://i.giphy.com/1vh1PXneQqN1e.webp",
-            "https://i.giphy.com/XEOdmFHVznCerkI6CI.webp",
-            "https://i.giphy.com/hPTZgtzfRIB5Nfb5rL.webp",
-            "https://i.giphy.com/11uoNyauChZR16.webp",
-            "https://i.giphy.com/Wb0TGxvE50Xew.webp"
+            "https://i.giphy.com/1vh1PXneQqN1e.webp"
           ],
           selectedAvatar: "",
           reactionAnimation: "",
@@ -1562,7 +1576,10 @@
           // 20 min lock
           showSessionPrompt: false,
           inputSessionCode: "",
-          sessionBlocked: false
+          sessionBlocked: false,
+
+          // "Masa închisă"
+          sessionClosed: false
         };
       },
       computed: {
@@ -1822,7 +1839,7 @@
 
         async checkSessionTime() {
           if (!this.sessionInfo) return;
-          // *** FORȚĂM: de fiecare dată când se încarcă, dacă masa e activă și au trecut >20min => cerem codul
+          // Verificăm la încărcare dacă au trecut >20min
           const docRef = doc(db, "sessions", this.tableId);
           const snap = await getDoc(docRef);
           if (!snap.exists()) return;
@@ -1831,11 +1848,28 @@
 
           const startTime = data.sessionStart.toDate();
           const now = new Date();
-          const MS_20MIN = 2 * 60 * 1000;
+          const MS_20MIN = 20 * 60 * 1000; // <-- 20 minute
 
           if (now - startTime >= MS_20MIN) {
             this.showSessionPrompt = true;
           }
+        },
+
+        // Ascultăm permanent starea sesiunii - dacă devine "closed", dezactivăm tabul Social
+        listenSessionStatus() {
+          if (!this.tableId) return;
+          const docRef = doc(db, "sessions", this.tableId);
+          onSnapshot(docRef, (snap) => {
+            if (!snap.exists()) return;
+            const data = snap.data();
+            if (data.status === "closed") {
+              this.sessionClosed = true;
+              // dacă userul era pe tabul 'social', îl trimitem pe 'meniu'
+              if (this.activeTab === 'social') {
+                this.activeTab = 'meniu';
+              }
+            }
+          });
         }
       },
       async mounted() {
@@ -1908,6 +1942,9 @@
 
         // 8) Check 20min
         await this.checkSessionTime();
+
+        // 9) Ascultă status-ul sesiunii
+        this.listenSessionStatus();
       },
       unmounted() {
         window.removeEventListener("scroll", this.handleWindowScroll);
