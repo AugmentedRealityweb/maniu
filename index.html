@@ -402,7 +402,7 @@
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'">
             <span class="material-icons">restaurant_menu</span>Meniu
           </button>
-          <!-- 2) Meniul Zilei (tabel) -->
+          <!-- 2) Meniul Zilei (un singur buton + un singur preț) -->
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniulZilei'">
             <span class="material-icons">local_dining</span>Meniul Zilei
           </button>
@@ -524,7 +524,6 @@
 
             <!-- TAB: MENIU -->
             <section v-if="activeTab==='meniu' && !showSessionPrompt">
-              <!-- Exemplu simplu: afișăm categoriile / produsele. -->
               <h2 class="text-xl font-semibold mb-4 text-center">Categorii</h2>
 
               <!-- Buton de toggle grid / list -->
@@ -538,6 +537,7 @@
                 </button>
               </div>
 
+              <!-- Vizualizare CATEGORII -->
               <div v-if="view==='categorii'">
                 <div :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'">
                   <div 
@@ -558,7 +558,7 @@
                 </div>
               </div>
 
-              <!-- Afișare produse dintr-o categorie -->
+              <!-- Vizualizare PRODUSE dintr-o categorie -->
               <div v-else-if="view==='produse'">
                 <button 
                   class="btn-orange mb-4 rounded-full"
@@ -566,9 +566,7 @@
                 >
                   Înapoi la Categorii
                 </button>
-                <div 
-                  :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
-                >
+                <div :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'">
                   <div
                     v-for="prod in currentProducts"
                     :key="prod.title"
@@ -594,8 +592,9 @@
                 class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
               >
                 <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
+                  <!-- X ROSU, MARE -->
                   <button
-                    class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]"
+                    class="absolute top-4 right-4 text-red-500 text-4xl hover:text-red-700"
                     @click="currentProduct=null"
                   >
                     &times;
@@ -633,68 +632,20 @@
               </div>
             </section>
 
-            <!-- TAB: Meniul Zilei (tabel) -->
+            <!-- TAB: Meniul Zilei (un singur preț, un singur buton) -->
             <section v-else-if="activeTab==='meniulZilei' && !showSessionPrompt">
               <h2 class="text-2xl font-bold mb-4 text-center">Meniul Zilei</h2>
-
-              <div v-if="dailyMenuProducts.length===0" class="text-center text-gray-300">
-                Momentan nu există Meniul Zilei.
+              <div class="text-center mb-4 text-gray-300">
+                Astăzi vă oferim un singur meniu complet la preț fix.
               </div>
-
-              <div v-else>
-                <!-- TABEL cu produsele Meniului Zilei -->
-                <table class="w-full text-left bg-black bg-opacity-40">
-                  <thead class="border-b border-[var(--border-color)]">
-                    <tr>
-                      <th class="px-4 py-2">Imagine</th>
-                      <th class="px-4 py-2">Nume</th>
-                      <th class="px-4 py-2">Preț (Lei)</th>
-                      <th class="px-4 py-2">Acțiune</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="(prod, index) in dailyMenuProducts"
-                      :key="index"
-                      class="border-b border-[var(--border-color)]"
-                    >
-                      <!-- Celulă Imagine -->
-                      <td class="px-4 py-2">
-                        <img 
-                          :src="prod.image"
-                          :alt="prod.title"
-                          class="w-24 h-24 object-cover rounded"
-                        />
-                      </td>
-                      <!-- Celulă Nume / Descriere -->
-                      <td class="px-4 py-2 align-top">
-                        <span class="font-bold font-[Dancing Script] text-xl">
-                          {{ prod.title }}
-                        </span>
-                        <br/>
-                        <small class="text-gray-300">
-                          {{ prod.description }}
-                        </small>
-                      </td>
-                      <!-- Celulă Preț -->
-                      <td 
-                        class="px-4 py-2 align-top font-bold"
-                        :style="{ color: 'var(--price-color)' }"
-                      >
-                        {{ prod.price }}
-                      </td>
-                      <!-- Celulă Buton "Adaugă în coș" -->
-                      <td class="px-4 py-2 align-top">
-                        <button
-                          class="btn-orange rounded-full"
-                          @click="addToOrder(prod)"
-                        >
-                          Adaugă în coș
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div class="text-center">
+                <p class="font-bold text-xl" style="color: var(--price-color)">35 Lei</p>
+                <button 
+                  class="btn-orange rounded-full mt-2"
+                  @click="addDailyMenuToOrder"
+                >
+                  Adaugă în coș
+                </button>
               </div>
             </section>
 
@@ -751,6 +702,7 @@
 
             <!-- TAB: Social -->
             <section v-else-if="activeTab==='social' && !showSessionPrompt && !sessionClosed && !sessionBlocked">
+              <!-- Dacă încă nu avem username setat -->
               <div v-if="!usernameSet" class="text-center">
                 <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
                 <p class="mb-4 text-gray-300 max-w-md mx-auto">
@@ -787,35 +739,34 @@
                   </button>
                 </div>
               </div>
-              <!-- Chat -->
+              <!-- Chat -> Mesaje + trimite -->
               <div v-else>
                 <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
-                <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto">
+                <!-- container chat, mai îngust, max-w-xl -->
+                <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto mx-auto max-w-xl">
                   <div
                     v-for="message in chatMessages"
                     :key="message.id"
                     class="mb-3 flex items-center"
-                    :class="message.name===usernameInput?'justify-end':'justify-start'"
+                    :class="message.name===usernameInput ? 'justify-end' : 'justify-start'"
                   >
                     <div
                       class="relative flex items-start"
-                      :class="message.name===usernameInput?'flex-row-reverse':'flex-row'"
+                      :class="message.name===usernameInput ? 'flex-row-reverse' : 'flex-row'"
                     >
                       <img 
-                        :src="message.avatar||'https://via.placeholder.com/40'"
+                        :src="message.avatar || 'https://via.placeholder.com/40'"
                         alt="Avatar"
                         class="w-10 h-10 rounded-full object-cover m-2"
                       />
+                      <!-- Bula text -> max-w-sm -->
                       <div
-                        class="leading-tight py-1 px-4 rounded-3xl"
-                        style="max-width:400px;"
-                        :class="[message.name===usernameInput?'bg-green-600 text-right mr-2':'bg-gray-700 text-left ml-2']"
+                        class="leading-tight py-1 px-4 rounded-3xl max-w-sm"
+                        :class="[message.name===usernameInput ? 'bg-green-600 text-right mr-2' : 'bg-gray-700 text-left ml-2']"
                       >
-                        <div class="font-bold" :style="{ color:'var(--price-color)' }">
-                          (masa {{ message.tableNumber }}) {{ message.name }}
-                        </div>
+                        <!-- Formă (masa10) Ionut: mesaj -->
                         <div class="text-gray-100">
-                          {{ message.text }}
+                          (masa{{ message.tableNumber }}) {{ message.name }}: {{ message.text }}
                         </div>
                         <div class="flex gap-2 mt-2 text-sm">
                           <button @click="reactToMessage(message.id,'❤️')">
@@ -847,6 +798,8 @@
                     </div>
                   </div>
                 </div>
+
+                <!-- Casuța de text + buton trimite (max-w-xl) -->
                 <div class="flex gap-2 max-w-xl mx-auto">
                   <input 
                     v-model="newMessage"
@@ -860,6 +813,8 @@
                     Trimite
                   </button>
                 </div>
+
+                <!-- Masa (vizual, cercuri) -->
                 <div class="table-zone">
                   <div
                     v-for="tableNum in 12"
@@ -1101,8 +1056,7 @@
       where,
       orderBy,
       serverTimestamp,
-      onSnapshot,
-      updateDoc
+      onSnapshot
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
     /* -- Configurare Firebase -- */
@@ -1183,8 +1137,7 @@
           activeTab: 'meniu',
           view: 'categorii',
 
-          // Categoriile disponibile (imaginile sunt doar demo)
-          categories: [
+         categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
             { name: "pasta",   image: "https://i.giphy.com/dZRlFW1sbFEpG.webp" },
@@ -1194,7 +1147,7 @@
             { name: "garnish", image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp" }
           ],
 
-          // Produsele (poți adăuga și altele)
+          // Placeholder PRODUCTION: adaugă tu categoriile și produsele
           products: {
             brunch: [
               {
@@ -1547,8 +1500,7 @@
               }
             ]
           },
-
-          // Meniul Zilei (din Firestore, doc "specials"/"dailyMenu")
+          // Meniul Zilei nu mai are listă de produse — folosim un singur buton
           dailyMenuProducts: [],
 
           // Variabile meniu
@@ -1666,7 +1618,22 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
-
+        // Butonul care adaugă Meniul Zilei
+        addDailyMenuToOrder() {
+          const existing = this.orders.find(o => o.name === "Meniul Zilei");
+          if (existing) {
+            existing.quantity++;
+          } else {
+            // Preț fix: 35 lei
+            this.orders.push({
+              name: "Meniul Zilei",
+              price: 35,
+              quantity: 1
+            });
+          }
+          this.isShaking = true;
+          setTimeout(() => this.isShaking = false, 500);
+        },
         async checkout() {
           try {
             const userId = localStorage.getItem("userId") || Date.now().toString();
@@ -1705,7 +1672,6 @@
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
-
         listenMyOrders() {
           if (!this.clientNumber) return;
           const cRef = collection(db, "orders");
@@ -1732,7 +1698,6 @@
             console.error("Eroare la onSnapshot myOrders:", err);
           });
         },
-
         setUsername() {
           if (!this.usernameInput.trim()) return;
           localStorage.setItem("username", this.usernameInput.trim());
@@ -1822,7 +1787,6 @@
             }
           }
         },
-
         verifySessionCode() {
           if (!this.inputSessionCode || !this.sessionInfo) return;
           if (this.inputSessionCode.trim() === this.sessionInfo.sessionCode) {
@@ -1835,7 +1799,6 @@
             this.showSessionPrompt = false;
           }
         },
-
         applyThemeClass(themeName) {
           const allThemes = [
             'theme-red','theme-blue','theme-green','theme-purple',
@@ -1846,22 +1809,6 @@
             document.body.classList.add(`theme-${themeName}`);
           }
         },
-
-        // Ascultă doc "specials/dailyMenu" => încarcă "dailyMenuProducts"
-        listenDailyMenu() {
-          const docRef = doc(db, "specials", "dailyMenu");
-          onSnapshot(docRef, (snap) => {
-            if (snap.exists()) {
-              const data = snap.data();
-              this.dailyMenuProducts = data.products || [];
-            } else {
-              this.dailyMenuProducts = [];
-            }
-          }, (err) => {
-            console.error("Eroare la dailyMenu onSnapshot:", err);
-          });
-        },
-
         async checkSessionTime() {
           if (!this.sessionInfo) return;
           // Verificăm la încărcare dacă au trecut >2min
@@ -1873,7 +1820,7 @@
 
           const startTime = data.sessionStart.toDate();
           const now = new Date();
-          const MS_2MIN = 2 * 60 * 1000; // <-- 2 minute (pt test)
+          const MS_2MIN = 2 * 60 * 1000; // <-- 2 minute (pentru test)
 
           if (now - startTime >= MS_2MIN) {
             this.showSessionPrompt = true;
@@ -1884,7 +1831,6 @@
             this.selectedAvatar = "";
           }
         },
-
         listenSessionStatus() {
           if (!this.tableId) return;
           const docRef = doc(db, "sessions", this.tableId);
@@ -1976,8 +1922,8 @@
         // 9) Ascultă status-ul sesiunii (dacă se închide)
         this.listenSessionStatus();
 
-        // 10) Ascultă Meniul Zilei
-        this.listenDailyMenu();
+        // 10) (Opțional) Ascultă Meniul Zilei (dacă vreți să îl încărcați din Firestore)
+        // this.listenDailyMenu(); // Puteți comenta/folosi dacă aveți nevoie
       },
       unmounted() {
         window.removeEventListener("scroll", this.handleWindowScroll);
