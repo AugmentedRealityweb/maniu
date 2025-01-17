@@ -1672,12 +1672,12 @@
 
             const orderData = {
               userId,
-              tableId: this.tableId,
+              tableId: this.tableId, 
               sessionCode: this.sessionInfo?.sessionCode || "",
               clientNumber: this.clientNumber,
               items: this.orders,
               total: parseFloat(this.total),
-              status: "open",
+              status: "open",       // Asigură-te că e "open"
               orderStatus: "pending",
               timestamp: serverTimestamp()
             };
@@ -1850,6 +1850,7 @@
 
           if (now - startTime >= MS_2MIN) {
             this.showSessionPrompt = true;
+            // Reset username la expirare
             localStorage.removeItem("username");
             localStorage.removeItem("selectedAvatar");
             this.usernameSet = false;
