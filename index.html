@@ -402,7 +402,7 @@
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'">
             <span class="material-icons">restaurant_menu</span>Meniu
           </button>
-          <!-- 2) Meniul Zilei (un singur buton + un singur preț) -->
+          <!-- 2) Meniul Zilei -->
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniulZilei'">
             <span class="material-icons">local_dining</span>Meniul Zilei
           </button>
@@ -632,20 +632,48 @@
               </div>
             </section>
 
-            <!-- TAB: Meniul Zilei (un singur preț, un singur buton) -->
+            <!-- TAB: Meniul Zilei (ACUM se vor afișa produsele din Firestore) -->
             <section v-else-if="activeTab==='meniulZilei' && !showSessionPrompt">
               <h2 class="text-2xl font-bold mb-4 text-center">Meniul Zilei</h2>
-              <div class="text-center mb-4 text-gray-300">
-                Astăzi vă oferim un singur meniu complet la preț fix.
+
+              <!-- Dacă array-ul e gol, afișăm un mesaj -->
+              <div v-if="dailyMenuProducts.length === 0" class="text-center text-gray-300">
+                Momentan nu există Meniul Zilei.
               </div>
-              <div class="text-center">
-                <p class="font-bold text-xl" style="color: var(--price-color)">35 Lei</p>
-                <button 
-                  class="btn-orange rounded-full mt-2"
-                  @click="addDailyMenuToOrder"
-                >
-                  Adaugă în coș
-                </button>
+
+              <!-- Altfel, afișăm produsele selectate de ospătar -->
+              <div v-else>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div
+                    v-for="(prod, idx) in dailyMenuProducts"
+                    :key="idx"
+                    class="card-container cursor-pointer"
+                    @click="showProductDetails(prod)"
+                  >
+                    <img 
+                      :src="prod.image"
+                      :alt="prod.title"
+                      class="card-img-square"
+                    />
+                    <div class="card-details">
+                      <h3>{{ prod.title }}</h3>
+                      <p>{{ prod.price }} Lei</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Un singur preț fix & un singur buton -->
+                <div class="text-center mt-4">
+                  <p class="text-xl font-bold" :style="{ color: 'var(--price-color)' }">
+                    35 Lei
+                  </p>
+                  <button 
+                    class="btn-orange rounded-full mt-2"
+                    @click="addDailyMenuToOrder"
+                  >
+                    Adaugă în coș (Meniul Zilei)
+                  </button>
+                </div>
               </div>
             </section>
 
@@ -702,7 +730,6 @@
 
             <!-- TAB: Social -->
             <section v-else-if="activeTab==='social' && !showSessionPrompt && !sessionClosed && !sessionBlocked">
-              <!-- Dacă încă nu avem username setat -->
               <div v-if="!usernameSet" class="text-center">
                 <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
                 <p class="mb-4 text-gray-300 max-w-md mx-auto">
@@ -739,10 +766,9 @@
                   </button>
                 </div>
               </div>
-              <!-- Chat -> Mesaje + trimite -->
+              <!-- Chat -->
               <div v-else>
                 <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
-                <!-- container chat, mai îngust, max-w-xl -->
                 <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto mx-auto max-w-xl">
                   <div
                     v-for="message in chatMessages"
@@ -755,16 +781,15 @@
                       :class="message.name===usernameInput ? 'flex-row-reverse' : 'flex-row'"
                     >
                       <img 
-                        :src="message.avatar || 'https://via.placeholder.com/40'"
+                        :src="message.avatar||'https://via.placeholder.com/40'"
                         alt="Avatar"
                         class="w-10 h-10 rounded-full object-cover m-2"
                       />
-                      <!-- Bula text -> max-w-sm -->
                       <div
                         class="leading-tight py-1 px-4 rounded-3xl max-w-sm"
-                        :class="[message.name===usernameInput ? 'bg-green-600 text-right mr-2' : 'bg-gray-700 text-left ml-2']"
+                        :class="[message.name===usernameInput?'bg-green-600 text-right mr-2':'bg-gray-700 text-left ml-2']"
                       >
-                        <!-- Formă (masa10) Ionut: mesaj -->
+                        <!-- Ex: (masa10) Ionut: mesaj -->
                         <div class="text-gray-100">
                           (masa{{ message.tableNumber }}) {{ message.name }}: {{ message.text }}
                         </div>
@@ -798,8 +823,6 @@
                     </div>
                   </div>
                 </div>
-
-                <!-- Casuța de text + buton trimite (max-w-xl) -->
                 <div class="flex gap-2 max-w-xl mx-auto">
                   <input 
                     v-model="newMessage"
@@ -813,8 +836,6 @@
                     Trimite
                   </button>
                 </div>
-
-                <!-- Masa (vizual, cercuri) -->
                 <div class="table-zone">
                   <div
                     v-for="tableNum in 12"
@@ -1056,7 +1077,8 @@
       where,
       orderBy,
       serverTimestamp,
-      onSnapshot
+      onSnapshot,
+      updateDoc
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
     /* -- Configurare Firebase -- */
@@ -1137,7 +1159,8 @@
           activeTab: 'meniu',
           view: 'categorii',
 
-         categories: [
+          // Categoriile disponibile
+          categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
             { name: "pasta",   image: "https://i.giphy.com/dZRlFW1sbFEpG.webp" },
@@ -1147,7 +1170,6 @@
             { name: "garnish", image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp" }
           ],
 
-          // Placeholder PRODUCTION: adaugă tu categoriile și produsele
           products: {
             brunch: [
               {
@@ -1500,7 +1522,8 @@
               }
             ]
           },
-          // Meniul Zilei nu mai are listă de produse — folosim un singur buton
+
+          // Meniul Zilei încărcat din Firestore
           dailyMenuProducts: [],
 
           // Variabile meniu
@@ -1618,13 +1641,13 @@
         toggleOrderBar() {
           this.isOrderOpen = !this.isOrderOpen;
         },
-        // Butonul care adaugă Meniul Zilei
+
+        // Adăugăm "Meniul Zilei" în coș ca un singur produs (35 Lei)
         addDailyMenuToOrder() {
           const existing = this.orders.find(o => o.name === "Meniul Zilei");
           if (existing) {
             existing.quantity++;
           } else {
-            // Preț fix: 35 lei
             this.orders.push({
               name: "Meniul Zilei",
               price: 35,
@@ -1634,6 +1657,7 @@
           this.isShaking = true;
           setTimeout(() => this.isShaking = false, 500);
         },
+
         async checkout() {
           try {
             const userId = localStorage.getItem("userId") || Date.now().toString();
@@ -1672,6 +1696,7 @@
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
+
         listenMyOrders() {
           if (!this.clientNumber) return;
           const cRef = collection(db, "orders");
@@ -1698,6 +1723,7 @@
             console.error("Eroare la onSnapshot myOrders:", err);
           });
         },
+
         setUsername() {
           if (!this.usernameInput.trim()) return;
           localStorage.setItem("username", this.usernameInput.trim());
@@ -1844,6 +1870,22 @@
               }
             }
           });
+        },
+
+        // Ascultă doc "specials/dailyMenu" => încarcă "dailyMenuProducts"
+        listenDailyMenu() {
+          const docRef = doc(db, "specials", "dailyMenu");
+          onSnapshot(docRef, (snap) => {
+            if (snap.exists()) {
+              const data = snap.data();
+              // Actualizăm array-ul cu produsele Meniului Zilei
+              this.dailyMenuProducts = data.products || [];
+            } else {
+              this.dailyMenuProducts = [];
+            }
+          }, (err) => {
+            console.error("Eroare la dailyMenu onSnapshot:", err);
+          });
         }
       },
       async mounted() {
@@ -1922,8 +1964,8 @@
         // 9) Ascultă status-ul sesiunii (dacă se închide)
         this.listenSessionStatus();
 
-        // 10) (Opțional) Ascultă Meniul Zilei (dacă vreți să îl încărcați din Firestore)
-        // this.listenDailyMenu(); // Puteți comenta/folosi dacă aveți nevoie
+        // 10) Ascultă Meniul Zilei => actualizează dailyMenuProducts
+        this.listenDailyMenu();
       },
       unmounted() {
         window.removeEventListener("scroll", this.handleWindowScroll);
