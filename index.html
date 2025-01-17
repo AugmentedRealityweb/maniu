@@ -19,7 +19,7 @@
 
   <style>
     /* ------------------------------------------------
-       1) TEMA IMPLICITĂ - PORTOCALIU
+       1) TEMA IMPLICITĂ - PORTOCALIU (și restul temelor)
        ------------------------------------------------ */
     :root {
       --gradient-start: #000000;
@@ -42,126 +42,7 @@
       --scratch-color: rgba(231,140,0,0.15);
     }
 
-    /* ------------------------------------------------
-       2) TEMELE SUPLIMENTARE (roșu, albastru etc.)
-       ------------------------------------------------ */
-    .theme-red {
-      --gradient-end: #8B0000;
-      --scrollbar-color: #8B0000;
-      --border-color: #8B0000;
-      --btn-start: #b30000;
-      --btn-end: #7d0000;
-      --btn-shadow-color1: #b30000;
-      --btn-shadow-color2: #7d0000;
-      --card-border-color: #8B0000;
-      --card-hover-shadow: rgba(179,0,0,0.3);
-      --price-color: #b30000;
-      --scratch-color: rgba(139,0,0,0.15);
-    }
-    .theme-blue {
-      --gradient-end: #004080;
-      --scrollbar-color: #004080;
-      --border-color: #004080;
-      --btn-start: #0066cc;
-      --btn-end: #004080;
-      --btn-shadow-color1: #0066cc;
-      --btn-shadow-color2: #004080;
-      --card-border-color: #004080;
-      --card-hover-shadow: rgba(0,64,128,0.3);
-      --price-color: #0066cc;
-      --scratch-color: rgba(0,64,128,0.15);
-    }
-    .theme-green {
-      --gradient-end: #004d00;
-      --scrollbar-color: #004d00;
-      --border-color: #004d00;
-      --btn-start: #008000;
-      --btn-end: #004d00;
-      --btn-shadow-color1: #008000;
-      --btn-shadow-color2: #004d00;
-      --card-border-color: #004d00;
-      --card-hover-shadow: rgba(0,77,0,0.3);
-      --price-color: #008000;
-      --scratch-color: rgba(0,77,0,0.15);
-    }
-    .theme-purple {
-      --gradient-end: #4B0082;
-      --scrollbar-color: #4B0082;
-      --border-color: #4B0082;
-      --btn-start: #6A0DAD;
-      --btn-end: #4B0082;
-      --btn-shadow-color1: #6A0DAD;
-      --btn-shadow-color2: #4B0082;
-      --card-border-color: #4B0082;
-      --card-hover-shadow: rgba(75,0,130,0.3);
-      --price-color: #6A0DAD;
-      --scratch-color: rgba(75,0,130,0.15);
-    }
-    .theme-pink {
-      --gradient-end: #A600A6;
-      --scrollbar-color: #A600A6;
-      --border-color: #A600A6;
-      --btn-start: #CC00CC;
-      --btn-end: #A600A6;
-      --btn-shadow-color1: #CC00CC;
-      --btn-shadow-color2: #A600A6;
-      --card-border-color: #A600A6;
-      --card-hover-shadow: rgba(166,0,166,0.3);
-      --price-color: #CC00CC;
-      --scratch-color: rgba(166,0,166,0.15);
-    }
-    .theme-grey {
-      --gradient-end: #555555;
-      --scrollbar-color: #555555;
-      --border-color: #555555;
-      --btn-start: #777777;
-      --btn-end: #555555;
-      --btn-shadow-color1: #777777;
-      --btn-shadow-color2: #555555;
-      --card-border-color: #555555;
-      --card-hover-shadow: rgba(85,85,85,0.3);
-      --price-color: #999999;
-      --scratch-color: rgba(85,85,85,0.15);
-    }
-    .theme-brown {
-      --gradient-end: #663300;
-      --scrollbar-color: #663300;
-      --border-color: #663300;
-      --btn-start: #996633;
-      --btn-end: #663300;
-      --btn-shadow-color1: #996633;
-      --btn-shadow-color2: #663300;
-      --card-border-color: #663300;
-      --card-hover-shadow: rgba(102,51,0,0.3);
-      --price-color: #996633;
-      --scratch-color: rgba(102,51,0,0.15);
-    }
-    .theme-teal {
-      --gradient-end: #004d4d;
-      --scrollbar-color: #004d4d;
-      --border-color: #004d4d;
-      --btn-start: #008080;
-      --btn-end: #004d4d;
-      --btn-shadow-color1: #008080;
-      --btn-shadow-color2: #004d4d;
-      --card-border-color: #004d4d;
-      --card-hover-shadow: rgba(0,128,128,0.3);
-      --price-color: #008080;
-      --scratch-color: rgba(0,77,77,0.15);
-    }
-    .theme-lime {
-      --gradient-end: #009900;
-      --scrollbar-color: #009900;
-      --border-color: #009900;
-      --btn-start: #00cc00;
-      --btn-end: #009900;
-      --btn-shadow-color1: #00cc00;
-      --btn-shadow-color2: #009900;
-      --card-border-color: #009900;
-      --card-hover-shadow: rgba(0,153,0,0.3);
-      --price-color: #00cc00;
-      --scratch-color: rgba(0,153,0,0.15);
-    }
+    /* Alte teme roșu, albastru etc. (le poți păstra sau șterge) ... */
 
     /* ------------------------------------------------
        3) STILURI DE BAZĂ
@@ -181,7 +62,6 @@
       display: flex;
       flex-direction: column;
     }
-
     .scrollbar {
       scrollbar-width: thin;
       scrollbar-color: var(--scrollbar-color) var(--scrollbar-track);
@@ -196,7 +76,6 @@
     .scrollbar::-webkit-scrollbar-track {
       background-color: var(--scrollbar-track);
     }
-
     .btn-orange {
       background: linear-gradient(to right, var(--btn-start), var(--btn-end));
       color: #fff;
@@ -234,9 +113,9 @@
       animation: shake 0.5s;
     }
     @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-5px); }
-      40%, 80% { transform: translateX(5px); }
+      0%,100% { transform: translateX(0); }
+      20%,60% { transform: translateX(-5px); }
+      40%,80% { transform: translateX(5px); }
     }
 
     .slide-cart-enter-active,
@@ -305,13 +184,6 @@
       border-top-left-radius: 1rem;
       border-top-right-radius: 1rem;
     }
-    .card-img-rect {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      border-top-left-radius: 1rem;
-      border-top-right-radius: 1rem;
-    }
     .card-details {
       padding: 0.75rem;
       text-align: center;
@@ -328,19 +200,6 @@
       text-align: center;
     }
 
-    @keyframes fadeInLeft {
-      0% {
-        transform: translateX(-50px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-    .fade-in-left {
-      animation: fadeInLeft 2s ease forwards;
-    }
     .handwriting-title {
       font-family: 'Dancing Script', cursive;
       font-size: 2rem;
@@ -379,20 +238,6 @@
       z-index: 1;
       box-shadow: 0 0 0 4px transparent;
     }
-    .table-circle:before {
-      content: "";
-      position: absolute;
-      top: -4px;
-      left: -4px;
-      right: -4px;
-      bottom: -4px;
-      border-radius: 30%;
-      z-index: -1;
-      transition: box-shadow 0.3s ease;
-    }
-    .table-circle[style*="background: #666"] {
-      box-shadow: 0 0 0 4px var(--btn-shadow-color1);
-    }
 
     .back-to-top {
       position: fixed;
@@ -416,12 +261,10 @@
       transform: scale(1.1);
     }
 
-    .pop-enter-active,
-    .pop-leave-active {
+    .pop-enter-active, .pop-leave-active {
       transition: opacity 0.4s;
     }
-    .pop-enter,
-    .pop-leave-to {
+    .pop-enter, .pop-leave-to {
       opacity: 0;
     }
   </style>
@@ -429,22 +272,30 @@
 <body>
   <div id="app">
     <div class="h-screen flex flex-col">
+
       <!-- SIDEBAR (desktop) -->
       <aside class="hidden md:flex md:flex-col md:w-64 p-4 space-y-4 sidebar scratches">
-        <div class="text-2xl font-bold mb-6 handwriting-title fade-in-left text-center">
+        <div class="text-2xl font-bold mb-6 handwriting-title text-center">
           Meniu Restaurant
         </div>
         <nav class="flex flex-col space-y-2">
+          <!-- 1) Meniu normal -->
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'">
             <span class="material-icons">restaurant_menu</span>Meniu
           </button>
+          <!-- 2) Meniul Zilei (nou tab) -->
+          <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniulZilei'">
+            <span class="material-icons">local_dining</span>Meniul Zilei
+          </button>
+          <!-- 3) Puncte -->
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='puncte'">
             <span class="material-icons">star</span>Puncte
           </button>
+          <!-- 4) Comenzile tale -->
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='comenzileTale'">
             <span class="material-icons">receipt</span>Comenzile Tale
           </button>
-          <!-- Butonul Social apare doar dacă sesiunea NU este închisă și userul nu e blocat -->
+          <!-- 5) Social (doar dacă masa nu e închisă și userul nu e blocat) -->
           <button 
             v-if="!sessionClosed && !sessionBlocked"
             class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
@@ -452,6 +303,7 @@
           >
             <span class="material-icons">group</span>Social
           </button>
+          <!-- 6) Design -->
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='design'">
             <span class="material-icons">palette</span>Design
           </button>
@@ -460,7 +312,6 @@
 
       <!-- CONȚINUT PRINCIPAL -->
       <div class="flex-1 flex flex-col p-2">
-        <!-- Daca e blocat, afisam ecran inchis. Altfel, tot layout-ul normal. -->
         <template v-if="!sessionBlocked">
           <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
             <!-- BARĂ mobilă -->
@@ -473,7 +324,7 @@
               >
                 <span class="material-icons">menu</span>
               </button>
-              <div class="handwriting-title text-2xl font-bold fade-in-left text-center flex-1">
+              <div class="handwriting-title text-2xl font-bold text-center flex-1">
                 Meniu Restaurant
               </div>
             </div>
@@ -497,6 +348,12 @@
                   </button>
                   <button 
                     class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
+                    @click="activeTab='meniulZilei'; isSidebarVisible=false"
+                  >
+                    <span class="material-icons">local_dining</span>Meniul Zilei
+                  </button>
+                  <button 
+                    class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
                     @click="activeTab='puncte'; isSidebarVisible=false"
                   >
                     <span class="material-icons">star</span>Puncte
@@ -507,7 +364,6 @@
                   >
                     <span class="material-icons">receipt</span>Comenzile Tale
                   </button>
-                  <!-- Buton Social: doar dacă masa nu e închisă și userul nu e blocat -->
                   <button 
                     v-if="!sessionClosed && !sessionBlocked"
                     class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" 
@@ -525,13 +381,12 @@
               </aside>
             </transition>
 
-            <!-- Daca au trecut >2min, cerem codul -->
+            <!-- Prompt reautentificare (dacă trec >2min) -->
             <div v-if="showSessionPrompt" class="fixed inset-0 z-50 bg-black bg-opacity-80 flex items-center justify-center p-4">
               <div class="bg-black border border-[var(--border-color)] p-4 rounded scratches max-w-xs w-full">
                 <p class="mb-4 text-center text-gray-200">
-                  Masa este deschisă de peste 2 minute (test). 
-                  <br/>
-                  Vă rugăm introduceți din nou codul sesiunii sau chemați ospătarul.
+                  Masa este deschisă de peste 2 minute.<br/>
+                  Vă rugăm introduceți codul sesiunii sau chemați ospătarul.
                 </p>
                 <input
                   v-model="inputSessionCode"
@@ -547,487 +402,61 @@
               </div>
             </div>
 
-            <!-- TAB: MENIU -->
-            <section v-if="activeTab === 'meniu' && !showSessionPrompt">
-              <!-- Căutare -->
-              <div class="flex items-center gap-4 mb-4">
-                <input 
-                  type="text" 
-                  placeholder="Caută produse..." 
-                  v-model="searchQuery" 
-                  class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] w-full md:w-1/2"
-                />
-              </div>
-              <!-- Rezultate căutare -->
-              <div v-if="searchQuery.trim()">
-                <h2 class="text-xl font-semibold mb-4 text-center">
-                  Rezultate pentru: "{{ searchQuery }}"
-                </h2>
-                <div class="flex justify-center mb-4">
-                  <button 
-                    class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
-                    @click="toggleLayout"
-                  >
-                    <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
-                    <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
-                  </button>
-                </div>
-                <!-- Produse filtrate -->
-                <div 
-                  v-if="displayedProducts.length > 0" 
-                  :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
-                >
-                  <div 
-                    v-for="product in displayedProducts" 
-                    :key="product.title" 
-                    class="card-container cursor-pointer"
-                    @click="showProductDetails(product)"
-                  >
-                    <img 
-                      :class="isGrid ? 'card-img-square' : 'card-img-rect'"
-                      :src="product.image" 
-                      :alt="product.title" 
-                    />
-                    <div class="card-details">
-                      <h3>{{ product.title }}</h3>
-                      <p>{{ product.price }} Lei</p>
-                    </div>
-                  </div>
-                </div>
-                <div v-else>
-                  <p class="text-center">
-                    Nu a fost găsit niciun produs care să corespundă căutării.
-                  </p>
-                </div>
-              </div>
-              <!-- Categorii / Produse (fără căutare) -->
-              <div v-else>
-                <div v-if="view === 'categorii'">
-                  <h2 class="text-xl font-semibold mb-4 text-center">
-                    Alege Categoria
-                  </h2>
-                  <div class="flex justify-center mb-4">
-                    <button 
-                      class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
-                      @click="toggleLayout"
-                    >
-                      <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
-                      <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
-                    </button>
-                  </div>
-                  <div :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'">
-                    <div 
-                      v-for="category in categories" 
-                      :key="category.name" 
-                      class="card-container cursor-pointer"
-                      @click="enterCategory(category.name)"
-                    >
-                      <img 
-                        :class="isGrid ? 'card-img-square' : 'card-img-rect'"
-                        :src="category.image" 
-                        :alt="category.name" 
-                      />
-                      <div class="card-details">
-                        <h3>{{ category.name }}</h3>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div v-else-if="view === 'produse'">
-                  <div class="flex items-center justify-between mb-4">
-                    <button class="btn-orange rounded-full" @click="backToCategories">
-                      Înapoi la Categorii
-                    </button>
-                    <button 
-                      class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
-                      @click="toggleLayout"
-                    >
-                      <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
-                      <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
-                    </button>
-                  </div>
-                  <h2 class="text-xl font-semibold mb-4 text-center">
-                    Produse ({{ currentProducts.length }})
-                  </h2>
-                  <div :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'">
-                    <div 
-                      v-for="product in currentProducts" 
-                      :key="product.title" 
-                      class="card-container cursor-pointer" 
-                      @click="showProductDetails(product)"
-                    >
-                      <img 
-                        :class="isGrid ? 'card-img-square' : 'card-img-rect'"
-                        :src="product.image" 
-                        :alt="product.title"
-                      />
-                      <div class="card-details">
-                        <h3>{{ product.title }}</h3>
-                        <p>{{ product.price }} Lei</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <!-- TAB: MENIU (codul tău) -->
+            <section v-if="activeTab==='meniu' && !showSessionPrompt">
+              <!-- ... cod complet meniu / categorii / search / products ... -->
+            </section>
 
-              <!-- Modal cu detalii produs -->
+            <!-- TAB: Meniul Zilei (nou!) -->
+            <section v-else-if="activeTab==='meniulZilei' && !showSessionPrompt">
+              <h2 class="text-2xl font-bold mb-4 text-center">Meniul Zilei</h2>
+              <div v-if="dailyMenuProducts.length===0" class="text-center text-gray-300">
+                Momentan nu există Meniul Zilei.
+              </div>
               <div 
-                v-if="currentProduct" 
-                class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+                v-else
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
               >
-                <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
-                  <button 
-                    class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
-                    @click="currentProduct = null"
-                  >
-                    &times;
-                  </button>
-                  <img 
-                    :src="currentProduct.image" 
-                    :alt="currentProduct.title" 
-                    class="w-full h-64 object-cover mb-4 rounded-lg"
-                  />
-                  <h2 class="text-xl font-bold mb-2 handwriting-title">
-                    {{ currentProduct.title }}
-                  </h2>
-                  <p class="font-bold text-lg mb-4" :style="{ color: 'var(--price-color)' }">
-                    {{ currentProduct.price }} Lei
-                  </p>
-                  <p class="text-gray-400 mb-4">
-                    {{ currentProduct.description }}
-                  </p>
-                  <ul class="text-gray-300 mb-4">
-                    <li 
-                      v-for="ingredient in currentProduct.ingredients" 
-                      :key="ingredient" 
-                      class="list-disc ml-5"
-                    >
-                      {{ ingredient }}
-                    </li>
-                  </ul>
-                  <button class="btn-orange rounded-full" @click="addToOrder(currentProduct)">
-                    Adaugă în coș
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            <!-- TAB: Puncte -->
-            <section v-else-if="activeTab === 'puncte' && !showSessionPrompt">
-              <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
-              <div class="bg-black p-4 rounded border border-[var(--border-color)] shadow max-w-md scratches mx-auto">
-                <div v-if="clientNumber === 0" class="mb-4">
-                  <p class="text-gray-300 text-center">
-                    Ești un client nou, nu ai niciun număr alocat. Plasează prima comandă!
-                  </p>
-                </div>
-                <div v-else>
-                  <p class="text-gray-300 mb-2 text-center">
-                    Număr client: <span class="font-bold">#{{ clientNumber }}</span>
-                  </p>
-                </div>
-                <p class="text-gray-300 text-center">
-                  Puncte acumulate:
-                  <span class="font-bold" :style="{ color: 'var(--price-color)' }">
-                    {{ clientPoints.toFixed(2) }}
-                  </span>
-                </p>
-              </div>
-            </section>
-
-            <!-- TAB: Comenzile Tale -->
-            <section v-else-if="activeTab === 'comenzileTale' && !showSessionPrompt">
-              <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
-              <div v-if="myOrders.length === 0" class="text-gray-300 text-center">
-                Nu ai nicio comandă finalizată încă.
-              </div>
-              <div v-else class="space-y-4">
                 <div 
-                  v-for="(order, idx) in myOrders" 
-                  :key="order.orderId" 
-                  class="bg-black p-4 rounded border border-[var(--border-color)] scratches"
+                  v-for="(prod, index) in dailyMenuProducts" 
+                  :key="index"
+                  class="card-container"
                 >
-                  <h3 class="text-lg font-semibold mb-2">
-                    Comanda #{{ idx + 1 }}
-                  </h3>
-                  <ul class="list-disc list-inside text-gray-300">
-                    <li 
-                      v-for="(prod, pidx) in order.items" 
-                      :key="pidx"
-                    >
-                      {{ prod.name }} x {{ prod.quantity }} – {{ (prod.price * prod.quantity).toFixed(2) }} Lei
-                    </li>
-                  </ul>
-                  <div class="mt-2 font-bold" :style="{ color: 'var(--price-color)' }">
-                    Total: {{ order.total }} Lei
-                  </div>
-                  <div class="mt-1 text-yellow-300">
-                    Cod ospătar: {{ order.sessionCode }}
-                  </div>
-                  <!-- Afișăm statusul (placed vs pending) -->
-                  <div v-if="order.orderStatus === 'placed'" class="text-green-500 font-bold mt-1">
-                    Comanda a fost plasată
-                  </div>
-                  <div v-else class="text-red-500 font-bold mt-1">
-                    Comanda în așteptare
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <!-- TAB: Social -->
-            <section v-else-if="activeTab === 'social' && !showSessionPrompt && !sessionClosed && !sessionBlocked">
-              <div v-if="!usernameSet" class="text-center">
-                <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
-                <p class="mb-4 text-gray-300 max-w-md mx-auto">
-                  Bun venit în zona de socializare! 
-                  Te rugăm să îți introduci numele și să alegi un avatar...
-                </p>
-                <div class="flex flex-col items-center max-w-sm mx-auto">
-                  <input 
-                    type="text" 
-                    v-model="usernameInput" 
-                    placeholder="Introduceți numele..." 
-                    class="bg-black text-gray-200 border border-[var(--border-color)] 
-                           rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] 
-                           w-full mb-4"
+                  <img 
+                    class="card-img-square"
+                    :src="prod.image"
+                    :alt="prod.title"
                   />
-                  <div class="flex flex-wrap gap-4 justify-center mb-4">
-                    <div 
-                      v-for="(av, i) in availableAvatars" 
-                      :key="i" 
-                      class="w-14 h-14 rounded-full border-2 border-gray-500 cursor-pointer overflow-hidden"
-                      :class="{'border-green-400': selectedAvatar === av}"
-                      @click="selectedAvatar = av"
-                    >
-                      <img 
-                        :src="av" 
-                        alt="avatar" 
-                        class="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                  <button class="btn-orange rounded-full" @click="setUsername">
-                    Continuă
-                  </button>
-                </div>
-              </div>
-              <!-- Dacă are username -> chat -->
-              <div v-else>
-                <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
-                <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto">
-                  <div
-                    v-for="message in chatMessages"
-                    :key="message.id"
-                    class="mb-3 flex items-center"
-                    :class="message.name === usernameInput ? 'justify-end' : 'justify-start'"
-                  >
-                    <div 
-                      class="relative flex items-start" 
-                      :class="message.name === usernameInput ? 'flex-row-reverse' : 'flex-row'"
-                    >
-                      <img 
-                        :src="message.avatar || 'https://via.placeholder.com/40'" 
-                        alt="Avatar" 
-                        class="w-10 h-10 rounded-full object-cover m-2"
-                      />
-                      <div 
-                        class="leading-tight py-1 px-4 rounded-3xl" 
-                        style="max-width: 400px;" 
-                        :class="[
-                          message.name === usernameInput 
-                            ? 'bg-green-600 text-right mr-2' 
-                            : 'bg-gray-700 text-left ml-2'
-                        ]"
-                      >
-                        <div class="font-bold" :style="{ color: 'var(--price-color)' }">
-                          (masa {{ message.tableNumber }}) {{ message.name }}
-                        </div>
-                        <div class="text-gray-100">
-                          {{ message.text }}
-                        </div>
-                        <div class="flex gap-2 mt-2 text-sm">
-                          <button @click="reactToMessage(message.id, '❤️')">
-                            ❤️
-                            <span v-if="message.reactions && message.reactions['❤️']">
-                              ({{ message.reactions['❤️'] }})
-                            </span>
-                          </button>
-                          <button @click="reactToMessage(message.id, '😂')">
-                            😂
-                            <span v-if="message.reactions && message.reactions['😂']">
-                              ({{ message.reactions['😂'] }})
-                            </span>
-                          </button>
-                          <button @click="reactToMessage(message.id, '👍')">
-                            👍
-                            <span v-if="message.reactions && message.reactions['👍']">
-                              ({{ message.reactions['👍'] }})
-                            </span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="flex gap-2 max-w-xl mx-auto">
-                  <input 
-                    v-model="newMessage" 
-                    class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 
-                           outline-none focus:ring-2 focus:ring-[var(--border-color)] flex-1" 
-                    placeholder="Scrie un mesaj..." 
-                  />
-                  <button class="btn-orange rounded-full" @click="postMessage">
-                    Trimite
-                  </button>
-                </div>
-                <div class="table-zone">
-                  <div 
-                    v-for="tableNum in 12" 
-                    :key="tableNum" 
-                    class="table-circle"
-                    :style="tableStyle(tableNum)"
-                  >
-                    Masa {{ tableNum }}
+                  <div class="card-details">
+                    <h3>{{ prod.title }}</h3>
+                    <p>{{ prod.price }} Lei</p>
                   </div>
                 </div>
               </div>
             </section>
 
-            <!-- Dacă totuși cineva ajunge pe tabul 'social' și sesiunea e închisă -->
-            <section v-else-if="activeTab === 'social' && sessionClosed">
-              <div class="text-center text-gray-300">
-                <h2 class="text-2xl font-bold">Zona Socială</h2>
-                <p class="mt-4">Această masă a fost deja finalizată.</p>
-                <p>Nu mai puteți accesa chatul.</p>
-              </div>
+            <!-- TAB: Puncte (codul tău) -->
+            <section v-else-if="activeTab==='puncte' && !showSessionPrompt">
+              <!-- ... cod ... -->
             </section>
 
-            <!-- TAB: DESIGN -->
-            <section v-else-if="activeTab === 'design' && !showSessionPrompt">
-              <h2 class="text-2xl font-bold mb-4 text-center">Tema de Design</h2>
-              <p class="text-gray-300 text-center mb-4">Alege o temă de culori pentru aplicație:</p>
-              <div class="flex flex-wrap gap-4 justify-center">
-                <!-- 1) Portocaliu (implicit) -->
-                <label class="inline-flex items-center gap-2 cursor-pointer">
-                  <input type="radio" value="orange" v-model="selectedTheme" />
-                  <span>Portocaliu</span>
-                </label>
-                <!-- 2) Roșu -->
-                <label class="inline-flex items-center gap-2 cursor-pointer">
-                  <input type="radio" value="red" v-model="selectedTheme" />
-                  <span>Roșu</span>
-                </label>
-                <!-- 3) Albastru -->
-                <label class="inline-flex items-center gap-2 cursor-pointer">
-                  <input type="radio" value="blue" v-model="selectedTheme" />
-                  <span>Albastru</span>
-                </label>
-                <!-- 4) Verde -->
-                <label class="inline-flex items-center gap-2 cursor-pointer">
-                  <input type="radio" value="green" v-model="selectedTheme" />
-                  <span>Verde</span>
-                </label>
-                <!-- 5) Mov -->
-                <label class="inline-flex items-center gap-2 cursor-pointer">
-                  <input type="radio" value="purple" v-model="selectedTheme" />
-                  <span>Mov</span>
-                </label>
-                <!-- 6) Roz -->
-                <label class="inline-flex items-center gap-2 cursor-pointer">
-                  <input type="radio" value="pink" v-model="selectedTheme" />
-                  <span>Roz</span>
-                </label>
-                <!-- 7) Gri -->
-                <label class="inline-flex items-center gap-2 cursor-pointer">
-                  <input type="radio" value="grey" v-model="selectedTheme" />
-                  <span>Gri</span>
-                </label>
-                <!-- 8) Maro -->
-                <label class="inline-flex items-center gap-2 cursor-pointer">
-                  <input type="radio" value="brown" v-model="selectedTheme" />
-                  <span>Maro</span>
-                </label>
-                <!-- 9) Teal -->
-                <label class="inline-flex items-center gap-2 cursor-pointer">
-                  <input type="radio" value="teal" v-model="selectedTheme" />
-                  <span>Teal</span>
-                </label>
-                <!-- 10) Verde-lămâie -->
-                <label class="inline-flex items-center gap-2 cursor-pointer">
-                  <input type="radio" value="lime" v-model="selectedTheme" />
-                  <span>Verde Lămâie</span>
-                </label>
-              </div>
+            <!-- TAB: Comenzile Tale (codul tău) -->
+            <section v-else-if="activeTab==='comenzileTale' && !showSessionPrompt">
+              <!-- ... cod ... -->
+            </section>
+
+            <!-- TAB: Social (codul tău) -->
+            <section v-else-if="activeTab==='social' && !showSessionPrompt && !sessionClosed && !sessionBlocked">
+              <!-- ... cod chat ... -->
+            </section>
+
+            <!-- TAB: Design (codul tău) -->
+            <section v-else-if="activeTab==='design' && !showSessionPrompt">
+              <!-- ... cod design ... -->
             </section>
           </main>
 
-          <!-- Buton Coș (apare dacă ai produse) -->
-          <div v-if="orders.length > 0" class="fixed bottom-3 right-5 z-50">
-            <button 
-              @click="toggleOrderBar" 
-              class="btn-orange flex items-center relative rounded-full" 
-              :class="{'animate-shake': isShaking}"
-            >
-              <span class="material-icons mr-2 text-white">shopping_cart</span>
-              <span class="text-white">Coș ({{ orders.length }})</span>
-            </button>
-          </div>
-
-          <!-- Bara laterală a Coșului (slide-up) -->
-          <transition name="slide-cart">
-            <aside 
-              v-show="isOrderOpen && orders.length > 0" 
-              class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[var(--border-color)] p-4 overflow-y-auto scrollbar" 
-              style="max-height: 100vh;"
-            >
-              <div class="relative flex flex-col">
-                <button 
-                  class="absolute top-2 right-2 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]" 
-                  @click="toggleOrderBar"
-                >
-                  &times;
-                </button>
-                <h3 class="text-xl font-bold mb-4 text-center">Comanda Ta</h3>
-                <div 
-                  v-for="(order, index) in orders" 
-                  :key="index" 
-                  class="flex justify-between items-center bg-black border border-[var(--border-color)] p-4 rounded-lg mb-2 scratches"
-                >
-                  <div class="flex flex-col">
-                    <span class="font-bold">{{ order.name }}</span>
-                    <div class="flex items-center gap-2 mt-1">
-                      <button class="btn-incdec" @click="decrementQuantity(index)">-</button>
-                      <span class="text-gray-400">x{{ order.quantity }}</span>
-                      <button class="btn-incdec" @click="incrementQuantity(index)">+</button>
-                      <button 
-                        class="bg-red-600 hover:bg-red-800 text-white px-2 py-1 rounded-full" 
-                        @click="removeItem(index)"
-                      >
-                        <span class="material-icons text-sm">delete</span>
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <span class="font-bold" :style="{ color: 'var(--price-color)' }">
-                      {{ (order.price * order.quantity).toFixed(2) }} Lei
-                    </span>
-                  </div>
-                </div>
-                <div class="mt-4">
-                  <div class="flex justify-between items-center">
-                    <span class="text-lg font-semibold">Total:</span>
-                    <span class="text-xl font-bold" :style="{ color: 'var(--price-color)' }">
-                      {{ total }}
-                    </span>
-                  </div>
-                  <button class="btn-orange mt-4 rounded-full self-end" @click="checkout">
-                    Finalizează Comanda
-                  </button>
-                </div>
-              </div>
-            </aside>
-          </transition>
+          <!-- Buton Coș + coș lateral (codul tău) -->
         </template>
 
         <!-- Ecran blocat (cod greșit) -->
@@ -1044,35 +473,30 @@
       </div>
     </div>
 
-    <!-- Buton "Sus" -->
-    <div 
-      v-if="showBackToTop" 
-      class="back-to-top" 
-      @click="scrollTop"
-    >
+    <!-- Buton "Sus" + animație reacții (ca în codul tău) -->
+    <div v-if="showBackToTop" class="back-to-top" @click="scrollTop">
       <span class="material-icons">keyboard_arrow_up</span>
     </div>
 
-    <!-- Animație reacție (overlay) -->
     <transition name="pop">
       <div 
         v-if="reactionAnimation" 
         class="fixed inset-0 flex items-center justify-center pointer-events-none z-50"
       >
         <div 
-          v-if="reactionAnimation === '❤️'" 
+          v-if="reactionAnimation==='❤️'" 
           class="text-red-500 text-7xl animate-bounce"
         >
           ❤️
         </div>
         <div 
-          v-else-if="reactionAnimation === '😂'" 
+          v-else-if="reactionAnimation==='😂'" 
           class="text-white text-7xl animate-bounce"
         >
           😂
         </div>
         <div 
-          v-else-if="reactionAnimation === '👍'" 
+          v-else-if="reactionAnimation==='👍'" 
           class="text-white text-7xl animate-bounce"
         >
           👍
@@ -1087,15 +511,15 @@
     import {
       getFirestore,
       doc,
-      getDoc,
       setDoc,
+      getDoc,
+      onSnapshot,
       collection,
       addDoc,
       query,
       where,
-      serverTimestamp,
-      onSnapshot,
       orderBy,
+      serverTimestamp,
       updateDoc
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
@@ -1124,40 +548,7 @@
 
     // Creează sau obține doc-ul de sesiune
     async function getOrCreateSessionDoc(tableId) {
-      if (!tableId) {
-        throw new Error("Nu există parametru pentru masă în URL.");
-      }
-      const docRef = doc(db, "sessions", tableId);
-      try {
-        const snap = await getDoc(docRef);
-        if (snap.exists()) {
-          const data = snap.data();
-          if (data.status === "closed") {
-            const newCode = generateSessionCode();
-            const newData = {
-              sessionCode: newCode,
-              status: "active",
-              sessionStart: serverTimestamp()
-            };
-            await setDoc(docRef, newData, { merge: true });
-            return newData;
-          } else {
-            return data;
-          }
-        } else {
-          const newSessionCode = generateSessionCode();
-          const dataToSet = {
-            sessionCode: newSessionCode,
-            status: "active",
-            sessionStart: serverTimestamp()
-          };
-          await setDoc(docRef, dataToSet);
-          return dataToSet;
-        }
-      } catch (error) {
-        console.error("Eroare la getOrCreateSessionDoc:", error);
-        throw new Error("Eroare la obținerea/crearea session code-ului.");
-      }
+      /* ... codul tău ... */
     }
 
     const app = Vue.createApp({
@@ -1173,22 +564,11 @@
           // Teme
           selectedTheme: 'orange',
 
-          // Tab activ
+          // TABS
           activeTab: 'meniu',
           view: 'categorii',
 
-          // Categorii (poți înlocui cu propriile imagini):
-          categories: [
-            { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
-            { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
-            { name: "pasta",   image: "https://i.giphy.com/dZRlFW1sbFEpG.webp" },
-            { name: "main",    image: "https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp" },
-            { name: "desserts",image: "https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp" },
-            { name: "drinks",  image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp" },
-            { name: "garnish", image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp" }
-          ],
-
-          // Placeholder PRODUCTION: adaugă tu categoriile și produsele
+          // AICI LA products -> lași gol, îl vei completa tu
           products: {
             brunch: [
               {
@@ -1542,6 +922,9 @@
             ]
           },
 
+          // “Meniul Zilei”
+          dailyMenuProducts: [],
+
           currentProducts: [],
           currentProduct: null,
           searchQuery: "",
@@ -1553,11 +936,9 @@
           tableId: "",
           sessionInfo: null,
           orders: [],
-
-          // Istoric comenzi (ultimele 12 ore)
           myOrders: [],
 
-          // Zona social
+          // Social
           usernameInput: "",
           usernameSet: false,
           newMessage: "",
@@ -1571,12 +952,11 @@
           selectedAvatar: "",
           reactionAnimation: "",
 
-          // 2 min lock
           showSessionPrompt: false,
           inputSessionCode: "",
           sessionBlocked: false,
 
-          // Masa închisă
+          // "Masa închisă"
           sessionClosed: false
         };
       },
@@ -1587,7 +967,6 @@
             return this.view === "produse" ? this.currentProducts : [];
           }
           const results = [];
-          // Iterăm toate categoriile + produsele
           for (const catKey in this.products) {
             for (const prod of this.products[catKey]) {
               const titleNoDiac = removeDiacritics(prod.title.toLowerCase());
@@ -1619,13 +998,13 @@
           this.currentProducts = this.products[categoryName] || [];
           this.view = "produse";
           this.searchQuery = "";
-          window.scrollTo(0,0);
+          window.scrollTo(0, 0);
         },
         backToCategories() {
           this.view = "categorii";
           this.currentProduct = null;
           this.searchQuery = "";
-          window.scrollTo(0,0);
+          window.scrollTo(0, 0);
         },
         showProductDetails(product) {
           this.currentProduct = product;
@@ -1646,13 +1025,13 @@
           setTimeout(() => this.isShaking = false, 500);
         },
         removeItem(index) {
-          this.orders.splice(index,1);
+          this.orders.splice(index, 1);
         },
         incrementQuantity(index) {
           this.orders[index].quantity++;
         },
         decrementQuantity(index) {
-          if (this.orders[index].quantity>1) {
+          if (this.orders[index].quantity > 1) {
             this.orders[index].quantity--;
           }
         },
@@ -1665,281 +1044,321 @@
             const userId = localStorage.getItem("userId") || Date.now().toString();
             localStorage.setItem("userId", userId);
 
-            let pointsToAdd=0;
+            // Calculează puncte
+            let pointsToAdd = 0;
             for (const item of this.orders) {
               pointsToAdd += item.price * item.quantity * 0.05;
             }
             this.clientPoints += pointsToAdd;
 
-            const orderData={
+            const orderData = {
               userId,
-              tableId:this.tableId,
-              sessionCode: this.sessionInfo?.sessionCode||"",
-              clientNumber:this.clientNumber,
-              items:this.orders,
+              tableId: this.tableId,
+              sessionCode: this.sessionInfo?.sessionCode || "",
+              clientNumber: this.clientNumber,
+              items: this.orders,
               total: parseFloat(this.total),
-              status:"open",
-              orderStatus:"pending",
+              status: "open",
+              orderStatus: "pending",
               timestamp: serverTimestamp()
             };
-            await addDoc(collection(db,"orders"),orderData);
+            await addDoc(collection(db, "orders"), orderData);
 
-            this.orders=[];
-            this.isOrderOpen=false;
-            const urlParams=new URLSearchParams(window.location.search);
-            const masaParam=urlParams.get("masa");
-            const baseUrl=window.location.origin;
-            window.location.href=`${baseUrl}/confirm.html?sessionCode=${this.sessionInfo?.sessionCode||""}&masa=${masaParam||""}`;
-          } catch(err){
-            console.error("Eroare la salvarea comenzii:",err);
+            this.orders = [];
+            this.isOrderOpen = false;
+
+            // După "Finalizează Comanda", mergem la confirm.html
+            const urlParams = new URLSearchParams(window.location.search);
+            const masaParam = urlParams.get("masa");
+            const baseUrl = window.location.origin;
+            window.location.href = `${baseUrl}/confirm.html?sessionCode=${this.sessionInfo?.sessionCode || ""}&masa=${masaParam || ""}`;
+          } catch (err) {
+            console.error("Eroare la salvarea comenzii:", err);
             alert("Eroare la salvarea comenzii. Încearcă din nou!");
           }
         },
 
         listenMyOrders() {
-          if(!this.clientNumber)return;
-          const cRef=collection(db,"orders");
-          const qRef=query(cRef,where("clientNumber","==",this.clientNumber));
-          onSnapshot(qRef,(snapshot)=>{
-            const updatedOrders=[];
-            const now=new Date();
-            const MS_12H=12*60*60*1000;
+          if (!this.clientNumber) return;
+          const cRef = collection(db, "orders");
+          const qRef = query(cRef, where("clientNumber", "==", this.clientNumber));
 
-            snapshot.forEach(docSnap=>{
-              const data=docSnap.data();
-              data.orderId=docSnap.id;
-              if(data.timestamp){
-                const docTime=data.timestamp.toDate();
-                if(now-docTime<=MS_12H){
+          onSnapshot(qRef, (snapshot) => {
+            const updatedOrders = [];
+            const now = new Date();
+            const MS_12H = 12 * 60 * 60 * 1000;
+
+            snapshot.forEach(docSnap => {
+              const data = docSnap.data();
+              data.orderId = docSnap.id;
+              if (data.timestamp) {
+                const docTime = data.timestamp.toDate();
+                if (now - docTime <= MS_12H) {
                   updatedOrders.push(data);
                 }
               }
             });
-            this.myOrders=updatedOrders;
-            localStorage.setItem("myOrders",JSON.stringify(updatedOrders));
-          },err=>{
-            console.error("Eroare la onSnapshot myOrders:",err);
+            this.myOrders = updatedOrders;
+            localStorage.setItem("myOrders", JSON.stringify(updatedOrders));
+          }, (err) => {
+            console.error("Eroare la onSnapshot myOrders:", err);
           });
         },
 
         setUsername() {
-          if(!this.usernameInput.trim())return;
-          localStorage.setItem("username",this.usernameInput.trim());
-          localStorage.setItem("selectedAvatar",this.selectedAvatar||"");
-          this.usernameSet=true;
+          if (!this.usernameInput.trim()) return;
+          localStorage.setItem("username", this.usernameInput.trim());
+          localStorage.setItem("selectedAvatar", this.selectedAvatar || "");
+          this.usernameSet = true;
         },
         loadMessages() {
-          const qRef=query(collection(db,"chatMessages"),orderBy("timestamp","asc"));
-          onSnapshot(qRef,(snapshot)=>{
-            const now=new Date();
-            const TEN_MIN_MS=10*60*1000;
-            const finalMsgs=[];
-            snapshot.forEach(docItem=>{
-              const data=docItem.data();
-              if(!data.timestamp)return;
-              const docTime=data.timestamp.toDate();
-              if((now-docTime)<TEN_MIN_MS){
-                finalMsgs.push({id:docItem.id,...data});
+          const qRef = query(collection(db, "chatMessages"), orderBy("timestamp", "asc"));
+          onSnapshot(qRef, (snapshot) => {
+            const now = new Date();
+            const TEN_MIN_MS = 10 * 60 * 1000;
+            const finalMsgs = [];
+            snapshot.forEach(docItem => {
+              const data = docItem.data();
+              if (!data.timestamp) return;
+              const docTime = data.timestamp.toDate();
+              // Păstrăm mesajele ultimelor 10 min
+              if ((now - docTime) < TEN_MIN_MS) {
+                finalMsgs.push({ id: docItem.id, ...data });
               }
             });
-            this.chatMessages=finalMsgs;
+            this.chatMessages = finalMsgs;
           });
         },
         async postMessage() {
-          if(!this.newMessage.trim())return;
+          if (!this.newMessage.trim()) return;
           try {
-            const userName=localStorage.getItem("username");
-            const userAvatar=localStorage.getItem("selectedAvatar")||"";
-            if(!userName)return;
+            const userName = localStorage.getItem("username");
+            const userAvatar = localStorage.getItem("selectedAvatar") || "";
+            if (!userName) return;
 
-            const masaParam=new URLSearchParams(window.location.search).get("masa")||"0";
-            const tableNumber=parseInt(masaParam)||0;
+            const masaParam = new URLSearchParams(window.location.search).get("masa") || "0";
+            const tableNumber = parseInt(masaParam) || 0;
 
-            const docData={
-              name:userName,
-              text:this.newMessage.trim(),
+            const docData = {
+              name: userName,
+              text: this.newMessage.trim(),
               tableNumber,
-              timestamp:serverTimestamp(),
-              avatar:userAvatar
+              timestamp: serverTimestamp(),
+              avatar: userAvatar
             };
-            await addDoc(collection(db,"chatMessages"),docData);
-            this.newMessage="";
-          } catch(err){
-            console.error("Eroare la trimiterea mesajului:",err);
+            await addDoc(collection(db, "chatMessages"), docData);
+            this.newMessage = "";
+          } catch (err) {
+            console.error("Eroare la trimiterea mesajului:", err);
           }
         },
-        reactToMessage(messageId,reaction){
-          const messageRef=doc(db,"chatMessages",messageId);
-          getDoc(messageRef).then((docSnap)=>{
-            if(docSnap.exists()){
-              const currentReactions=docSnap.data().reactions||{};
-              currentReactions[reaction]=(currentReactions[reaction]||0)+1;
-              setDoc(messageRef,{ reactions:currentReactions },{merge:true});
+        reactToMessage(messageId, reaction) {
+          const messageRef = doc(db, "chatMessages", messageId);
+          getDoc(messageRef).then((docSnap) => {
+            if (docSnap.exists()) {
+              const currentReactions = docSnap.data().reactions || {};
+              currentReactions[reaction] = (currentReactions[reaction] || 0) + 1;
+              setDoc(messageRef, { reactions: currentReactions }, { merge: true });
             }
-          }).catch(err=>console.error("Eroare la reacționare:",err));
-          this.reactionAnimation=reaction;
-          setTimeout(()=>{this.reactionAnimation="";},2000);
+          }).catch((err) => console.error("Eroare la reacționare:", err));
+
+          this.reactionAnimation = reaction;
+          setTimeout(() => { this.reactionAnimation = ""; }, 2000);
         },
-        tableStyle(tableNum){
-          const hasMessages=this.chatMessages.some(m=>m.tableNumber===tableNum);
-          if(hasMessages){
+        tableStyle(tableNum) {
+          const hasMessages = this.chatMessages.some(m => m.tableNumber === tableNum);
+          if (hasMessages) {
             return {
-              background:`linear-gradient(to right, var(--btn-start), var(--btn-end))`,
-              color:'#000',
-              boxShadow:'none'
+              background: `linear-gradient(to right, var(--btn-start), var(--btn-end))`,
+              color: '#000',
+              boxShadow: 'none'
             };
           }
           return {
-            background:'#666',
-            color:'#fff',
-            boxShadow:`0 0 0 4px var(--btn-shadow-color1)`
+            background: '#666',
+            color: '#fff',
+            boxShadow: `0 0 0 4px var(--btn-shadow-color1)`
           };
         },
-        handleOutsideClick(e){
-          if(this.isSidebarVisible){
-            const mobileAside=this.$refs.mobileSidebar;
-            const toggleBtn=this.$refs.mobileToggle;
-            if(mobileAside&&!mobileAside.contains(e.target)&&toggleBtn&&!toggleBtn.contains(e.target)){
-              this.isSidebarVisible=false;
+        handleOutsideClick(e) {
+          if (this.isSidebarVisible) {
+            const mobileAside = this.$refs.mobileSidebar;
+            const toggleBtn = this.$refs.mobileToggle;
+            if (
+              mobileAside && 
+              !mobileAside.contains(e.target) && 
+              toggleBtn && 
+              !toggleBtn.contains(e.target)
+            ) {
+              this.isSidebarVisible = false;
             }
           }
         },
-        verifySessionCode(){
-          if(!this.inputSessionCode||!this.sessionInfo)return;
-          if(this.inputSessionCode.trim()===this.sessionInfo.sessionCode){
-            this.showSessionPrompt=false;
-            this.sessionBlocked=false;
-          }else{
-            this.sessionBlocked=true;
-            this.showSessionPrompt=false;
+
+        verifySessionCode() {
+          if (!this.inputSessionCode || !this.sessionInfo) return;
+          if (this.inputSessionCode.trim() === this.sessionInfo.sessionCode) {
+            // Sesiune validă -> ascundem prompt
+            this.showSessionPrompt = false;
+            this.sessionBlocked = false;
+          } else {
+            // Cod incorect -> blocăm de tot
+            this.sessionBlocked = true;
+            this.showSessionPrompt = false;
           }
         },
-        applyThemeClass(themeName){
-          const allThemes=['theme-red','theme-blue','theme-green','theme-purple','theme-pink','theme-grey','theme-brown','theme-teal','theme-lime'];
-          allThemes.forEach(t=>document.body.classList.remove(t));
-          if(themeName!=='orange'){
+
+        applyThemeClass(themeName) {
+          const allThemes = [
+            'theme-red','theme-blue','theme-green','theme-purple',
+            'theme-pink','theme-grey','theme-brown','theme-teal','theme-lime'
+          ];
+          allThemes.forEach(t => document.body.classList.remove(t));
+          if (themeName !== 'orange') {
             document.body.classList.add(`theme-${themeName}`);
           }
         },
-        async checkSessionTime(){
-          if(!this.sessionInfo)return;
-          const docRef=doc(db,"sessions",this.tableId);
-          const snap=await getDoc(docRef);
-          if(!snap.exists())return;
-          const data=snap.data();
-          if(!data.sessionStart||data.status!=="active")return;
-          const startTime=data.sessionStart.toDate();
-          const now=new Date();
-          const MS_2MIN=2*60*1000; 
-          if(now-startTime>=MS_2MIN){
-            this.showSessionPrompt=true;
+
+        async checkSessionTime() {
+          if (!this.sessionInfo) return;
+          // Verificăm la încărcare dacă au trecut >2min
+          const docRef = doc(db, "sessions", this.tableId);
+          const snap = await getDoc(docRef);
+          if (!snap.exists()) return;
+          const data = snap.data();
+          if (!data.sessionStart || data.status !== "active") return;
+
+          const startTime = data.sessionStart.toDate();
+          const now = new Date();
+          const MS_2MIN = 2 * 60 * 1000; // <-- 2 minute (pt test)
+
+          if (now - startTime >= MS_2MIN) {
+            // 1) Afișăm prompt de reautentificare
+            this.showSessionPrompt = true;
+
+            // 2) Ștergem local username => forțăm userul să-și reintre numele dacă e acceptat
             localStorage.removeItem("username");
             localStorage.removeItem("selectedAvatar");
-            this.usernameSet=false;
-            this.usernameInput="";
-            this.selectedAvatar="";
+            this.usernameSet = false;
+            this.usernameInput = "";
+            this.selectedAvatar = "";
           }
         },
-        listenSessionStatus(){
-          if(!this.tableId)return;
-          const docRef=doc(db,"sessions",this.tableId);
-          onSnapshot(docRef,(snap)=>{
-            if(!snap.exists())return;
-            const data=snap.data();
-            if(data.status==="closed"){
-              this.sessionClosed=true;
-              if(this.activeTab==='social'){
-                this.activeTab='meniu';
+
+        // Ascultăm permanent starea sesiunii - dacă devine "closed", dezactivăm tabul Social
+        listenSessionStatus() {
+          if (!this.tableId) return;
+          const docRef = doc(db, "sessions", this.tableId);
+          onSnapshot(docRef, (snap) => {
+            if (!snap.exists()) return;
+            const data = snap.data();
+            if (data.status === "closed") {
+              this.sessionClosed = true;
+              // dacă userul era pe tabul 'social', îl trimitem pe 'meniu'
+              if (this.activeTab === 'social') {
+                this.activeTab = 'meniu';
               }
             }
           });
         }
       },
-      async mounted(){
-        window.addEventListener("scroll",this.handleWindowScroll);
-        document.addEventListener("click",this.handleOutsideClick);
+      async mounted() {
+        window.addEventListener("scroll", this.handleWindowScroll);
+        document.addEventListener("click", this.handleOutsideClick);
 
-        const storedTheme=localStorage.getItem('selectedTheme');
-        if(storedTheme){this.selectedTheme=storedTheme;}
+        // 1) Tema
+        const storedTheme = localStorage.getItem('selectedTheme');
+        if (storedTheme) {
+          this.selectedTheme = storedTheme;
+        }
         this.applyThemeClass(this.selectedTheme);
 
-        const urlParams=new URLSearchParams(window.location.search);
-        const masaParam=urlParams.get("masa");
-        if(masaParam){
-          this.tableId=`Masa numărul ${masaParam}`;
-        }else{
-          this.tableId="Masa numărul 1";
+        // 2) Masa
+        const urlParams = new URLSearchParams(window.location.search);
+        const masaParam = urlParams.get("masa");
+        if (masaParam) {
+          this.tableId = `Masa numărul ${masaParam}`;
+        } else {
+          this.tableId = "Masa numărul 1";
         }
 
-        try{
-          this.sessionInfo=await getOrCreateSessionDoc(this.tableId);
-        }catch(err){
+        // 3) sessionInfo
+        try {
+          this.sessionInfo = await getOrCreateSessionDoc(this.tableId);
+        } catch (err) {
           console.error(err);
         }
 
-        const storedNumber=localStorage.getItem("clientNumber");
-        if(storedNumber){
-          this.clientNumber=parseInt(storedNumber);
-          if(this.clientNumber>0){
-            this.isFirstOrder=false;
+        // 4) clientNumber
+        const storedNumber = localStorage.getItem("clientNumber");
+        if (storedNumber) {
+          this.clientNumber = parseInt(storedNumber);
+          if (this.clientNumber > 0) {
+            this.isFirstOrder = false;
           }
-        }else{
-          const randomNum=Math.floor(Math.random()*90000)+10000;
-          this.clientNumber=randomNum;
-          localStorage.setItem("clientNumber",randomNum);
-          this.isFirstOrder=false;
+        } else {
+          const randomNum = Math.floor(Math.random() * 90000) + 10000;
+          this.clientNumber = randomNum;
+          localStorage.setItem("clientNumber", randomNum);
+          this.isFirstOrder = false;
         }
 
-        const storedPoints=localStorage.getItem("clientPoints");
-        if(storedPoints){
-          this.clientPoints=parseFloat(storedPoints);
+        // 5) puncte
+        const storedPoints = localStorage.getItem("clientPoints");
+        if (storedPoints) {
+          this.clientPoints = parseFloat(storedPoints);
         }
 
-        const storedMyOrders=localStorage.getItem("myOrders");
-        if(storedMyOrders){
-          this.myOrders=JSON.parse(storedMyOrders);
+        // 6) myOrders
+        const storedMyOrders = localStorage.getItem("myOrders");
+        if (storedMyOrders) {
+          this.myOrders = JSON.parse(storedMyOrders);
         }
         this.listenMyOrders();
 
-        const storedUsername=localStorage.getItem("username");
-        if(storedUsername){
-          this.usernameSet=true;
-          this.usernameInput=storedUsername;
+        // 7) username
+        const storedUsername = localStorage.getItem("username");
+        if (storedUsername) {
+          this.usernameSet = true;
+          this.usernameInput = storedUsername;
         }
-        const storedAvatar=localStorage.getItem("selectedAvatar");
-        if(storedAvatar){
-          this.selectedAvatar=storedAvatar;
+        const storedAvatar = localStorage.getItem("selectedAvatar");
+        if (storedAvatar) {
+          this.selectedAvatar = storedAvatar;
         }
-        if(this.usernameSet){
+        if (this.usernameSet) {
           this.loadMessages();
         }
 
+        // 8) Check 2min
         await this.checkSessionTime();
+
+        // 9) Ascultă status-ul sesiunii (dacă se închide)
         this.listenSessionStatus();
       },
-      unmounted(){
-        window.removeEventListener("scroll",this.handleWindowScroll);
-        document.removeEventListener("click",this.handleOutsideClick);
+      unmounted() {
+        window.removeEventListener("scroll", this.handleWindowScroll);
+        document.removeEventListener("click", this.handleOutsideClick);
       },
-      watch:{
-        usernameSet(newVal){
-          if(newVal){
+      watch: {
+        usernameSet(newVal) {
+          if (newVal) {
             this.loadMessages();
           }
         },
-        clientPoints(newVal){
-          localStorage.setItem("clientPoints",newVal);
+        clientPoints(newVal) {
+          localStorage.setItem("clientPoints", newVal);
         },
-        clientNumber(newVal){
-          localStorage.setItem("clientNumber",newVal);
+        clientNumber(newVal) {
+          localStorage.setItem("clientNumber", newVal);
         },
-        myOrders(newVal){
-          localStorage.setItem("myOrders",JSON.stringify(newVal));
+        myOrders(newVal) {
+          localStorage.setItem("myOrders", JSON.stringify(newVal));
         },
-        selectedTheme(newVal){
-          localStorage.setItem('selectedTheme',newVal);
+        selectedTheme(newVal) {
+          localStorage.setItem('selectedTheme', newVal);
           this.applyThemeClass(newVal);
-          this.activeTab='meniu';
+          this.activeTab = 'meniu';
         }
       }
     });
