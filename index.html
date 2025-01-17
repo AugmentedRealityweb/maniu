@@ -42,7 +42,7 @@
       --scratch-color: rgba(231,140,0,0.15);
     }
 
-    /* Alte teme roșu, albastru etc. (le poți păstra sau șterge) ... */
+    /* Alte teme roșu, albastru etc. */
 
     /* ------------------------------------------------
        3) STILURI DE BAZĂ
@@ -261,10 +261,12 @@
       transform: scale(1.1);
     }
 
-    .pop-enter-active, .pop-leave-active {
+    .pop-enter-active,
+    .pop-leave-active {
       transition: opacity 0.4s;
     }
-    .pop-enter, .pop-leave-to {
+    .pop-enter,
+    .pop-leave-to {
       opacity: 0;
     }
   </style>
@@ -402,12 +404,12 @@
               </div>
             </div>
 
-            <!-- TAB: MENIU (codul tău) -->
+            <!-- TAB: MENIU -->
             <section v-if="activeTab==='meniu' && !showSessionPrompt">
-              <!-- ... cod complet meniu / categorii / search / products ... -->
+              <!-- TOT CODUL MENIU (categoriile, produsele, etc.) -->
             </section>
 
-            <!-- TAB: Meniul Zilei (nou!) -->
+            <!-- TAB: Meniul Zilei -->
             <section v-else-if="activeTab==='meniulZilei' && !showSessionPrompt">
               <h2 class="text-2xl font-bold mb-4 text-center">Meniul Zilei</h2>
               <div v-if="dailyMenuProducts.length===0" class="text-center text-gray-300">
@@ -435,28 +437,29 @@
               </div>
             </section>
 
-            <!-- TAB: Puncte (codul tău) -->
+            <!-- TAB: Puncte -->
             <section v-else-if="activeTab==='puncte' && !showSessionPrompt">
-              <!-- ... cod ... -->
+              <!-- TOT CODUL Puncte -->
             </section>
 
-            <!-- TAB: Comenzile Tale (codul tău) -->
+            <!-- TAB: Comenzile Tale -->
             <section v-else-if="activeTab==='comenzileTale' && !showSessionPrompt">
-              <!-- ... cod ... -->
+              <!-- TOT CODUL Comenzile Tale -->
             </section>
 
-            <!-- TAB: Social (codul tău) -->
+            <!-- TAB: Social -->
             <section v-else-if="activeTab==='social' && !showSessionPrompt && !sessionClosed && !sessionBlocked">
-              <!-- ... cod chat ... -->
+              <!-- TOT CODUL Social (chat) -->
             </section>
 
-            <!-- TAB: Design (codul tău) -->
+            <!-- TAB: Design -->
             <section v-else-if="activeTab==='design' && !showSessionPrompt">
-              <!-- ... cod design ... -->
+              <!-- TOT CODUL Design (select radio butoane teme) -->
             </section>
           </main>
 
-          <!-- Buton Coș + coș lateral (codul tău) -->
+          <!-- Buton Coș + coș lateral -->
+          <!-- ... cod complet coș ... -->
         </template>
 
         <!-- Ecran blocat (cod greșit) -->
@@ -473,11 +476,14 @@
       </div>
     </div>
 
-    <!-- Buton "Sus" + animație reacții (ca în codul tău) -->
-    <div v-if="showBackToTop" class="back-to-top" @click="scrollTop">
+    <!-- Buton "Sus" + animație reacții -->
+    <div 
+      v-if="showBackToTop" 
+      class="back-to-top" 
+      @click="scrollTop"
+    >
       <span class="material-icons">keyboard_arrow_up</span>
     </div>
-
     <transition name="pop">
       <div 
         v-if="reactionAnimation" 
@@ -511,15 +517,15 @@
     import {
       getFirestore,
       doc,
-      setDoc,
       getDoc,
-      onSnapshot,
+      setDoc,
       collection,
       addDoc,
       query,
       where,
       orderBy,
       serverTimestamp,
+      onSnapshot,
       updateDoc
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
@@ -536,7 +542,7 @@
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    // Eliminăm diacriticele pentru o căutare flexibilă
+    // Funcție ajutătoare: elimină diacritice
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
@@ -548,7 +554,40 @@
 
     // Creează sau obține doc-ul de sesiune
     async function getOrCreateSessionDoc(tableId) {
-      /* ... codul tău ... */
+      if (!tableId) {
+        throw new Error("Nu există parametru pentru masă în URL.");
+      }
+      const docRef = doc(db, "sessions", tableId);
+      try {
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data.status === "closed") {
+            const newCode = generateSessionCode();
+            const newData = {
+              sessionCode: newCode,
+              status: "active",
+              sessionStart: serverTimestamp()
+            };
+            await setDoc(docRef, newData, { merge: true });
+            return newData;
+          } else {
+            return data;
+          }
+        } else {
+          const newSessionCode = generateSessionCode();
+          const dataToSet = {
+            sessionCode: newSessionCode,
+            status: "active",
+            sessionStart: serverTimestamp()
+          };
+          await setDoc(docRef, dataToSet);
+          return dataToSet;
+        }
+      } catch (error) {
+        console.error("Eroare la getOrCreateSessionDoc:", error);
+        throw new Error("Eroare la obținerea/crearea session code-ului.");
+      }
     }
 
     const app = Vue.createApp({
@@ -564,11 +603,21 @@
           // Teme
           selectedTheme: 'orange',
 
-          // TABS
+          // Tab activ
           activeTab: 'meniu',
           view: 'categorii',
 
-          // AICI LA products -> lași gol, îl vei completa tu
+          categories: [
+            { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
+            { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
+            { name: "pasta",   image: "https://i.giphy.com/dZRlFW1sbFEpG.webp" },
+            { name: "main",    image: "https://i.giphy.com/NRS40PZGqScW4Tm2F5.webp" },
+            { name: "desserts",image: "https://i.giphy.com/L2mf2cMkd2m7BJCjX7.webp" },
+            { name: "drinks",  image: "https://i.giphy.com/AxVvjTt0Fa1WEHzMM8.webp" },
+            { name: "garnish", image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp" }
+          ],
+
+          // Placeholder PRODUCTION: adaugă tu categoriile și produsele
           products: {
             brunch: [
               {
@@ -922,9 +971,10 @@
             ]
           },
 
-          // “Meniul Zilei”
+          // Meniul Zilei
           dailyMenuProducts: [],
 
+          // Variabile meniu
           currentProducts: [],
           currentProduct: null,
           searchQuery: "",
@@ -948,15 +998,17 @@
             "https://i.giphy.com/17A0SmzhN6a4AGSrQ9.webp",
             "https://i.giphy.com/uK1v8dVSrc7yp7Ciqn.webp",
             "https://i.giphy.com/1vh1PXneQqN1e.webp"
+            
           ],
           selectedAvatar: "",
           reactionAnimation: "",
 
+          // 2 min lock
           showSessionPrompt: false,
           inputSessionCode: "",
           sessionBlocked: false,
 
-          // "Masa închisă"
+          // Masa închisă
           sessionClosed: false
         };
       },
@@ -1067,7 +1119,7 @@
             this.orders = [];
             this.isOrderOpen = false;
 
-            // După "Finalizează Comanda", mergem la confirm.html
+            // Redirect la confirm.html
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
@@ -1221,7 +1273,6 @@
 
         async checkSessionTime() {
           if (!this.sessionInfo) return;
-          // Verificăm la încărcare dacă au trecut >2min
           const docRef = doc(db, "sessions", this.tableId);
           const snap = await getDoc(docRef);
           if (!snap.exists()) return;
@@ -1230,13 +1281,10 @@
 
           const startTime = data.sessionStart.toDate();
           const now = new Date();
-          const MS_2MIN = 2 * 60 * 1000; // <-- 2 minute (pt test)
+          const MS_2MIN = 2 * 60 * 1000; // 2 minute test
 
           if (now - startTime >= MS_2MIN) {
-            // 1) Afișăm prompt de reautentificare
             this.showSessionPrompt = true;
-
-            // 2) Ștergem local username => forțăm userul să-și reintre numele dacă e acceptat
             localStorage.removeItem("username");
             localStorage.removeItem("selectedAvatar");
             this.usernameSet = false;
@@ -1245,7 +1293,6 @@
           }
         },
 
-        // Ascultăm permanent starea sesiunii - dacă devine "closed", dezactivăm tabul Social
         listenSessionStatus() {
           if (!this.tableId) return;
           const docRef = doc(db, "sessions", this.tableId);
@@ -1254,26 +1301,39 @@
             const data = snap.data();
             if (data.status === "closed") {
               this.sessionClosed = true;
-              // dacă userul era pe tabul 'social', îl trimitem pe 'meniu'
               if (this.activeTab === 'social') {
                 this.activeTab = 'meniu';
               }
             }
           });
-        }
+        },
+
+        // Ascultăm "dailyMenu" => tab "Meniul Zilei"
+        listenDailyMenu() {
+          const docRef = doc(db, "specials", "dailyMenu");
+          onSnapshot(docRef, (snap) => {
+            if (snap.exists()) {
+              const data = snap.data();
+              this.dailyMenuProducts = data.products || [];
+            } else {
+              this.dailyMenuProducts = [];
+            }
+          });
+        },
       },
       async mounted() {
+        // Evenimente scroll, click pt. outside
         window.addEventListener("scroll", this.handleWindowScroll);
         document.addEventListener("click", this.handleOutsideClick);
 
-        // 1) Tema
+        // Tema salvată
         const storedTheme = localStorage.getItem('selectedTheme');
         if (storedTheme) {
           this.selectedTheme = storedTheme;
         }
         this.applyThemeClass(this.selectedTheme);
 
-        // 2) Masa
+        // Parametrul "masa" din URL
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
         if (masaParam) {
@@ -1282,14 +1342,14 @@
           this.tableId = "Masa numărul 1";
         }
 
-        // 3) sessionInfo
+        // Creez/obțin session
         try {
           this.sessionInfo = await getOrCreateSessionDoc(this.tableId);
         } catch (err) {
           console.error(err);
         }
 
-        // 4) clientNumber
+        // clientNumber
         const storedNumber = localStorage.getItem("clientNumber");
         if (storedNumber) {
           this.clientNumber = parseInt(storedNumber);
@@ -1303,20 +1363,20 @@
           this.isFirstOrder = false;
         }
 
-        // 5) puncte
+        // Puncte
         const storedPoints = localStorage.getItem("clientPoints");
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
         }
 
-        // 6) myOrders
+        // MyOrders
         const storedMyOrders = localStorage.getItem("myOrders");
         if (storedMyOrders) {
           this.myOrders = JSON.parse(storedMyOrders);
         }
         this.listenMyOrders();
 
-        // 7) username
+        // username (chat)
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
           this.usernameSet = true;
@@ -1330,11 +1390,12 @@
           this.loadMessages();
         }
 
-        // 8) Check 2min
+        // check time 2min
         await this.checkSessionTime();
-
-        // 9) Ascultă status-ul sesiunii (dacă se închide)
+        // ascultă status-ul sesiunii
         this.listenSessionStatus();
+        // ascultă doc "dailyMenu" pt. tab "Meniul Zilei"
+        this.listenDailyMenu();
       },
       unmounted() {
         window.removeEventListener("scroll", this.handleWindowScroll);
