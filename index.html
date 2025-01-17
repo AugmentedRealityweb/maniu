@@ -42,7 +42,8 @@
       --scratch-color: rgba(231,140,0,0.15);
     }
 
-   .theme-red {
+    /* Alte teme roșu, albastru etc. (opțional) */
+    .theme-red {
       --gradient-end: #8B0000;
       --scrollbar-color: #8B0000;
       --border-color: #8B0000;
@@ -160,6 +161,9 @@
       --scratch-color: rgba(0,153,0,0.15);
     }
 
+    /* ------------------------------------------------
+       3) STILURI DE BAZĂ
+       ------------------------------------------------ */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     body {
       font-family: 'Inter', sans-serif;
@@ -427,6 +431,7 @@
 
       <!-- CONȚINUT PRINCIPAL -->
       <div class="flex-1 flex flex-col p-2">
+        <!-- Daca userul e blocat (cod incorect), afișăm ecran blocat -->
         <template v-if="!sessionBlocked">
           <main class="flex-1 p-4 overflow-y-auto scrollbar main-container scratches">
             <!-- BARĂ mobilă -->
@@ -542,7 +547,7 @@
                     @click="enterCategory(cat.name)"
                   >
                     <img 
-                      :class="isGrid?'card-img-square':''"
+                      :class="isGrid ? 'card-img-square' : ''"
                       :src="cat.image"
                       :alt="cat.name"
                     />
@@ -562,7 +567,7 @@
                   Înapoi la Categorii
                 </button>
                 <div 
-                  :class="isGrid?'grid grid-cols-3 gap-6':'flex flex-col space-y-4'"
+                  :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'"
                 >
                   <div
                     v-for="prod in currentProducts"
@@ -1178,8 +1183,8 @@
           activeTab: 'meniu',
           view: 'categorii',
 
-
-         categories: [
+          // Categoriile disponibile (imaginile sunt doar demo)
+          categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
             { name: "pasta",   image: "https://i.giphy.com/dZRlFW1sbFEpG.webp" },
@@ -1189,7 +1194,7 @@
             { name: "garnish", image: "https://i.giphy.com/xUPGcjaoWW2tLOAvWo.webp" }
           ],
 
-          // Placeholder PRODUCTION: adaugă tu categoriile și produsele
+          // Produsele (poți adăuga și altele)
           products: {
             brunch: [
               {
@@ -1543,7 +1548,7 @@
             ]
           },
 
-          // Meniul Zilei
+          // Meniul Zilei (din Firestore, doc "specials"/"dailyMenu")
           dailyMenuProducts: [],
 
           // Variabile meniu
@@ -1560,7 +1565,7 @@
           orders: [],
           myOrders: [],
 
-          // Social
+          // Social / Chat
           usernameInput: "",
           usernameSet: false,
           newMessage: "",
@@ -1842,6 +1847,21 @@
           }
         },
 
+        // Ascultă doc "specials/dailyMenu" => încarcă "dailyMenuProducts"
+        listenDailyMenu() {
+          const docRef = doc(db, "specials", "dailyMenu");
+          onSnapshot(docRef, (snap) => {
+            if (snap.exists()) {
+              const data = snap.data();
+              this.dailyMenuProducts = data.products || [];
+            } else {
+              this.dailyMenuProducts = [];
+            }
+          }, (err) => {
+            console.error("Eroare la dailyMenu onSnapshot:", err);
+          });
+        },
+
         async checkSessionTime() {
           if (!this.sessionInfo) return;
           // Verificăm la încărcare dacă au trecut >2min
@@ -1856,10 +1876,7 @@
           const MS_2MIN = 2 * 60 * 1000; // <-- 2 minute (pt test)
 
           if (now - startTime >= MS_2MIN) {
-            // 1) Afișăm prompt de reautentificare
             this.showSessionPrompt = true;
-
-            // 2) Ștergem local username => forțăm userul să-și reintre numele dacă e acceptat
             localStorage.removeItem("username");
             localStorage.removeItem("selectedAvatar");
             this.usernameSet = false;
@@ -1868,7 +1885,6 @@
           }
         },
 
-        // Ascultăm permanent starea sesiunii - dacă devine "closed", dezactivăm tabul Social
         listenSessionStatus() {
           if (!this.tableId) return;
           const docRef = doc(db, "sessions", this.tableId);
@@ -1877,7 +1893,6 @@
             const data = snap.data();
             if (data.status === "closed") {
               this.sessionClosed = true;
-              // dacă userul era pe tabul 'social', îl trimitem pe 'meniu'
               if (this.activeTab === 'social') {
                 this.activeTab = 'meniu';
               }
@@ -1886,7 +1901,9 @@
         }
       },
       async mounted() {
+        // Ascultă scroll pt. back-to-top
         window.addEventListener("scroll", this.handleWindowScroll);
+        // Ascultă click pt. a închide sidebar mobil
         document.addEventListener("click", this.handleOutsideClick);
 
         // 1) Tema
@@ -1896,7 +1913,7 @@
         }
         this.applyThemeClass(this.selectedTheme);
 
-        // 2) Masa
+        // 2) Masa (parametru "masa" din URL)
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
         if (masaParam) {
@@ -1905,7 +1922,7 @@
           this.tableId = "Masa numărul 1";
         }
 
-        // 3) sessionInfo
+        // 3) Creez/obțin session
         try {
           this.sessionInfo = await getOrCreateSessionDoc(this.tableId);
         } catch (err) {
@@ -1958,6 +1975,9 @@
 
         // 9) Ascultă status-ul sesiunii (dacă se închide)
         this.listenSessionStatus();
+
+        // 10) Ascultă Meniul Zilei
+        this.listenDailyMenu();
       },
       unmounted() {
         window.removeEventListener("scroll", this.handleWindowScroll);
@@ -1981,6 +2001,7 @@
         selectedTheme(newVal) {
           localStorage.setItem('selectedTheme', newVal);
           this.applyThemeClass(newVal);
+          // Reset la tab -> meniu
           this.activeTab = 'meniu';
         }
       }
