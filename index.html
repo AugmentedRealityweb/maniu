@@ -19,7 +19,7 @@
 
   <style>
     /* ------------------------------------------------
-       1) TEMA IMPLICITĂ - PORTOCALIU (și restul temelor)
+       1) TEMA IMPLICITĂ - PORTOCALIU
        ------------------------------------------------ */
     :root {
       --gradient-start: #000000;
@@ -42,7 +42,7 @@
       --scratch-color: rgba(231,140,0,0.15);
     }
 
-    /* Alte teme roșu, albastru etc. */
+    /* Alte teme roșu, albastru etc. (opțional) ... */
 
     /* ------------------------------------------------
        3) STILURI DE BAZĂ
@@ -62,6 +62,7 @@
       display: flex;
       flex-direction: column;
     }
+
     .scrollbar {
       scrollbar-width: thin;
       scrollbar-color: var(--scrollbar-color) var(--scrollbar-track);
@@ -76,6 +77,7 @@
     .scrollbar::-webkit-scrollbar-track {
       background-color: var(--scrollbar-track);
     }
+
     .btn-orange {
       background: linear-gradient(to right, var(--btn-start), var(--btn-end));
       color: #fff;
@@ -261,12 +263,10 @@
       transform: scale(1.1);
     }
 
-    .pop-enter-active,
-    .pop-leave-active {
+    .pop-enter-active, .pop-leave-active {
       transition: opacity 0.4s;
     }
-    .pop-enter,
-    .pop-leave-to {
+    .pop-enter, .pop-leave-to {
       opacity: 0;
     }
   </style>
@@ -285,7 +285,7 @@
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniu'">
             <span class="material-icons">restaurant_menu</span>Meniu
           </button>
-          <!-- 2) Meniul Zilei (nou tab) -->
+          <!-- 2) Meniul Zilei (tabel) -->
           <button class="sidebar-btn flex items-center gap-3 px-4 py-2 rounded-full" @click="activeTab='meniulZilei'">
             <span class="material-icons">local_dining</span>Meniul Zilei
           </button>
@@ -406,60 +406,518 @@
 
             <!-- TAB: MENIU -->
             <section v-if="activeTab==='meniu' && !showSessionPrompt">
-              <!-- TOT CODUL MENIU (categoriile, produsele, etc.) -->
+              <!-- Exemplu simplu: afișăm categoriile / produsele. -->
+              <h2 class="text-xl font-semibold mb-4 text-center">Categorii</h2>
+
+              <!-- Buton de toggle grid / list -->
+              <div class="flex justify-center mb-4">
+                <button 
+                  class="btn-orange flex items-center gap-2 px-3 py-2 rounded-full" 
+                  @click="toggleLayout"
+                >
+                  <span class="material-icons">{{ isGrid ? 'view_list' : 'grid_view' }}</span>
+                  <span>{{ isGrid ? 'Listă' : 'Grid' }}</span>
+                </button>
+              </div>
+
+              <div v-if="view==='categorii'">
+                <div :class="isGrid ? 'grid grid-cols-3 gap-6' : 'flex flex-col space-y-4'">
+                  <div 
+                    v-for="cat in categories" 
+                    :key="cat.name" 
+                    class="card-container cursor-pointer"
+                    @click="enterCategory(cat.name)"
+                  >
+                    <img 
+                      :class="isGrid?'card-img-square':''"
+                      :src="cat.image"
+                      :alt="cat.name"
+                    />
+                    <div class="card-details">
+                      <h3>{{ cat.name }}</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Afișare produse dintr-o categorie -->
+              <div v-else-if="view==='produse'">
+                <button 
+                  class="btn-orange mb-4 rounded-full"
+                  @click="backToCategories"
+                >
+                  Înapoi la Categorii
+                </button>
+                <div 
+                  :class="isGrid?'grid grid-cols-3 gap-6':'flex flex-col space-y-4'"
+                >
+                  <div
+                    v-for="prod in currentProducts"
+                    :key="prod.title"
+                    class="card-container cursor-pointer"
+                    @click="showProductDetails(prod)"
+                  >
+                    <img 
+                      :class="isGrid?'card-img-square':''"
+                      :src="prod.image"
+                      :alt="prod.title"
+                    />
+                    <div class="card-details">
+                      <h3>{{ prod.title }}</h3>
+                      <p>{{ prod.price }} Lei</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modal detalii produs -->
+              <div 
+                v-if="currentProduct"
+                class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+              >
+                <div class="modal-product p-6 w-11/12 md:w-3/4 lg:w-1/2 scratches">
+                  <button
+                    class="absolute top-4 right-4 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]"
+                    @click="currentProduct=null"
+                  >
+                    &times;
+                  </button>
+                  <img 
+                    :src="currentProduct.image"
+                    :alt="currentProduct.title"
+                    class="w-full h-64 object-cover mb-4 rounded-lg"
+                  />
+                  <h2 class="text-xl font-bold mb-2 handwriting-title">
+                    {{ currentProduct.title }}
+                  </h2>
+                  <p class="font-bold text-lg mb-4" :style="{ color: 'var(--price-color)' }">
+                    {{ currentProduct.price }} Lei
+                  </p>
+                  <p class="text-gray-400 mb-4">
+                    {{ currentProduct.description }}
+                  </p>
+                  <ul class="text-gray-300 mb-4">
+                    <li 
+                      v-for="ing in currentProduct.ingredients"
+                      :key="ing"
+                      class="list-disc ml-5"
+                    >
+                      {{ ing }}
+                    </li>
+                  </ul>
+                  <button 
+                    class="btn-orange rounded-full"
+                    @click="addToOrder(currentProduct)"
+                  >
+                    Adaugă în coș
+                  </button>
+                </div>
+              </div>
             </section>
 
-            <!-- TAB: Meniul Zilei -->
+            <!-- TAB: Meniul Zilei (tabel) -->
             <section v-else-if="activeTab==='meniulZilei' && !showSessionPrompt">
               <h2 class="text-2xl font-bold mb-4 text-center">Meniul Zilei</h2>
+
               <div v-if="dailyMenuProducts.length===0" class="text-center text-gray-300">
                 Momentan nu există Meniul Zilei.
               </div>
-              <div 
-                v-else
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-              >
-                <div 
-                  v-for="(prod, index) in dailyMenuProducts" 
-                  :key="index"
-                  class="card-container"
-                >
-                  <img 
-                    class="card-img-square"
-                    :src="prod.image"
-                    :alt="prod.title"
-                  />
-                  <div class="card-details">
-                    <h3>{{ prod.title }}</h3>
-                    <p>{{ prod.price }} Lei</p>
-                  </div>
-                </div>
+
+              <div v-else>
+                <!-- TABEL cu produsele Meniului Zilei -->
+                <table class="w-full text-left bg-black bg-opacity-40">
+                  <thead class="border-b border-[var(--border-color)]">
+                    <tr>
+                      <th class="px-4 py-2">Imagine</th>
+                      <th class="px-4 py-2">Nume</th>
+                      <th class="px-4 py-2">Preț (Lei)</th>
+                      <th class="px-4 py-2">Acțiune</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="(prod, index) in dailyMenuProducts"
+                      :key="index"
+                      class="border-b border-[var(--border-color)]"
+                    >
+                      <!-- Celulă Imagine -->
+                      <td class="px-4 py-2">
+                        <img 
+                          :src="prod.image"
+                          :alt="prod.title"
+                          class="w-24 h-24 object-cover rounded"
+                        />
+                      </td>
+                      <!-- Celulă Nume / Descriere -->
+                      <td class="px-4 py-2 align-top">
+                        <span class="font-bold font-[Dancing Script] text-xl">
+                          {{ prod.title }}
+                        </span>
+                        <br/>
+                        <small class="text-gray-300">
+                          {{ prod.description }}
+                        </small>
+                      </td>
+                      <!-- Celulă Preț -->
+                      <td 
+                        class="px-4 py-2 align-top font-bold"
+                        :style="{ color: 'var(--price-color)' }"
+                      >
+                        {{ prod.price }}
+                      </td>
+                      <!-- Celulă Buton "Adaugă în coș" -->
+                      <td class="px-4 py-2 align-top">
+                        <button
+                          class="btn-orange rounded-full"
+                          @click="addToOrder(prod)"
+                        >
+                          Adaugă în coș
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </section>
 
             <!-- TAB: Puncte -->
             <section v-else-if="activeTab==='puncte' && !showSessionPrompt">
-              <!-- TOT CODUL Puncte -->
+              <h2 class="text-2xl font-bold mb-4 text-center">Punctele Mele</h2>
+              <p class="text-center text-gray-300">
+                Ai {{ clientPoints.toFixed(2) }} puncte acumulate!
+              </p>
             </section>
 
             <!-- TAB: Comenzile Tale -->
             <section v-else-if="activeTab==='comenzileTale' && !showSessionPrompt">
-              <!-- TOT CODUL Comenzile Tale -->
+              <h2 class="text-2xl font-bold mb-4 text-center">Comenzile Tale</h2>
+              <div v-if="myOrders.length===0" class="text-center text-gray-300">
+                Nu ai nicio comandă finalizată încă.
+              </div>
+              <div v-else>
+                <div 
+                  v-for="(order,idx) in myOrders"
+                  :key="order.orderId"
+                  class="bg-black p-4 rounded border border-[var(--border-color)] scratches mb-2"
+                >
+                  <h3 class="text-lg font-semibold mb-2">Comanda #{{ idx+1 }}</h3>
+                  <ul class="list-disc list-inside text-gray-300">
+                    <li
+                      v-for="(prod,pidx) in order.items"
+                      :key="pidx"
+                    >
+                      {{ prod.name }} x {{ prod.quantity }}
+                      – {{ (prod.price*prod.quantity).toFixed(2) }} Lei
+                    </li>
+                  </ul>
+                  <div 
+                    class="mt-2 font-bold" 
+                    :style="{ color: 'var(--price-color)' }"
+                  >
+                    Total: {{ order.total }} Lei
+                  </div>
+                  <div class="mt-1 text-yellow-300">
+                    Cod ospătar: {{ order.sessionCode }}
+                  </div>
+                  <div v-if="order.orderStatus==='placed'"
+                    class="text-green-500 font-bold mt-1"
+                  >
+                    Comanda a fost plasată
+                  </div>
+                  <div v-else class="text-red-500 font-bold mt-1">
+                    Comanda în așteptare
+                  </div>
+                </div>
+              </div>
             </section>
 
             <!-- TAB: Social -->
             <section v-else-if="activeTab==='social' && !showSessionPrompt && !sessionClosed && !sessionBlocked">
-              <!-- TOT CODUL Social (chat) -->
+              <div v-if="!usernameSet" class="text-center">
+                <h2 class="text-2xl font-bold mb-6">Zona Socială</h2>
+                <p class="mb-4 text-gray-300 max-w-md mx-auto">
+                  Bun venit în zona de socializare!<br/>
+                  Te rugăm să îți introduci numele și să alegi un avatar...
+                </p>
+                <div class="flex flex-col items-center max-w-sm mx-auto">
+                  <input 
+                    type="text"
+                    v-model="usernameInput"
+                    placeholder="Introduceți numele..."
+                    class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] w-full mb-4"
+                  />
+                  <div class="flex flex-wrap gap-4 justify-center mb-4">
+                    <div
+                      v-for="(av,i) in availableAvatars"
+                      :key="i"
+                      class="w-14 h-14 rounded-full border-2 border-gray-500 cursor-pointer overflow-hidden"
+                      :class="{'border-green-400': selectedAvatar===av}"
+                      @click="selectedAvatar=av"
+                    >
+                      <img 
+                        :src="av"
+                        alt="avatar"
+                        class="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <button 
+                    class="btn-orange rounded-full"
+                    @click="setUsername"
+                  >
+                    Continuă
+                  </button>
+                </div>
+              </div>
+              <!-- Chat -->
+              <div v-else>
+                <h2 class="text-2xl font-bold mb-4 text-center">Zona Socială</h2>
+                <div class="mb-4 bg-black border border-[var(--border-color)] p-4 rounded scratches max-h-60 overflow-y-auto">
+                  <div
+                    v-for="message in chatMessages"
+                    :key="message.id"
+                    class="mb-3 flex items-center"
+                    :class="message.name===usernameInput?'justify-end':'justify-start'"
+                  >
+                    <div
+                      class="relative flex items-start"
+                      :class="message.name===usernameInput?'flex-row-reverse':'flex-row'"
+                    >
+                      <img 
+                        :src="message.avatar||'https://via.placeholder.com/40'"
+                        alt="Avatar"
+                        class="w-10 h-10 rounded-full object-cover m-2"
+                      />
+                      <div
+                        class="leading-tight py-1 px-4 rounded-3xl"
+                        style="max-width:400px;"
+                        :class="[message.name===usernameInput?'bg-green-600 text-right mr-2':'bg-gray-700 text-left ml-2']"
+                      >
+                        <div class="font-bold" :style="{ color:'var(--price-color)' }">
+                          (masa {{ message.tableNumber }}) {{ message.name }}
+                        </div>
+                        <div class="text-gray-100">
+                          {{ message.text }}
+                        </div>
+                        <div class="flex gap-2 mt-2 text-sm">
+                          <button @click="reactToMessage(message.id,'❤️')">
+                            ❤️
+                            <span 
+                              v-if="message.reactions && message.reactions['❤️']"
+                            >
+                              ({{ message.reactions['❤️'] }})
+                            </span>
+                          </button>
+                          <button @click="reactToMessage(message.id,'😂')">
+                            😂
+                            <span 
+                              v-if="message.reactions && message.reactions['😂']"
+                            >
+                              ({{ message.reactions['😂'] }})
+                            </span>
+                          </button>
+                          <button @click="reactToMessage(message.id,'👍')">
+                            👍
+                            <span 
+                              v-if="message.reactions && message.reactions['👍']"
+                            >
+                              ({{ message.reactions['👍'] }})
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex gap-2 max-w-xl mx-auto">
+                  <input 
+                    v-model="newMessage"
+                    class="bg-black text-gray-200 border border-[var(--border-color)] rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-[var(--border-color)] flex-1"
+                    placeholder="Scrie un mesaj..."
+                  />
+                  <button 
+                    class="btn-orange rounded-full"
+                    @click="postMessage"
+                  >
+                    Trimite
+                  </button>
+                </div>
+                <div class="table-zone">
+                  <div
+                    v-for="tableNum in 12"
+                    :key="tableNum"
+                    class="table-circle"
+                    :style="tableStyle(tableNum)"
+                  >
+                    Masa {{ tableNum }}
+                  </div>
+                </div>
+              </div>
             </section>
 
             <!-- TAB: Design -->
             <section v-else-if="activeTab==='design' && !showSessionPrompt">
-              <!-- TOT CODUL Design (select radio butoane teme) -->
+              <h2 class="text-2xl font-bold mb-4 text-center">Tema de Design</h2>
+              <p class="text-gray-300 text-center mb-4">Alege o temă de culori:</p>
+              <div class="flex flex-wrap gap-4 justify-center">
+                <!-- Radiobutton Portocaliu -->
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio"
+                    value="orange"
+                    v-model="selectedTheme"
+                  />
+                  <span>Portocaliu</span>
+                </label>
+                <!-- Radiobutton roșu, albastru etc. -->
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio"
+                    value="red"
+                    v-model="selectedTheme"
+                  />
+                  <span>Roșu</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio"
+                    value="blue"
+                    v-model="selectedTheme"
+                  />
+                  <span>Albastru</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio"
+                    value="green"
+                    v-model="selectedTheme"
+                  />
+                  <span>Verde</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio"
+                    value="purple"
+                    v-model="selectedTheme"
+                  />
+                  <span>Mov</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio"
+                    value="pink"
+                    v-model="selectedTheme"
+                  />
+                  <span>Roz</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio"
+                    value="grey"
+                    v-model="selectedTheme"
+                  />
+                  <span>Gri</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio"
+                    value="brown"
+                    v-model="selectedTheme"
+                  />
+                  <span>Maro</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio"
+                    value="teal"
+                    v-model="selectedTheme"
+                  />
+                  <span>Teal</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio"
+                    value="lime"
+                    v-model="selectedTheme"
+                  />
+                  <span>Verde Lămâie</span>
+                </label>
+              </div>
             </section>
           </main>
 
-          <!-- Buton Coș + coș lateral -->
-          <!-- ... cod complet coș ... -->
+          <!-- Buton Coș (apare dacă ai produse) -->
+          <div 
+            v-if="orders.length>0"
+            class="fixed bottom-3 right-5 z-50"
+          >
+            <button
+              @click="toggleOrderBar"
+              class="btn-orange flex items-center relative rounded-full"
+              :class="{'animate-shake':isShaking}"
+            >
+              <span class="material-icons mr-2 text-white">shopping_cart</span>
+              <span class="text-white">Coș ({{ orders.length }})</span>
+            </button>
+          </div>
+
+          <!-- Bara laterală a Coșului -->
+          <transition name="slide-cart">
+            <aside
+              v-show="isOrderOpen && orders.length>0"
+              class="fixed bottom-0 left-0 w-full bg-black bg-opacity-90 border-t-2 border-[var(--border-color)] p-4 overflow-y-auto scrollbar"
+              style="max-height: 100vh;"
+            >
+              <div class="relative flex flex-col">
+                <button
+                  class="absolute top-2 right-2 text-gray-300 text-2xl hover:text-[var(--btn-shadow-color1)]"
+                  @click="toggleOrderBar"
+                >
+                  &times;
+                </button>
+                <h3 class="text-xl font-bold mb-4 text-center">Comanda Ta</h3>
+                <div
+                  v-for="(orderItem,idx) in orders"
+                  :key="idx"
+                  class="flex justify-between items-center bg-black border border-[var(--border-color)] p-4 rounded-lg mb-2 scratches"
+                >
+                  <div class="flex flex-col">
+                    <span class="font-bold">{{ orderItem.name }}</span>
+                    <div class="flex items-center gap-2 mt-1">
+                      <button class="btn-incdec" @click="decrementQuantity(idx)">-</button>
+                      <span class="text-gray-400">x{{ orderItem.quantity }}</span>
+                      <button class="btn-incdec" @click="incrementQuantity(idx)">+</button>
+                      <button 
+                        class="bg-red-600 hover:bg-red-800 text-white px-2 py-1 rounded-full"
+                        @click="removeItem(idx)"
+                      >
+                        <span class="material-icons text-sm">delete</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="font-bold" :style="{ color:'var(--price-color)' }">
+                      {{ (orderItem.price*orderItem.quantity).toFixed(2) }} Lei
+                    </span>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <div class="flex justify-between items-center">
+                    <span class="text-lg font-semibold">Total:</span>
+                    <span class="text-xl font-bold" :style="{ color:'var(--price-color)' }">
+                      {{ total }}
+                    </span>
+                  </div>
+                  <button 
+                    class="btn-orange mt-4 rounded-full self-end"
+                    @click="checkout"
+                  >
+                    Finalizează Comanda
+                  </button>
+                </div>
+              </div>
+            </aside>
+          </transition>
         </template>
 
         <!-- Ecran blocat (cod greșit) -->
@@ -490,19 +948,19 @@
         class="fixed inset-0 flex items-center justify-center pointer-events-none z-50"
       >
         <div 
-          v-if="reactionAnimation==='❤️'" 
+          v-if="reactionAnimation==='❤️'"
           class="text-red-500 text-7xl animate-bounce"
         >
           ❤️
         </div>
         <div 
-          v-else-if="reactionAnimation==='😂'" 
+          v-else-if="reactionAnimation==='😂'"
           class="text-white text-7xl animate-bounce"
         >
           😂
         </div>
         <div 
-          v-else-if="reactionAnimation==='👍'" 
+          v-else-if="reactionAnimation==='👍'"
           class="text-white text-7xl animate-bounce"
         >
           👍
@@ -607,7 +1065,8 @@
           activeTab: 'meniu',
           view: 'categorii',
 
-          categories: [
+
+         categories: [
             { name: "brunch",  image: "https://i.giphy.com/9qZEmFR8fs7CrCgy4T.webp" },
             { name: "soups",   image: "https://bistropoint.ro/wp-content/uploads/2021/12/Ciorba-de-Burta-380gr.jpg" },
             { name: "pasta",   image: "https://i.giphy.com/dZRlFW1sbFEpG.webp" },
@@ -998,7 +1457,6 @@
             "https://i.giphy.com/17A0SmzhN6a4AGSrQ9.webp",
             "https://i.giphy.com/uK1v8dVSrc7yp7Ciqn.webp",
             "https://i.giphy.com/1vh1PXneQqN1e.webp"
-            
           ],
           selectedAvatar: "",
           reactionAnimation: "",
@@ -1119,7 +1577,7 @@
             this.orders = [];
             this.isOrderOpen = false;
 
-            // Redirect la confirm.html
+            // După "Finalizează Comanda", mergem la confirm.html
             const urlParams = new URLSearchParams(window.location.search);
             const masaParam = urlParams.get("masa");
             const baseUrl = window.location.origin;
@@ -1273,6 +1731,7 @@
 
         async checkSessionTime() {
           if (!this.sessionInfo) return;
+          // Verificăm la încărcare dacă au trecut >2min
           const docRef = doc(db, "sessions", this.tableId);
           const snap = await getDoc(docRef);
           if (!snap.exists()) return;
@@ -1281,10 +1740,13 @@
 
           const startTime = data.sessionStart.toDate();
           const now = new Date();
-          const MS_2MIN = 2 * 60 * 1000; // 2 minute test
+          const MS_2MIN = 2 * 60 * 1000; // <-- 2 minute (pt test)
 
           if (now - startTime >= MS_2MIN) {
+            // 1) Afișăm prompt de reautentificare
             this.showSessionPrompt = true;
+
+            // 2) Ștergem local username => forțăm userul să-și reintre numele dacă e acceptat
             localStorage.removeItem("username");
             localStorage.removeItem("selectedAvatar");
             this.usernameSet = false;
@@ -1293,6 +1755,7 @@
           }
         },
 
+        // Ascultăm permanent starea sesiunii - dacă devine "closed", dezactivăm tabul Social
         listenSessionStatus() {
           if (!this.tableId) return;
           const docRef = doc(db, "sessions", this.tableId);
@@ -1301,39 +1764,26 @@
             const data = snap.data();
             if (data.status === "closed") {
               this.sessionClosed = true;
+              // dacă userul era pe tabul 'social', îl trimitem pe 'meniu'
               if (this.activeTab === 'social') {
                 this.activeTab = 'meniu';
               }
             }
           });
-        },
-
-        // Ascultăm "dailyMenu" => tab "Meniul Zilei"
-        listenDailyMenu() {
-          const docRef = doc(db, "specials", "dailyMenu");
-          onSnapshot(docRef, (snap) => {
-            if (snap.exists()) {
-              const data = snap.data();
-              this.dailyMenuProducts = data.products || [];
-            } else {
-              this.dailyMenuProducts = [];
-            }
-          });
-        },
+        }
       },
       async mounted() {
-        // Evenimente scroll, click pt. outside
         window.addEventListener("scroll", this.handleWindowScroll);
         document.addEventListener("click", this.handleOutsideClick);
 
-        // Tema salvată
+        // 1) Tema
         const storedTheme = localStorage.getItem('selectedTheme');
         if (storedTheme) {
           this.selectedTheme = storedTheme;
         }
         this.applyThemeClass(this.selectedTheme);
 
-        // Parametrul "masa" din URL
+        // 2) Masa
         const urlParams = new URLSearchParams(window.location.search);
         const masaParam = urlParams.get("masa");
         if (masaParam) {
@@ -1342,14 +1792,14 @@
           this.tableId = "Masa numărul 1";
         }
 
-        // Creez/obțin session
+        // 3) sessionInfo
         try {
           this.sessionInfo = await getOrCreateSessionDoc(this.tableId);
         } catch (err) {
           console.error(err);
         }
 
-        // clientNumber
+        // 4) clientNumber
         const storedNumber = localStorage.getItem("clientNumber");
         if (storedNumber) {
           this.clientNumber = parseInt(storedNumber);
@@ -1363,20 +1813,20 @@
           this.isFirstOrder = false;
         }
 
-        // Puncte
+        // 5) puncte
         const storedPoints = localStorage.getItem("clientPoints");
         if (storedPoints) {
           this.clientPoints = parseFloat(storedPoints);
         }
 
-        // MyOrders
+        // 6) myOrders
         const storedMyOrders = localStorage.getItem("myOrders");
         if (storedMyOrders) {
           this.myOrders = JSON.parse(storedMyOrders);
         }
         this.listenMyOrders();
 
-        // username (chat)
+        // 7) username
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
           this.usernameSet = true;
@@ -1390,12 +1840,11 @@
           this.loadMessages();
         }
 
-        // check time 2min
+        // 8) Check 2min
         await this.checkSessionTime();
-        // ascultă status-ul sesiunii
+
+        // 9) Ascultă status-ul sesiunii (dacă se închide)
         this.listenSessionStatus();
-        // ascultă doc "dailyMenu" pt. tab "Meniul Zilei"
-        this.listenDailyMenu();
       },
       unmounted() {
         window.removeEventListener("scroll", this.handleWindowScroll);
